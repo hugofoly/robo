@@ -1,52 +1,60 @@
 1
-00:00:00,120 --> 00:00:00,840
+00:00:00,120 --> 00:00:00,902
 Deu match.
 
 2
-00:00:01,020 --> 00:00:01,717
+00:00:01,082 --> 00:00:01,649
 E agora?
 
 3
-00:00:02,067 --> 00:00:04,343
+00:00:01,999 --> 00:00:04,557
 Você abre a conversa, pensa demais...
 
 4
-00:00:04,493 --> 00:00:06,581
+00:00:04,707 --> 00:00:08,246
 e manda o mesmo "oi, tudo bem?" que ela já
 
 5
-00:00:06,581 --> 00:00:07,674
+00:00:08,246 --> 00:00:10,100
 recebeu de todo mundo.
 
 6
-00:00:07,974 --> 00:00:10,575
+00:00:10,400 --> 00:00:13,795
 A real é que a mensagem certa muda o jogo.
 
 7
-00:00:10,875 --> 00:00:13,316
+00:00:14,095 --> 00:00:16,354
 No Robô de Date, você manda o print e
 
 8
-00:00:13,316 --> 00:00:14,965
+00:00:16,354 --> 00:00:17,881
 pergunta: como eu começo?
 
 9
-00:00:15,165 --> 00:00:17,377
+00:00:18,081 --> 00:00:21,250
 Ele lê o contexto e sugere uma mensagem
 
 10
-00:00:17,377 --> 00:00:18,625
+00:00:21,250 --> 00:00:23,038
 que tem a ver com ela.
 
 11
-00:00:18,875 --> 00:00:21,522
+00:00:23,288 --> 00:00:25,741
 Você copia, ajusta do seu jeito e manda.
 
 12
-00:00:21,822 --> 00:00:24,087
-Sem cantada pronta. Sem forçar a barra.
+00:00:26,041 --> 00:00:28,671
+Nada de cantada pronta. Nada de forçar a
 
 13
-00:00:24,437 --> 00:00:27,574
-Toque em Saiba mais e veja como funciona.
+00:00:28,671 --> 00:00:29,065
+barra.
+
+14
+00:00:29,415 --> 00:00:33,171
+É só clicar em Saiba mais e ver como
+
+15
+00:00:33,171 --> 00:00:34,110
+funciona.
 

@@ -1,36 +1,40 @@
 1
-00:00:00,120 --> 00:00:00,898
+00:00:00,120 --> 00:00:01,132
 Manda o print.
 
 2
-00:00:01,198 --> 00:00:03,078
+00:00:01,432 --> 00:00:04,658
 Copia e cola. Simples assim.
 
 3
-00:00:03,428 --> 00:00:05,483
+00:00:05,008 --> 00:00:07,935
 O Robô de Date é como um amigo que manja
 
 4
-00:00:05,483 --> 00:00:07,178
+00:00:07,935 --> 00:00:10,350
 de conversa, na palma da sua mão.
 
 5
-00:00:07,428 --> 00:00:09,706
+00:00:10,600 --> 00:00:13,782
 Você manda o print, ele entende a situação
 
 6
-00:00:09,706 --> 00:00:11,225
+00:00:13,782 --> 00:00:15,904
 e te mostra o que responder.
 
 7
-00:00:11,475 --> 00:00:13,727
+00:00:16,154 --> 00:00:19,430
 Se preferir, manda um áudio explicando.
 
 8
-00:00:13,977 --> 00:00:16,427
+00:00:19,680 --> 00:00:23,424
 Você escolhe, copia e manda do seu jeito.
 
 9
-00:00:16,727 --> 00:00:20,123
-Toque em Saiba mais e veja como funciona.
+00:00:23,724 --> 00:00:27,480
+É só clicar em Saiba mais e ver como
+
+10
+00:00:27,480 --> 00:00:28,419
+funciona.
 
