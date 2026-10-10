@@ -34,7 +34,10 @@ const prog = (t, at, dur) => clamp((t - at) / dur);
 function h(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 function css(e, o) { for (const k in o) e.style[k] = o[k]; return e; }
 function rnd(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
-function avStyle(who) { return `background:linear-gradient(140deg,hsl(${who.hue},70%,58%),hsl(${(who.hue + 40) % 360},65%,38%))`; }
+function avStyle(who) {
+  if (who.photo) return `background:url(assets/${who.photo}.jpg) center 30%/cover;color:transparent`;
+  return `background:linear-gradient(140deg,hsl(${who.hue},70%,58%),hsl(${(who.hue + 40) % 360},65%,38%))`;
+}
 function show(e, vis) { e.style.display = vis ? '' : 'none'; }
 function pop(e, t, at, dur = .26, from = .72) {
   const p = prog(t, at, dur);
@@ -152,6 +155,7 @@ function imageMsg(m) {
   const mini = h('div', 'mini');
   const who = m.print.who;
   mini.appendChild(h('div', 'mh', `<div class="mav" style="${avStyle(who)}">${who.initial}</div><b>${who.name}</b>`));
+  if (m.print.lines && who.photo) mini.appendChild(css(h('div'), {height: '170px', borderRadius: '10px', margin: '0 0 8px', background: `url(assets/${who.photo}_full.jpg) center 25%/cover`}));
   if (m.print.lines) m.print.lines.forEach(x => mini.appendChild(h('div', 'pl', x)));
   if (m.print.chat) m.print.chat.forEach(x => {
     const mine = !x.startsWith('— ') && m.print.chat.length > 1 && x !== m.print.chat[m.print.chat.length - 1];

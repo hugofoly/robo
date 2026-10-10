@@ -24,9 +24,9 @@ Conversas e interface são DEMONSTRAÇÕES ILUSTRATIVAS, não provas de resultad
 # ---------------------------------------------------------------------------
 # Personagens / conteúdo fictício reaproveitado
 # ---------------------------------------------------------------------------
-JULIA = {'name': 'Júlia', 'initial': 'J', 'hue': 330}
-CAMILA = {'name': 'Camila', 'initial': 'C', 'hue': 280}
-BIA = {'name': 'Bia', 'initial': 'B', 'hue': 15}
+JULIA = {'name': 'Júlia', 'initial': 'J', 'hue': 330, 'photo': 'julia'}  # fotos: mulheres fictícias geradas por IA (Gemini)
+CAMILA = {'name': 'Camila', 'initial': 'C', 'hue': 280, 'photo': 'camila'}
+BIA = {'name': 'Bia', 'initial': 'B', 'hue': 15, 'photo': 'bia'}
 PEDRO = {'name': 'Pedro', 'initial': 'P', 'hue': 200, 'status': 'amigo'}
 
 CTA_SAY_VEJA = 'É só clicar em Saiba Mais, e ver como o Robô de Dêit funciona.'
