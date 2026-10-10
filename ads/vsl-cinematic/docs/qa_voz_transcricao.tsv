@@ -1,0 +1,41 @@
+conceito	linha	similaridade	legenda	transcricao_whisper
+C1	hA1	1.00	Deu *match*.	Deu match.
+C1	hA2	1.00	E *agora*?	E agora?
+C1	hB1	1.00	Quantas vezes você já digitou *"oi, tudo bem?"*... e apagou?	Quantas vezes você já digitou "Oi, tudo bem?" e apagou?
+C1	b1	1.00	Você abre a conversa, *pensa demais*...	Você abre a conversa, pensa demais.
+C1	b2	1.00	e manda o mesmo *"oi, tudo bem?"* que ela já recebeu de todo mundo.	e manda o mesmo oi, tudo bem, que ela já recebeu de todo mundo.
+C1	b3	1.00	A real é que a *mensagem certa* muda o jogo.	A real é que a mensagem certa muda o jogo.
+C1	b4	0.93	No *Robô de Date*, você manda o print e pergunta: *como eu começo?*	No Robô de Date você manda o print e pergunta "Como eu começo essa conversa?"
+C1	b5	0.93	Ele lê o *contexto* e sugere uma mensagem que *tem a ver com ela*.	Ele lê o contexto e sugere uma mensagem que tenha a ver com ela.
+C1	b6	1.00	Você *copia*, ajusta do seu jeito e *manda*.	Você copia, ajusta do seu jeito e manda.
+C1	b7	1.00	Sem cantada pronta. *Sem forçar a barra.*	Sem cantada pronta, sem forçar a barra.
+C1	cta	0.80	Toque em *Saiba mais* e veja como funciona.	Toque em Saiba Mais e veja como o robô de date funciona.
+C2	hA1	1.00	A conversa tava *boa*...	A conversa estava boa.
+C2	hA2	1.00	aí ela respondeu: *kkk*	Aí ela respondeu "kakaka".
+C2	hB1	0.89	Ela respondeu às *21h*. Já passou da *meia-noite*.	Ela respondeu às 9, já passou da meia-noite.
+C2	hB2	0.93	E você ainda tá *olhando pra tela*.	E você ainda está olhando para a tela.
+C2	b1	0.86	Puxa outro assunto? *Manda meme?* Deixa quieto?	Puxa outro assunto, manda meme, deixe quieto.
+C2	b2	1.00	Enquanto você pensa, a conversa *vai esfriando*.	Enquanto você pensa, a conversa vai esfriando.
+C2	b3	1.00	Manda o print pro *Robô de Date*.	manda o print pro robot de date
+C2	b4	0.88	Ele lê o *contexto* e sugere como *retomar*. De um jeito leve, sem parecer desesperado.	Ele leu o contexto da conversa e sugere como retomar, de um jeito leve sem parecer desesperado.
+C2	b5	1.00	Você *copia*, ajusta do seu jeito e *manda*.	Você copia, ajusta do seu jeito e manda.
+C2	b6	0.89	Vale print do *WhatsApp*, do *Tinder* ou do *Instagram*.	Vale print no WhatsApp do Tinder ou do Instagram.
+C2	cta	0.94	Toque em *Saiba mais* e assista à explicação.	Toque em Saiba Mais e assista à explicação completa.
+C3	hA1	1.00	Manda o *print*.	manda o print
+C3	hA2	0.80	*Copia* e *cola*. Simples assim.	Copie e cola simples assim.
+C3	hB1	0.96	Todo mundo já mandou print pro amigo perguntando: *"e agora, respondo o quê?"*	Todo mundo já mandou o print pro amigo perguntando, e agora, respondo o quê?
+C3	hB2	1.00	E o amigo responde: *"sei lá, mano"*.	E o amigo responde "Sei lá, mano".
+C3	b1	0.94	O *Robô de Date* é como um amigo que manja de conversa, *na palma da sua mão*.	O robot de Deity é como um amigo que manja de conversa, na palma da sua mão.
+C3	b2	1.00	Você manda o print, ele *entende a situação* e te mostra *o que responder*.	Você manda o print, ele entende a situação e te mostra o que responder.
+C3	b3	1.00	Se preferir, manda um *áudio* explicando.	Se preferir, manda um áudio explicando.
+C3	b4	1.00	Você *escolhe*, copia e manda *do seu jeito*.	Você escolhe, copia e manda do seu jeito.
+C3	cta	0.80	Toque em *Saiba mais* e veja como funciona.	Toque em Saiba Mais e veja como o robô de date funciona.
+C4	hA1	1.00	Resposta pronta, *todo mundo* te dá.	Resposta pronta, todo mundo te dá.
+C4	hA2	1.00	Difícil é entender *por que* ela faz sentido.	Difícil é entender porque ela faz sentido.
+C4	hB1	1.00	E se cada conversa te *ensinasse* o que falar na próxima?	E se cada conversa te ensinasse o que falar na próxima?
+C4	b1	1.00	No *Robô de Date*, você manda o print e recebe a *sugestão de mensagem*.	No RoboDate, você manda o print e recebe a sugestão de mensagem.
+C4	b2	1.00	Mas dá pra ir além: perguntar *por que* falar isso,	Mas dá pra ir além, perguntar por que falar isso.
+C4	b3	1.00	pedir *outra opção* ou mandar um *áudio* contando a situação.	Pedir outra opção ou mandar um áudio contando a situação.
+C4	b4	1.00	Não é uma muleta. *É treino.*	Não é uma muleta, é treino.
+C4	b5	1.00	A cada mensagem, você vai *pegando o jeito*.	A cada mensagem você vai pegando o jeito.
+C4	cta	0.94	Toque em *Saiba mais* e assista à explicação.	Toque em Saiba Mais e assista à explicação completa.

@@ -1,0 +1,52 @@
+1
+00:00:00,120 --> 00:00:00,840
+Deu match.
+
+2
+00:00:01,020 --> 00:00:01,717
+E agora?
+
+3
+00:00:02,067 --> 00:00:04,343
+Você abre a conversa, pensa demais...
+
+4
+00:00:04,493 --> 00:00:06,581
+e manda o mesmo "oi, tudo bem?" que ela já
+
+5
+00:00:06,581 --> 00:00:07,674
+recebeu de todo mundo.
+
+6
+00:00:07,974 --> 00:00:10,575
+A real é que a mensagem certa muda o jogo.
+
+7
+00:00:10,875 --> 00:00:13,316
+No Robô de Date, você manda o print e
+
+8
+00:00:13,316 --> 00:00:14,965
+pergunta: como eu começo?
+
+9
+00:00:15,165 --> 00:00:17,377
+Ele lê o contexto e sugere uma mensagem
+
+10
+00:00:17,377 --> 00:00:18,625
+que tem a ver com ela.
+
+11
+00:00:18,875 --> 00:00:21,522
+Você copia, ajusta do seu jeito e manda.
+
+12
+00:00:21,822 --> 00:00:24,087
+Sem cantada pronta. Sem forçar a barra.
+
+13
+00:00:24,437 --> 00:00:27,574
+Toque em Saiba mais e veja como funciona.
+

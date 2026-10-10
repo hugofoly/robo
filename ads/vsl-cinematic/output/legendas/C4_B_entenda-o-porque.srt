@@ -1,0 +1,48 @@
+1
+00:00:00,120 --> 00:00:02,141
+E se cada conversa te ensinasse o que
+
+2
+00:00:02,141 --> 00:00:03,069
+falar na próxima?
+
+3
+00:00:03,469 --> 00:00:05,508
+No Robô de Date, você manda o print e
+
+4
+00:00:05,508 --> 00:00:07,161
+recebe a sugestão de mensagem.
+
+5
+00:00:07,361 --> 00:00:09,130
+Mas dá pra ir além: perguntar por que
+
+6
+00:00:09,130 --> 00:00:09,656
+falar isso,
+
+7
+00:00:09,776 --> 00:00:11,672
+pedir outra opção ou mandar um áudio
+
+8
+00:00:11,672 --> 00:00:12,725
+contando a situação.
+
+9
+00:00:13,025 --> 00:00:14,542
+Não é uma muleta. É treino.
+
+10
+00:00:14,842 --> 00:00:17,315
+A cada mensagem, você vai pegando o jeito.
+
+11
+00:00:17,615 --> 00:00:19,847
+Toque em Saiba mais e assista à
+
+12
+00:00:19,847 --> 00:00:20,639
+explicação.
+

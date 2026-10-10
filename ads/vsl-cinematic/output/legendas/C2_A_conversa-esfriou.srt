@@ -1,0 +1,56 @@
+1
+00:00:00,120 --> 00:00:01,374
+A conversa tava boa...
+
+2
+00:00:01,624 --> 00:00:03,358
+aí ela respondeu: kkk
+
+3
+00:00:03,808 --> 00:00:06,112
+Puxa outro assunto? Manda meme? Deixa
+
+4
+00:00:06,112 --> 00:00:06,548
+quieto?
+
+5
+00:00:06,798 --> 00:00:08,794
+Enquanto você pensa, a conversa vai
+
+6
+00:00:08,794 --> 00:00:09,364
+esfriando.
+
+7
+00:00:09,664 --> 00:00:11,313
+Manda o print pro Robô de Date.
+
+8
+00:00:11,463 --> 00:00:14,057
+Ele lê o contexto e sugere como retomar.
+
+9
+00:00:14,057 --> 00:00:16,780
+De um jeito leve, sem parecer desesperado.
+
+10
+00:00:17,030 --> 00:00:19,642
+Você copia, ajusta do seu jeito e manda.
+
+11
+00:00:19,892 --> 00:00:21,778
+Vale print do WhatsApp, do Tinder ou do
+
+12
+00:00:21,778 --> 00:00:22,261
+Instagram.
+
+13
+00:00:22,561 --> 00:00:24,933
+Toque em Saiba mais e assista à
+
+14
+00:00:24,933 --> 00:00:25,775
+explicação.
+
