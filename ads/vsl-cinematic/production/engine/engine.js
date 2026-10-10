@@ -505,7 +505,7 @@ function sceneFor(sc) {
     const h2 = css(h('h2', '', sc.title), {fontSize: 112 * k + 'px'});
     const sub = css(h('div', 'sub', sc.sub), {fontSize: 38 * k + 'px', maxWidth: 820 + 'px'});
     const btn = css(h('div', 'btn', `${sc.button} <span style="font-size:1.1em">→</span>`), {fontSize: 46 * k + 'px', padding: `${30 * k}px ${70 * k}px`});
-    const hint = css(h('div', 'hint', 'Toque no botão <b style="color:#FF5A5F">Saiba mais</b> ↓'), {fontSize: 32 * k + 'px'});
+    const hint = css(h('div', 'hint', 'Clique em <b style="color:#FF5A5F">Saiba mais</b> ↓'), {fontSize: 32 * k + 'px'});
     const disc = css(h('div', 'disc', 'Conversas e interface meramente ilustrativas.'), {bottom: L.ctaDiscB + 'px', fontSize: 26 + 'px'});
     [logo, brand, h2, sub, btn, hint].forEach(e => c.appendChild(e));
     root.appendChild(c); root.appendChild(disc);

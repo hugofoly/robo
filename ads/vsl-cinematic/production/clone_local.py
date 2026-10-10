@@ -25,7 +25,7 @@ PLAIN = [('métch', 'match'), ('Dêit', 'Date')]
 # Grafias alternativas testadas quando a transcrição acusa erro (YourTTS lê por caracteres).
 ALT = [('print', 'prínti'), ('métch', 'métchi'), ('Sem ', 'Sêm '), ('Toque em...', 'Tóque ẽin...'),
        ('E agora?', 'E agóra?'), ('pro Robô', 'para o Robô'), ('Resposta', 'Respósta'),
-       ('E se cada', 'E se, cada'), ('Deu', 'Dêu')]
+       ('E se cada', 'E se, cada'), ('Deu métch!', 'Deu mátchi!'), ('Clique em', 'Clíque em')]
 ONLY = [x for x in os.environ.get('ONLY', '').split(',') if x]
 
 

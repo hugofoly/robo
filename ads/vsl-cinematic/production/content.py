@@ -29,8 +29,8 @@ CAMILA = {'name': 'Camila', 'initial': 'C', 'hue': 280}
 BIA = {'name': 'Bia', 'initial': 'B', 'hue': 15}
 PEDRO = {'name': 'Pedro', 'initial': 'P', 'hue': 200, 'status': 'amigo'}
 
-CTA_SAY_VEJA = 'Toque em... Saiba Mais. E veja como o Robô de Dêit funciona.'
-CTA_SAY_ASSISTA = 'Toque em... Saiba Mais. E assista à explicação completa.'
+CTA_SAY_VEJA = 'Clique em Saiba Mais, e veja como o Robô de Dêit funciona.'
+CTA_SAY_ASSISTA = 'Clique em Saiba Mais, e assista à explicação completa.'
 
 
 def L(id, say, cap, scene, speed=1.0, pause=0.22, vsl=None, beat=None):
@@ -85,9 +85,9 @@ C1 = {
         L('b6', 'Você copia, ajusta do seu jeito, e manda.', 'Você *copia*, ajusta do seu jeito e *manda*.',
           'b_paste', pause=0.3, beat='benefit',
           vsl='VSL: "Manda o print, copia e cola a mensagem. Simples assim."'),
-        L('b7', 'Sem cantada pronta. Sem forçar a barra.', 'Sem cantada pronta. *Sem forçar a barra.*',
+        L('b7', 'Nada de cantada pronta. Nada de forçar a barra.', 'Nada de cantada pronta. *Nada de forçar a barra.*',
           'b_kinetic2', speed=0.97, pause=0.35, beat='benefit'),
-        L('cta', CTA_SAY_VEJA, 'Toque em *Saiba mais* e veja como funciona.', 'cta',
+        L('cta', CTA_SAY_VEJA, 'Clique em *Saiba mais* e veja como funciona.', 'cta',
           speed=1.0, pause=1.6, beat='cta',
           vsl='Destino real: página com VSL (pro.robodedate.com/lp).'),
     ],
@@ -191,10 +191,10 @@ C1 = {
         'b_kinetic2': {
             'type': 'kinetic',
             'lines': [
-                {'txt': 'Sem cantada pronta.', 'at': ('b7', 0.0)},
-                {'txt': '<em>Sem forçar a barra.</em>', 'at': ('b7', 'end', -1.15)},
+                {'txt': 'Nada de cantada pronta.', 'at': ('b7', 0.0)},
+                {'txt': '<em>Nada de forçar a barra.</em>', 'at': ('b7', 'end', -1.3)},
             ],
-            'sfx': [('hit_soft', ('b7', 0.0)), ('hit_soft', ('b7', 'end', -1.15))],
+            'sfx': [('hit_soft', ('b7', 0.0)), ('hit_soft', ('b7', 'end', -1.3))],
         },
         'cta': dict(CTA_SCENE, sfx=[('cta_swell', ('cta', -0.2))]),
     },
@@ -245,7 +245,7 @@ C2 = {
         L('b6', 'Vale print do WhatsApp... do Tinder... ou do Instagram.',
           'Vale print do *WhatsApp*, do *Tinder* ou do *Instagram*.', 'b_apps', pause=0.3, beat='benefit',
           vsl='VSL: "Pode mandar print de WhatsApp, Tinder, Instagram."'),
-        L('cta', CTA_SAY_ASSISTA, 'Toque em *Saiba mais* e assista à explicação.', 'cta',
+        L('cta', CTA_SAY_ASSISTA, 'Clique em *Saiba mais* e assista à explicação.', 'cta',
           pause=1.6, beat='cta', vsl='Destino real: página com VSL.'),
     ],
     'scenes': {
@@ -381,7 +381,7 @@ C3 = {
           pause=0.25, beat='demo', vsl='VSL: "E se quiser pode mandar áudio pra facilitar!"'),
         L('b4', 'Você escolhe, copia, e manda do seu jeito.', 'Você *escolhe*, copia e manda *do seu jeito*.',
           'b_paste', pause=0.3, beat='benefit', vsl='VSL: "copia e cola a mensagem".'),
-        L('cta', CTA_SAY_VEJA, 'Toque em *Saiba mais* e veja como funciona.', 'cta', pause=1.6, beat='cta',
+        L('cta', CTA_SAY_VEJA, 'Clique em *Saiba mais* e veja como funciona.', 'cta', pause=1.6, beat='cta',
           vsl='Destino real: página com VSL.'),
     ],
     'scenes': {
@@ -518,7 +518,7 @@ C4 = {
           beat='benefit', vsl='VSL 1.2: "O Robô de Date não é muleta. É treino."'),
         L('b5', 'A cada mensagem, você vai pegando o jeito.', 'A cada mensagem, você vai *pegando o jeito*.',
           'b_kinetic2', pause=0.3, beat='benefit', vsl='VSL 1.2: "Mas cada mensagem que ele manda, você APRENDE."'),
-        L('cta', CTA_SAY_ASSISTA, 'Toque em *Saiba mais* e assista à explicação.', 'cta', pause=1.6, beat='cta',
+        L('cta', CTA_SAY_ASSISTA, 'Clique em *Saiba mais* e assista à explicação.', 'cta', pause=1.6, beat='cta',
           vsl='Destino real: página com VSL.'),
     ],
     'scenes': {
