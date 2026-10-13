@@ -4,6 +4,9 @@ import { ADJUSTMENTS, TONES, getScenario } from './demo'
 import {
   MODES,
   POST_DATE_PATHS,
+  SPECIAL_MODES,
+  defaultModeDraft,
+  hasOwnModeInput,
   allModeContents,
   emptyModeDraft,
   getMode,
@@ -18,8 +21,23 @@ const allTexts = (c: (typeof modeContents)[number]['content']) =>
   TONES.flatMap((t) => [c.cards[t.id].text, ...ADJUSTMENTS.map((a) => c.cards[t.id].variants[a.id])])
 
 describe('modos especiais', () => {
-  it('tem os quatro modos', () => {
-    expect(MODES.map((m) => m.title)).toEqual(['Date Rápido', 'Pós-Date', 'Protocolo Nudes', 'Sexo Express'])
+  it('Modos especiais listam os quatro modos; Robô de Match fica em aba própria', () => {
+    expect(SPECIAL_MODES.map((m) => m.title)).toEqual(['Date Rápido', 'Pós-Date', 'Protocolo Nudes', 'Sexo Express'])
+    expect(MODES.find((m) => m.id === 'match')?.section).toBe('match')
+  })
+
+  it('Robô de Match: app pré-selecionado não conta como texto próprio; exemplo identificado', () => {
+    const def = getMode('match')
+    const draft = defaultModeDraft('match')
+    expect(draft.values.app).toBe('Tinder')
+    expect(isModeValid(def, draft)).toBe(false)
+    expect(hasOwnModeInput(def, draft)).toBe(false)
+    const ex = { ...draft, values: getModeExampleValues('match') }
+    const req = toModeRequest(def, ex)
+    expect(req.source).toBe('example')
+    expect(req.label).toBe('Robô de Match · Tinder')
+    expect(req.content.followUps.herReply).toBeUndefined()
+    expect(toModeRequest(def, { ...ex, values: { ...ex.values, app: 'Hinge' } }).source).toBe('own-text')
   })
 
   it('Pós-Date inclui os três caminhos com exemplos próprios', () => {

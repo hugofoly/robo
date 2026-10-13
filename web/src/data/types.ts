@@ -19,8 +19,9 @@ export interface FollowUps {
   why: string
   /** Resposta para "O que faço depois?". */
   next: string
-  /** Resposta para "Ela respondeu isso.": uma resposta fictícia dela, a leitura e a sugestão. */
-  herReply: { message: string; reading: string; suggestion: string }
+  /** Resposta para "Ela respondeu isso.": uma resposta fictícia dela, a leitura e a sugestão.
+   *  Opcional: no Robô de Match (perfil) não há resposta de outra pessoa, e o atalho não aparece. */
+  herReply?: { message: string; reading: string; suggestion: string }
 }
 
 /** Conteúdo de resultado de um cenário fictício, escrito à mão. Nada aqui vem da entrada do usuário. */

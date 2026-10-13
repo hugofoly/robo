@@ -4,8 +4,8 @@ import type { InputSnapshot, WorkspaceId } from '../lib/store'
 import { ContinuingBanner } from './ContinuingBanner'
 import { DEMO_NOTICE } from '../lib/demo'
 import {
-  MODES,
   POST_DATE_PATHS,
+  SPECIAL_MODES,
   getMode,
   getModeExampleValues,
   hasOwnModeInput,
@@ -47,7 +47,7 @@ export function SpecialModes({ onToast }: { onToast: (message: string) => void }
       </div>
       <p className="panel-intro">Fluxos curtos para momentos específicos. Todos usam exemplos locais nesta versão.</p>
       <ul className="mode-list">
-        {MODES.map((m) => (
+        {SPECIAL_MODES.map((m) => (
           <li key={m.id}>
             <button type="button" className="mode-row" onClick={() => onOpen(m.id)}>
               <span className="mode-row-text">
@@ -67,8 +67,16 @@ interface ViewProps {
   mode: ModeId
   draft: ModeDraft
   onChange: (update: (d: ModeDraft) => ModeDraft) => void
-  onBack: () => void
+  /** Sem `onBack` o modo está numa aba própria (Robô de Match) e não mostra "voltar". */
+  onBack?: () => void
   onToast: (message: string) => void
+}
+
+/** Robô de Match: o mesmo fluxo dos modos (formulário curto + cards), numa aba própria. */
+export function MatchSection({ onToast }: { onToast: (message: string) => void }) {
+  const draft = useAppState((s) => s.modeDrafts.match)
+  const { updateModeDraft } = useActions()
+  return <ModeView mode="match" draft={draft} onChange={(u) => updateModeDraft('match', u)} onToast={onToast} />
 }
 
 function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
@@ -83,6 +91,7 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const valid = isModeValid(def, draft)
   const usingExample = isModeExample(def, draft)
+  const firstTextField = def.fields.find((f) => f.kind !== 'choice')
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -101,9 +110,11 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
 
   return (
     <section className="mode-view" aria-labelledby="mode-title">
-      <button type="button" className="btn-back" onClick={onBack}>
-        <BackIcon /> Modos especiais
-      </button>
+      {onBack && (
+        <button type="button" className="btn-back" onClick={onBack}>
+          <BackIcon /> Modos especiais
+        </button>
+      )}
       <div className="modes-head">
         <h2 id="mode-title" ref={titleRef} tabIndex={-1}>
           {def.title}
@@ -160,12 +171,28 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         <div className="card mode-fields">
           {def.fields.map((f) => (
             <div key={f.id} className="field">
-              <label htmlFor={`mode-${f.id}`} className="field-label">
-                {f.label}
-                {!f.required && <span className="optional">opcional</span>}
-                {usingExample && f === def.fields[0] && <span className="tag">Exemplo fictício</span>}
-              </label>
-              {f.kind === 'textarea' ? (
+              {f.kind === 'choice' ? (
+                <span id={`mode-${f.id}-label`} className="field-label">
+                  {f.label}
+                </span>
+              ) : (
+                <label htmlFor={`mode-${f.id}`} className="field-label">
+                  {f.label}
+                  {!f.required && <span className="optional">opcional</span>}
+                  {usingExample && f === firstTextField && <span className="tag">Exemplo fictício</span>}
+                </label>
+              )}
+              {f.kind === 'choice' ? (
+                <SegmentedControl
+                  kind="radio"
+                  size="small"
+                  idPrefix={`mode-${f.id}`}
+                  label={f.label}
+                  options={(f.options ?? []).map((o) => ({ id: o, label: o }))}
+                  value={draft.values[f.id] || f.options?.[0] || ''}
+                  onChange={(v) => setValue(f.id, v)}
+                />
+              ) : f.kind === 'textarea' ? (
                 <textarea
                   id={`mode-${f.id}`}
                   rows={4}

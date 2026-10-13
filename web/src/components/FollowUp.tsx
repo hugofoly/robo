@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import type { DemoContent } from '../lib/demo'
-import { SHORTCUTS, answerFor, matchShortcut, type FollowUpAnswer, type FollowUpEntry, type Shortcut } from '../lib/followup'
+import { answerFor, shortcutsFor, matchShortcut, type FollowUpAnswer, type FollowUpEntry, type Shortcut } from '../lib/followup'
 import { explain, type Detail } from '../lib/preferences'
 import { COPY_FALLBACK_MESSAGE, useCopy } from '../lib/useCopy'
 import { CopyButton } from './CopyButton'
@@ -37,7 +37,7 @@ export function FollowUp({ scenario, entries, onAdd, detail, onCopied }: Props) 
       </h3>
 
       <div className="shortcut-row" role="group" aria-label="Atalhos">
-        {SHORTCUTS.map((s) => (
+        {shortcutsFor(scenario).map((s) => (
           <button key={s.id} type="button" className="chip-btn" onClick={() => ask(s.label, s.id)}>
             {s.label}
           </button>

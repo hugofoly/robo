@@ -1,7 +1,8 @@
+import { MATCH_EXAMPLE } from '../data/matchExample'
 import { EXPRESS, NUDES, POST_DATE, QUICK_DATE, type ModeExample } from '../data/modeExamples'
 import type { DemoContent, DemoRequest } from './demo'
 
-export type ModeId = 'quick-date' | 'post-date' | 'nudes' | 'express'
+export type ModeId = 'quick-date' | 'post-date' | 'nudes' | 'express' | 'match'
 export type PostDatePath = 'casual' | 'relationship' | 'second-date'
 
 export const POST_DATE_PATHS: { id: PostDatePath; label: string }[] = [
@@ -13,13 +14,17 @@ export const POST_DATE_PATHS: { id: PostDatePath; label: string }[] = [
 export interface ModeField {
   id: string
   label: string
-  kind: 'textarea' | 'text'
+  /** `choice` vira um seletor segmentado; o valor salvo é o rótulo da opção. */
+  kind: 'textarea' | 'text' | 'choice'
   placeholder: string
   required: boolean
+  options?: string[]
 }
 
 export interface ModeDef {
   id: ModeId
+  /** Onde o modo aparece: na lista de Modos especiais ou numa aba própria (Robô de Match). */
+  section: 'modes' | 'match'
   title: string
   /** Uma linha na lista de modos. */
   tagline: string
@@ -34,6 +39,7 @@ export interface ModeDef {
 export const MODES: ModeDef[] = [
   {
     id: 'quick-date',
+    section: 'modes',
     title: 'Date Rápido',
     tagline: 'Transforme o papo em encontro com dia e hora.',
     description: 'Conte com quem você está falando e quando você pode. As sugestões já chegam com convite e horário.',
@@ -57,6 +63,7 @@ export const MODES: ModeDef[] = [
   },
   {
     id: 'post-date',
+    section: 'modes',
     title: 'Pós-Date',
     tagline: 'A mensagem do dia seguinte, do jeito que você quer seguir.',
     description: 'Escolha o caminho que você quer e conte como foi o encontro.',
@@ -73,6 +80,7 @@ export const MODES: ModeDef[] = [
   },
   {
     id: 'nudes',
+    section: 'modes',
     title: 'Protocolo Nudes',
     tagline: 'Conversa consensual entre adultos, com limites claros.',
     description: 'Ajuda a perguntar com clareza, combinar limites e aceitar um não. Não é para pedir nem enviar imagens.',
@@ -95,6 +103,7 @@ export const MODES: ModeDef[] = [
   },
   {
     id: 'express',
+    section: 'modes',
     title: 'Sexo Express',
     tagline: 'Fale de interesse em intimidade sem ser gráfico.',
     description: 'Ajuda a comunicar a vontade com clareza e respeito, sempre com espaço para ela recusar.',
@@ -114,7 +123,29 @@ export const MODES: ModeDef[] = [
       },
     ],
   },
+  {
+    id: 'match',
+    section: 'match',
+    title: 'Robô de Match',
+    tagline: 'Bio e perfil que geram match.',
+    description: 'Conte sobre você e cole sua bio atual. Você recebe três bios novas e o que ajustar no perfil.',
+    adultConfirm: false,
+    fields: [
+      { id: 'app', label: 'App', kind: 'choice', placeholder: '', required: true, options: ['Tinder', 'Bumble', 'Hinge'] },
+      {
+        id: 'about',
+        label: 'Sobre você',
+        kind: 'textarea',
+        placeholder: 'Profissão, hobbies, manias, o que você faz no fim de semana.',
+        required: true,
+      },
+      { id: 'bio', label: 'Bio atual', kind: 'textarea', placeholder: 'Cole a bio que você usa hoje.', required: false },
+    ],
+  }
 ]
+
+/** Modos listados em "Modos especiais" (o Robô de Match tem aba própria). */
+export const SPECIAL_MODES = MODES.filter((m) => m.section === 'modes')
 
 export function getMode(id: ModeId): ModeDef {
   return MODES.find((m) => m.id === id)!
@@ -132,6 +163,8 @@ function exampleFor(mode: ModeId, path: PostDatePath): ModeExample {
       return NUDES
     case 'express':
       return EXPRESS
+    case 'match':
+      return MATCH_EXAMPLE
   }
 }
 
@@ -150,6 +183,7 @@ export function allModeContents(): { key: string; content: DemoContent }[] {
     ...POST_DATE_PATHS.map((p) => ({ key: `post-date/${p.id}`, content: POST_DATE[p.id].content })),
     { key: 'nudes', content: NUDES.content },
     { key: 'express', content: EXPRESS.content },
+    { key: 'match', content: MATCH_EXAMPLE.content },
   ]
 }
 
@@ -163,6 +197,21 @@ export interface ModeDraft {
 
 export const emptyModeDraft = (): ModeDraft => ({ values: {}, path: 'casual', adult: false })
 
+/** Rascunho inicial de um modo: campos de escolha já vêm com a primeira opção (ex.: App = Tinder). */
+export function defaultModeDraft(mode: ModeId): ModeDraft {
+  const values = Object.fromEntries(
+    getMode(mode)
+      .fields.filter((f) => f.kind === 'choice' && f.options?.length)
+      .map((f) => [f.id, f.options![0]]),
+  )
+  return { ...emptyModeDraft(), values }
+}
+
+/** Há texto digitado pelo usuário (campos de escolha não contam). */
+export function hasTypedModeInput(def: ModeDef, draft: ModeDraft): boolean {
+  return def.fields.some((f) => f.kind !== 'choice' && (draft.values[f.id] ?? '').trim() !== '')
+}
+
 export function isModeValid(def: ModeDef, draft: ModeDraft): boolean {
   const fieldsOk = def.fields.every((f) => !f.required || (draft.values[f.id] ?? '').trim().length > 0)
   return fieldsOk && (!def.adultConfirm || draft.adult)
@@ -175,17 +224,19 @@ export function isModeExample(def: ModeDef, draft: ModeDraft): boolean {
 }
 
 export function hasOwnModeInput(def: ModeDef, draft: ModeDraft): boolean {
-  return def.fields.some((f) => (draft.values[f.id] ?? '').trim() !== '') && !isModeExample(def, draft)
+  return hasTypedModeInput(def, draft) && !isModeExample(def, draft)
 }
 
 export function toModeRequest(def: ModeDef, draft: ModeDraft): DemoRequest {
   const isPostDate = def.id === 'post-date'
   const pathLabel = POST_DATE_PATHS.find((p) => p.id === draft.path)?.label
+  // Pós-Date mostra o caminho; Robô de Match mostra o app escolhido.
+  const detail = isPostDate ? (pathLabel ?? null) : def.id === 'match' ? draft.values.app || null : null
   return {
     content: getModeContent(def.id, draft.path),
-    label: isPostDate ? `${def.title} · ${pathLabel}` : def.title,
+    label: detail ? `${def.title} · ${detail}` : def.title,
     modeLabel: def.title,
-    goalLabel: isPostDate ? (pathLabel ?? null) : null,
+    goalLabel: detail,
     feedbackKey: isPostDate ? `mode/${def.id}/${draft.path}` : `mode/${def.id}`,
     source: isModeExample(def, draft) ? 'example' : 'own-text',
   }

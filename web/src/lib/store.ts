@@ -2,7 +2,7 @@ import { INITIAL_DRAFT, type AssistantDraft } from './assistant'
 import type { DemoRequest, Tone, Version } from './demo'
 import { nextFeedback, type Feedback, type Verdict, type Reason } from './feedback'
 import { normalize, type FollowUpEntry } from './followup'
-import { emptyModeDraft, type ModeDraft, type ModeId } from './modes'
+import { defaultModeDraft, getMode, hasTypedModeInput, type ModeDraft, type ModeId } from './modes'
 import { NO_PREFERENCES, type Preferences } from './preferences'
 
 /**
@@ -10,7 +10,7 @@ import { NO_PREFERENCES, type Preferences } from './preferences'
  * cookies nem rede: recarregar a página cria um store novo, vazio.
  */
 
-export type Section = 'assistant' | 'modes' | 'conversations'
+export type Section = 'assistant' | 'modes' | 'photos' | 'match' | 'conversations'
 export type WorkspaceId = 'assistant' | `mode:${ModeId}`
 
 export const ORIGINAL_VERSIONS: Record<Tone, Version> = { light: 'original', confident: 'original', bold: 'original' }
@@ -61,9 +61,11 @@ export interface AppState {
   conversations: SavedConversation[]
   preferences: Preferences
   feedback: Record<string, Feedback>
+  /** Filtro de categoria da galeria Fotos de Impacto ('all' = todas). */
+  photoCategory: string
 }
 
-const MODE_IDS: ModeId[] = ['quick-date', 'post-date', 'nudes', 'express']
+const MODE_IDS: ModeId[] = ['quick-date', 'post-date', 'nudes', 'express', 'match']
 const emptyWorkspace = (): Workspace => ({ result: null, conversationId: null })
 
 export function initialState(): AppState {
@@ -71,13 +73,14 @@ export function initialState(): AppState {
     section: 'assistant',
     openMode: null,
     assistantDraft: INITIAL_DRAFT,
-    modeDrafts: Object.fromEntries(MODE_IDS.map((m) => [m, emptyModeDraft()])) as Record<ModeId, ModeDraft>,
+    modeDrafts: Object.fromEntries(MODE_IDS.map((m) => [m, defaultModeDraft(m)])) as Record<ModeId, ModeDraft>,
     workspaces: Object.fromEntries(
       (['assistant', ...MODE_IDS.map((m) => `mode:${m}`)] as WorkspaceId[]).map((w) => [w, emptyWorkspace()]),
     ) as Record<WorkspaceId, Workspace>,
     conversations: [],
     preferences: NO_PREFERENCES,
     feedback: {},
+    photoCategory: 'all',
   }
 }
 
@@ -243,11 +246,17 @@ export function createStore(initial: AppState = initialState()) {
       }
       if (conv.input.kind === 'assistant') {
         next.section = 'assistant'
+      } else if (conv.input.mode === 'match') {
+        next.section = 'match'
       } else {
         next.section = 'modes'
         next.openMode = conv.input.mode
       }
       set(next)
+    },
+
+    setPhotoCategory(photoCategory: string) {
+      set({ ...state, photoCategory })
     },
 
     setPreferences(prefs: Partial<Preferences>) {
@@ -294,5 +303,5 @@ export function workspaceHasUnsavedWork(state: AppState, id: WorkspaceId, convId
   }
   const mode = id.slice('mode:'.length) as ModeId
   const md = state.modeDrafts[mode]
-  return ws.conversationId === null && Object.values(md.values).some((v) => v.trim() !== '')
+  return ws.conversationId === null && hasTypedModeInput(getMode(mode), md)
 }

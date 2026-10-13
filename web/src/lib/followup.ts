@@ -46,8 +46,13 @@ export function answerFor(scenario: DemoContent, shortcut: Shortcut | null): Fol
     case 'next':
       return { kind: 'next', text: scenario.followUps.next }
     case 'her-reply':
-      return { kind: 'her-reply', ...scenario.followUps.herReply }
+      return scenario.followUps.herReply ? { kind: 'her-reply', ...scenario.followUps.herReply } : { kind: 'not-connected' }
     default:
       return { kind: 'not-connected' }
   }
+}
+
+/** Atalhos disponíveis para um conteúdo: "Ela respondeu isso." só existe quando há resposta preparada. */
+export function shortcutsFor(scenario: DemoContent) {
+  return SHORTCUTS.filter((s) => s.id !== 'her-reply' || scenario.followUps.herReply)
 }

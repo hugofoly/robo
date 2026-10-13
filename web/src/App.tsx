@@ -3,7 +3,8 @@ import { Assistant } from './components/Assistant'
 import { Header } from './components/Header'
 import { MyConversations } from './components/MyConversations'
 import { Navigation } from './components/Navigation'
-import { SpecialModes } from './components/SpecialModes'
+import { PhotoGallery } from './components/PhotoGallery'
+import { MatchSection, SpecialModes } from './components/SpecialModes'
 import { Toast } from './components/Toast'
 import { StoreProvider, useActions, useAppState } from './lib/StoreProvider'
 
@@ -43,6 +44,8 @@ function Shell() {
       <main className="app-main">
         {section === 'assistant' && <Assistant onToast={showToast} />}
         {section === 'modes' && <SpecialModes onToast={showToast} />}
+        {section === 'photos' && <PhotoGallery onToast={showToast} />}
+        {section === 'match' && <MatchSection onToast={showToast} />}
         {section === 'conversations' && <MyConversations onToast={showToast} />}
       </main>
 

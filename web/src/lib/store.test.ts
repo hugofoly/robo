@@ -170,3 +170,28 @@ describe('store em memória', () => {
     expect(fresh.getState().feedback).toEqual({})
   })
 })
+
+describe('Robô de Match e Fotos de Impacto no store', () => {
+  it('abrir conversa do Robô de Match vai para a aba Match', () => {
+    const s = createStore()
+    const d = { ...s.getState().modeDrafts.match, values: getModeExampleValues('match') }
+    s.actions.setResult('mode:match', toModeRequest(getMode('match'), d), { kind: 'mode', mode: 'match', draft: d })
+    const { id } = s.actions.saveConversation('mode:match', 'Bio Lucas')!
+    s.actions.setSection('conversations')
+    s.actions.openConversation(id)
+    expect(s.getState().section).toBe('match')
+    expect(s.getState().conversations[0].goalLabel).toBe('Tinder')
+  })
+
+  it('filtro da galeria fica no estado (navegação mantém)', () => {
+    const s = createStore()
+    s.actions.setPhotoCategory('Viagem')
+    s.actions.setSection('assistant')
+    expect(s.getState().photoCategory).toBe('Viagem')
+    expect(createStore().getState().photoCategory).toBe('all')
+  })
+
+  it('app pré-selecionado no Match não conta como trabalho não salvo', () => {
+    expect(workspaceHasUnsavedWork(createStore().getState(), 'mode:match', 'x')).toBe(false)
+  })
+})

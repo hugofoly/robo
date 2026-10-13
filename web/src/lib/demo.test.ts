@@ -54,7 +54,7 @@ describe('variantes e explicações', () => {
     const label = TONES.find((t) => t.id === scenario.recommended)!.label
     expect(scenario.followUps.why).toContain(`(${label})`)
     expect(scenario.followUps.next.length).toBeGreaterThan(0)
-    expect(scenario.followUps.herReply.suggestion.length).toBeGreaterThan(0)
+    expect(scenario.followUps.herReply!.suggestion.length).toBeGreaterThan(0)
   })
 
   it('cardText devolve a versão escolhida', () => {

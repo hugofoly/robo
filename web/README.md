@@ -47,6 +47,11 @@ npm run build      # typecheck + build em dist/
   - **Protocolo Nudes**: comunicação consensual entre adultos; sem upload de imagens; confirmação de maioridade.
   - **Sexo Express**: interesse em intimidade de forma não gráfica, com espaço explícito para recusa; confirmação de
     maioridade.
+- **Fotos de Impacto**: galeria de prompts para criar fotos de perfil no gerador de imagens do usuário (ChatGPT,
+  Gemini etc.), com filtro por categoria e botão Copiar. O app não gera nem recebe fotos. Para trocar os prompts,
+  edite `src/data/photoPrompts.ts` (campo opcional `image` para ilustrar cada card com um arquivo de `public/`).
+- **Robô de Match**: otimização de perfil (app, sobre você e bio atual) com três bios nos mesmos cards de resultado,
+  ajustes, explicações, acompanhamento e salvar/continuar. Exemplo local em `src/data/matchExample.ts`.
 - **Minhas conversas** (histórico temporário, só em memória): "Salvar conversa" no resultado registra nome, modo,
   objetivo, contexto, sugestões (com a versão escolhida em cada card) e acompanhamento, sem arquivos de print ou
   áudio. Salvar de novo atualiza a mesma conversa. Dá para buscar pelo nome, abrir e continuar, renomear e excluir
@@ -61,6 +66,8 @@ Os exemplos da demonstração são só dados, em `src/data/` (sem componentes ne
 - `assistantScenarios.ts`: 12 cenários do Assistente (aba × objetivo), com cards, variantes e acompanhamento.
 - `modeExamples.ts`: exemplos dos Modos especiais (formulário + resultado).
 - `audioExample.ts`: transcrição fictícia do exemplo de áudio identificado.
+- `matchExample.ts`: perfil de exemplo e as três bios do Robô de Match.
+- `photoPrompts.ts`: prompts da galeria Fotos de Impacto (hoje, exemplos marcados como tal).
 - `types.ts`: o formato (`DemoContent`) que qualquer fonte de sugestões deve devolver.
 
 Pontos onde uma integração real entraria (nenhum endpoint existe hoje):

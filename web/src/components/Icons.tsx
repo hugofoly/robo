@@ -156,3 +156,16 @@ export const ShieldIcon = ({ size = 16 }: Props) => (
     <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
   </svg>
 )
+
+export const HeartIcon = ({ size = 22 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z" />
+  </svg>
+)
+
+export const CameraIcon = ({ size = 22 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M4 8h3l2-3h6l2 3h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </svg>
+)

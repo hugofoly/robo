@@ -27,7 +27,7 @@ describe('answerFor', () => {
   it('responde atalhos com o exemplo do cenário', () => {
     expect(answerFor(scenario, 'why')).toEqual({ kind: 'why', text: scenario.followUps.why })
     expect(answerFor(scenario, 'next')).toEqual({ kind: 'next', text: scenario.followUps.next })
-    expect(answerFor(scenario, 'her-reply')).toMatchObject({ kind: 'her-reply', message: scenario.followUps.herReply.message })
+    expect(answerFor(scenario, 'her-reply')).toMatchObject({ kind: 'her-reply', message: scenario.followUps.herReply!.message })
   })
 
   it('pergunta livre vira "não conectado", sem conteúdo do cenário', () => {
