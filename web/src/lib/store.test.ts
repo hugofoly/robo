@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { INITIAL_DRAFT, type AssistantDraft } from './assistant'
 import { getScenario, toDemoRequest } from './demo'
 import { getMode, getModeExampleValues, toModeRequest } from './modes'
-import { createStore, searchConversations, snapshotAssistantDraft, workspaceHasUnsavedWork, type Store } from './store'
+import { createStore, searchConversations, snapshotAssistantDraft, tabOf, workspaceHasUnsavedWork, type Store } from './store'
 
 const draft: AssistantDraft = {
   ...INITIAL_DRAFT,
@@ -193,5 +193,30 @@ describe('Robô de Match e Fotos de Impacto no store', () => {
 
   it('app pré-selecionado no Match não conta como trabalho não salvo', () => {
     expect(workspaceHasUnsavedWork(createStore().getState(), 'mode:match', 'x')).toBe(false)
+  })
+})
+
+describe('abas (como no iOS)', () => {
+  it('cada aba lembra onde estava; tocar na aba ativa volta ao início', () => {
+    const s = createStore()
+    s.actions.setSection('modes')
+    s.actions.setOpenMode('express')
+    s.actions.selectTab('photos')
+    expect(s.getState().section).toBe('photos')
+    s.actions.selectTab('assistant')
+    expect(s.getState().section).toBe('modes')
+    expect(s.getState().openMode).toBe('express')
+    s.actions.selectTab('assistant')
+    expect(s.getState().section).toBe('assistant')
+    expect(s.getState().openMode).toBeNull()
+  })
+
+  it('Minhas conversas volta para a tela de origem', () => {
+    const s = createStore()
+    s.actions.selectTab('match')
+    s.actions.setSection('conversations')
+    expect(tabOf(s.getState().section)).toBeNull()
+    s.actions.goBack()
+    expect(s.getState().section).toBe('match')
   })
 })

@@ -12,6 +12,13 @@ npm run build      # typecheck + build em dist/
 
 ## O que existe
 
+Navegação no padrão iOS: tab bar flutuante com três abas principais (ícone ao lado do nome), cada uma lembrando
+onde o usuário estava; tocar na aba ativa volta ao início dela.
+
+- **Assistente** (inclui a entrada para Modos especiais), **Robô de Match** e **Fotos de Impacto** são as abas.
+- **Minhas conversas** (com as preferências) abre pelo botão no canto do cabeçalho, com contador de conversas salvas
+  e "Voltar" para a tela de origem.
+
 - **Assistente** (tela inicial) com as abas Responder conversa, Puxar assunto e Responder story.
   - Entrada por print (PNG/JPEG/WebP até 10 MB, com preview local, trocar e remover; aceita arrastar e colar) ou por texto.
   - Contexto opcional e objetivo (Continuar o papo, Flertar, Retomar contato, Chamar para sair).

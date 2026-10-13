@@ -9,7 +9,7 @@ import { useDemoGeneration } from '../lib/useDemoGeneration'
 import { AudioInput } from './AudioInput'
 import { ContinuingBanner } from './ContinuingBanner'
 import { ImageInput } from './ImageInput'
-import { LockIcon, MicIcon, PhotoIcon, TextIcon } from './Icons'
+import { ChevronIcon, LockIcon, MicIcon, PhotoIcon, TextIcon, WandIcon } from './Icons'
 import { Results } from './Results'
 import { SegmentedControl } from './SegmentedControl'
 import { TestTools } from './TestTools'
@@ -33,7 +33,7 @@ const EMPTY_HELP: Record<InputMode, string> = {
 export function Assistant({ onToast }: Props) {
   // Rascunho e resultado ficam no store em memória: sobrevivem à navegação, somem ao recarregar.
   const draft = useAppState((s) => s.assistantDraft)
-  const { updateAssistantDraft: onChange, setResult } = useActions()
+  const { updateAssistantDraft: onChange, setResult, setSection } = useActions()
   const [imageError, setImageError] = useState<string | null>(null)
   // Gerar só preenche o resultado atual; histórico só existe ao clicar em "Salvar conversa".
   // A entrada é fotografada no clique em "Gerar" (sem arquivos) e salva junto com o resultado.
@@ -111,9 +111,20 @@ export function Assistant({ onToast }: Props) {
 
   return (
     <section className="assistant" aria-labelledby="assistant-title">
-      <h2 id="assistant-title" className="visually-hidden">
-        Assistente
-      </h2>
+      <div className="modes-head">
+        <h2 id="assistant-title">Assistente</h2>
+      </div>
+
+      <button type="button" className="entry-row" onClick={() => setSection('modes')}>
+        <span className="entry-icon" aria-hidden="true">
+          <WandIcon size={20} />
+        </span>
+        <span className="entry-text">
+          <span className="entry-title">Modos especiais</span>
+          <span className="entry-sub">Date Rápido, Pós-Date, Protocolo Nudes e Sexo Express</span>
+        </span>
+        <ChevronIcon />
+      </button>
 
       <ContinuingBanner workspace="assistant" />
 

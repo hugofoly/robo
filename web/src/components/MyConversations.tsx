@@ -1,22 +1,34 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { TONES } from '../lib/demo'
-import { cardText } from '../lib/demo'
+import { TONES, cardText } from '../lib/demo'
 import { useActions, useAppState, useStoreSnapshot } from '../lib/StoreProvider'
-import { searchConversations, workspaceHasUnsavedWork, type SavedConversation } from '../lib/store'
+import { searchConversations, workspaceHasUnsavedWork, type SavedConversation, type Section } from '../lib/store'
 import { EmptyState } from './EmptyState'
-import { BubblesIcon } from './Icons'
+import { BackIcon, BubblesIcon } from './Icons'
 import { PreferencesCard } from './Preferences'
 import { TEMP_HISTORY_NOTICE } from './Results'
+
+const BACK_LABEL: Record<Section, string> = {
+  assistant: 'Assistente',
+  modes: 'Modos especiais',
+  match: 'Robô de Match',
+  photos: 'Fotos de Impacto',
+  conversations: 'Voltar',
+}
 
 const dateFmt = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
 export function MyConversations({ onToast }: { onToast: (message: string) => void }) {
   const conversations = useAppState((s) => s.conversations)
+  const returnTo = useAppState((s) => s.returnTo)
+  const { goBack } = useActions()
   const [query, setQuery] = useState('')
   const visible = searchConversations(conversations, query)
 
   return (
     <section className="conversations" aria-labelledby="conversations-title">
+      <button type="button" className="btn-back" onClick={goBack}>
+        <BackIcon /> {BACK_LABEL[returnTo]}
+      </button>
       <div className="modes-head">
         <h2 id="conversations-title">Minhas conversas</h2>
       </div>

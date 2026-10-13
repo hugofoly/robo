@@ -19,7 +19,7 @@ export default function App() {
 function Shell() {
   // Navegação, rascunhos, resultados, conversas e preferências vivem no store em memória.
   const section = useAppState((s) => s.section)
-  const { setSection } = useActions()
+  const { selectTab } = useActions()
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | undefined>(undefined)
 
@@ -39,7 +39,7 @@ function Shell() {
   return (
     <div className="app">
       <Header />
-      <Navigation current={section} onChange={setSection} />
+      <Navigation current={section} onChange={selectTab} />
 
       <main className="app-main">
         {section === 'assistant' && <Assistant onToast={showToast} />}

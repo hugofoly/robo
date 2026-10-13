@@ -24,7 +24,7 @@ import { TestTools } from './TestTools'
 export function SpecialModes({ onToast }: { onToast: (message: string) => void }) {
   const openMode = useAppState((s) => s.openMode)
   const drafts = useAppState((s) => s.modeDrafts)
-  const { setOpenMode: onOpen, updateModeDraft } = useActions()
+  const { setOpenMode: onOpen, updateModeDraft, setSection } = useActions()
 
   if (openMode) {
     return (
@@ -41,6 +41,9 @@ export function SpecialModes({ onToast }: { onToast: (message: string) => void }
 
   return (
     <section className="modes" aria-labelledby="modes-title">
+      <button type="button" className="btn-back" onClick={() => setSection('assistant')}>
+        <BackIcon /> Assistente
+      </button>
       <div className="modes-head">
         <h2 id="modes-title">Modos especiais</h2>
         <span className="badge">Liberados no Beta</span>

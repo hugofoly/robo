@@ -63,6 +63,19 @@ export interface AppState {
   feedback: Record<string, Feedback>
   /** Filtro de categoria da galeria Fotos de Impacto ('all' = todas). */
   photoCategory: string
+  /** Seção para onde "Voltar" leva ao sair de Minhas conversas. */
+  returnTo: Section
+  /** Última tela dentro da aba Assistente (o próprio Assistente ou Modos especiais), para restaurar ao voltar à aba. */
+  assistantTabSection: 'assistant' | 'modes'
+}
+
+export type Tab = 'assistant' | 'match' | 'photos'
+
+/** Aba da tab bar a que cada seção pertence (Modos especiais fica dentro do Assistente). */
+export function tabOf(section: Section): Tab | null {
+  if (section === 'assistant' || section === 'modes') return 'assistant'
+  if (section === 'match' || section === 'photos') return section
+  return null
 }
 
 const MODE_IDS: ModeId[] = ['quick-date', 'post-date', 'nudes', 'express', 'match']
@@ -81,6 +94,8 @@ export function initialState(): AppState {
     preferences: NO_PREFERENCES,
     feedback: {},
     photoCategory: 'all',
+    returnTo: 'assistant',
+    assistantTabSection: 'assistant',
   }
 }
 
@@ -119,6 +134,7 @@ export function createStore(initial: AppState = initialState()) {
   const listeners = new Set<Listener>()
 
   function set(next: AppState) {
+    if (next.section === 'assistant' || next.section === 'modes') next = { ...next, assistantTabSection: next.section }
     state = next
     listeners.forEach((l) => l())
   }
@@ -133,9 +149,24 @@ export function createStore(initial: AppState = initialState()) {
 
   const actions = {
     setSection(section: Section) {
-      // Como numa tab bar do iOS: tocar de novo em "Modos especiais" volta para a lista.
-      const openMode = section === 'modes' && state.section === 'modes' ? null : state.openMode
-      set({ ...state, section, openMode })
+      // Como numa tab bar do iOS: tocar na aba Assistente estando em Modos especiais volta ao início dela.
+      const backToRoot = section === 'assistant' && state.section === 'modes'
+      const openMode = backToRoot || (section === 'modes' && state.section === 'modes') ? null : state.openMode
+      const returnTo = section === 'conversations' && state.section !== 'conversations' ? state.section : state.returnTo
+      set({ ...state, section, openMode, returnTo })
+    },
+    /**
+     * Toque numa aba (como no iOS): cada aba lembra onde o usuário estava; tocar na aba já ativa
+     * volta ao início dela (no Assistente, fecha Modos especiais).
+     */
+    selectTab(tab: Tab) {
+      if (tab !== 'assistant') return actions.setSection(tab)
+      if (tabOf(state.section) === 'assistant') return set({ ...state, section: 'assistant', openMode: null })
+      set({ ...state, section: state.assistantTabSection })
+    },
+    /** "Voltar" de Minhas conversas para a tela de onde o usuário veio. */
+    goBack() {
+      set({ ...state, section: state.returnTo })
     },
     setOpenMode(openMode: ModeId | null) {
       set({ ...state, openMode })
