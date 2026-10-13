@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { AudioInput as AudioValue } from '../lib/assistant'
 import { AUDIO_ACCEPT, AUDIO_EXAMPLE, MAX_AUDIO_BYTES, MAX_RECORDING_MS, MIC_ERROR_MESSAGES, formatDuration, validateAudio } from '../lib/audio'
 import { formatBytes } from '../lib/upload'
+import { useClickGuard } from '../lib/useClickGuard'
 import { useRecorder } from '../lib/useRecorder'
 import { AudioPlayer } from './AudioPlayer'
 import { AlertIcon, LockIcon, MicIcon, StopIcon, WaveIcon } from './Icons'
@@ -32,6 +33,9 @@ export function AudioInput({ audio, hint, onChange, onUseText }: Props) {
 
   const { state } = recorder
   const busy = state.status === 'recording' || state.status === 'requesting'
+  // Cada troca de tela (vazio → gravando → player…) arma uma proteção contra o 2º clique do duplo clique.
+  const view = audio?.kind ?? (busy ? 'busy' : state.status)
+  const guard = useClickGuard(view)
 
   function startRecording() {
     setError(null)
@@ -89,7 +93,7 @@ export function AudioInput({ audio, hint, onChange, onUseText }: Props) {
             onChange={(e) => onChange({ kind: 'example', transcript: e.target.value })}
           />
           {edited && <p className="field-help">Editada: ao gerar, ela deixa de contar como exemplo e não é analisada.</p>}
-          <button type="button" className="btn-secondary destructive" onClick={() => onChange(null)}>
+          <button type="button" className="btn-secondary destructive" onClick={guard(() => onChange(null))}>
             Remover exemplo
           </button>
         </div>
@@ -104,16 +108,16 @@ export function AudioInput({ audio, hint, onChange, onUseText }: Props) {
         {fileInput}
         <AudioPlayer url={audio.url} name={audio.name} durationMs={audio.durationMs} />
         <div className="preview-actions">
-          <button type="button" className="btn-secondary" onClick={() => fileRef.current?.click()}>
+          <button type="button" className="btn-secondary" onClick={guard(() => fileRef.current?.click())}>
             Trocar arquivo
           </button>
           <button
             type="button"
             className="btn-secondary destructive"
-            onClick={() => {
+            onClick={guard(() => {
               setNotice(null)
               onChange(null)
-            }}
+            })}
           >
             Remover
           </button>
@@ -148,10 +152,10 @@ export function AudioInput({ audio, hint, onChange, onUseText }: Props) {
             <span style={{ width: `${(elapsed / MAX_RECORDING_MS) * 100}%` }} />
           </div>
           <div className="preview-actions">
-            <button type="button" className="btn-secondary" onClick={recorder.cancel}>
+            <button type="button" className="btn-secondary" onClick={guard(recorder.cancel)}>
               Cancelar
             </button>
-            <button type="button" className="btn-stop" onClick={recorder.stop} disabled={state.status !== 'recording'}>
+            <button type="button" className="btn-stop" onClick={guard(recorder.stop)} disabled={state.status !== 'recording'}>
               <StopIcon /> Parar
             </button>
           </div>
@@ -188,10 +192,10 @@ export function AudioInput({ audio, hint, onChange, onUseText }: Props) {
         <div className="audio-empty">
           <p className="audio-hint">{hint}</p>
           <div className="preview-actions">
-            <button type="button" className="btn-record" onClick={startRecording}>
+            <button type="button" className="btn-record" onClick={guard(startRecording)}>
               <MicIcon /> Gravar
             </button>
-            <button type="button" className="btn-secondary" onClick={() => fileRef.current?.click()}>
+            <button type="button" className="btn-secondary" onClick={guard(() => fileRef.current?.click())}>
               Enviar arquivo
             </button>
           </div>

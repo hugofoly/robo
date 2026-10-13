@@ -1,5 +1,6 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { IMAGE_ACCEPT, formatBytes } from '../lib/upload'
+import { useClickGuard } from '../lib/useClickGuard'
 import type { ImageSelection } from '../lib/assistant'
 import { AlertIcon, PhotoIcon } from './Icons'
 
@@ -14,6 +15,9 @@ interface Props {
 export function ImageInput({ image, error, hint, onSelect, onRemove }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
+  // Depois de "Remover", o 2º clique de um duplo clique cairia na área de envio e abriria o seletor.
+  // Só a área de envio é protegida: é ela que ocupa o lugar do botão "Remover".
+  const guard = useClickGuard(image !== null)
 
   const openPicker = () => inputRef.current?.click()
 
@@ -32,6 +36,7 @@ export function ImageInput({ image, error, hint, onSelect, onRemove }: Props) {
         type="file"
         accept={IMAGE_ACCEPT}
         className="visually-hidden"
+        aria-label="Escolher print"
         aria-describedby="print-help print-error"
         onChange={(e) => {
           const file = e.target.files?.[0]
@@ -65,6 +70,7 @@ export function ImageInput({ image, error, hint, onSelect, onRemove }: Props) {
         <label
           htmlFor="print-input"
           className={`dropzone${dragging ? ' is-dragging' : ''}${error ? ' has-error' : ''}`}
+          onClick={guard(() => {})}
           onDragOver={(e) => {
             e.preventDefault()
             setDragging(true)

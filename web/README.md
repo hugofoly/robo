@@ -54,6 +54,23 @@ npm run build      # typecheck + build em dist/
 - **Preferências** opcionais (em Minhas conversas): tom padrão (Leve, Confiante, Ousado) vem primeiro nos resultados;
   explicação Curta (só o essencial) ou Detalhada (acrescenta o próximo passo). Valem até recarregar.
 
+## Exemplos e integração futura
+
+Os exemplos da demonstração são só dados, em `src/data/` (sem componentes nem lógica):
+
+- `assistantScenarios.ts`: 12 cenários do Assistente (aba × objetivo), com cards, variantes e acompanhamento.
+- `modeExamples.ts`: exemplos dos Modos especiais (formulário + resultado).
+- `audioExample.ts`: transcrição fictícia do exemplo de áudio identificado.
+- `types.ts`: o formato (`DemoContent`) que qualquer fonte de sugestões deve devolver.
+
+Pontos onde uma integração real entraria (nenhum endpoint existe hoje):
+
+- `toDemoRequest` / `toModeRequest` (`src/lib/demo.ts`, `src/lib/modes.ts`): hoje escolhem um exemplo pela
+  aba/objetivo/modo, sem ler a entrada. Uma fonte real geraria `DemoContent` a partir da entrada.
+- `useDemoGeneration` (`src/lib/useDemoGeneration.ts`): hoje simula 1,4 s de carregamento; seria a chamada real.
+- `answerFor` (`src/lib/followup.ts`): hoje só responde aos atalhos; perguntas livres seriam conectadas aqui.
+- Transcrição de áudio e leitura de print: hoje não existem (a interface diz que serão conectadas depois).
+
 ## Estado e privacidade
 
 Todo o estado (navegação, rascunhos, resultados, conversas salvas, preferências e feedback) vive num store em

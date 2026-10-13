@@ -45,14 +45,16 @@ export function FollowUp({ scenario, entries, onAdd, detail, onCopied }: Props) 
       </div>
 
       {entries.length > 0 && (
-        <ol className="thread" role="log" aria-live="polite" aria-label="Respostas">
-          {entries.map((e) => (
-            <li key={e.id} className="thread-item">
-              <p className="bubble bubble-user">{e.question}</p>
-              <Answer entryId={e.id} answer={e.answer} detail={detail} onCopied={onCopied} />
-            </li>
-          ))}
-        </ol>
+        <div role="log" aria-live="polite" aria-label="Respostas">
+          <ol className="thread">
+            {entries.map((e) => (
+              <li key={e.id} className="thread-item">
+                <p className="bubble bubble-user">{e.question}</p>
+                <Answer entryId={e.id} answer={e.answer} detail={detail} onCopied={onCopied} />
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
 
       <form className="ask-form" onSubmit={onSubmit}>

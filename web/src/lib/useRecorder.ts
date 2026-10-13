@@ -38,6 +38,8 @@ export function useRecorder({ onComplete }: Options) {
   const ticker = useRef<number | undefined>(undefined)
   /** Incrementa a cada start/cancel para ignorar um getUserMedia que resolve depois de cancelado. */
   const session = useRef(0)
+  /** Há um pedido de permissão do microfone em andamento. */
+  const pending = useRef(false)
   const onCompleteRef = useRef(onComplete)
   onCompleteRef.current = onComplete
 
@@ -56,6 +58,7 @@ export function useRecorder({ onComplete }: Options) {
 
   const cancel = useCallback(() => {
     session.current += 1
+    pending.current = false
     if (current.current) current.current.discarded = true
     stop()
     current.current = null
@@ -70,12 +73,17 @@ export function useRecorder({ onComplete }: Options) {
     const mySession = ++session.current
     setState({ status: 'requesting' })
     let media: MediaStream
+    pending.current = true
     try {
       media = await navigator.mediaDevices.getUserMedia({ audio: true })
     } catch (err) {
-      if (mySession === session.current) setState({ status: 'error', error: classify(err) })
+      if (mySession === session.current) {
+        pending.current = false
+        setState({ status: 'error', error: classify(err) })
+      }
       return
     }
+    if (mySession === session.current) pending.current = false
     if (mySession !== session.current) {
       // Cancelado (ou componente desmontado) enquanto o navegador pedia permissão.
       media.getTracks().forEach((t) => t.stop())
@@ -130,13 +138,21 @@ export function useRecorder({ onComplete }: Options) {
   const clearError = useCallback(() => setState({ status: 'idle' }), [])
 
   // Sair: desmontar o componente ou fechar/trocar a página encerra e descarta a gravação.
+  // Página escondida (troca de app/aba): finaliza e mantém o que foi gravado, liberando o microfone.
   useEffect(() => {
+    const onHidden = () => {
+      if (document.visibilityState !== 'hidden') return
+      if (current.current) stop()
+      else if (pending.current) cancel()
+    }
     window.addEventListener('pagehide', cancel)
+    document.addEventListener('visibilitychange', onHidden)
     return () => {
       window.removeEventListener('pagehide', cancel)
+      document.removeEventListener('visibilitychange', onHidden)
       cancel()
     }
-  }, [cancel])
+  }, [cancel, stop])
 
   return { state, start, stop, cancel, clearError }
 }

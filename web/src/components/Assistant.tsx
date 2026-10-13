@@ -126,127 +126,126 @@ export function Assistant({ onToast }: Props) {
         onChange={(tab) => onChange((d) => ({ ...d, tab }))}
       />
 
-      <form
-        id="assistant-tab-panel"
-        role="tabpanel"
-        aria-labelledby={`assistant-tab-${draft.tab}`}
-        className="panel"
-        onSubmit={(e) => {
-          e.preventDefault()
-          generate()
-        }}
-      >
-        <div className="panel-intro-row">
-          <p className="panel-intro">{copy.intro}</p>
-          <button type="button" className="btn-link" onClick={applyExample}>
-            Usar exemplo
-          </button>
-        </div>
+      <div id="assistant-tab-panel" role="tabpanel" aria-labelledby={`assistant-tab-${draft.tab}`}>
+        <form
+          className="panel"
+          onSubmit={(e) => {
+            e.preventDefault()
+            generate()
+          }}
+        >
+          <div className="panel-intro-row">
+            <p className="panel-intro">{copy.intro}</p>
+            <button type="button" className="btn-link" onClick={applyExample}>
+              Usar exemplo
+            </button>
+          </div>
 
-        <fieldset className="card">
-          <legend className="card-title">Entrada</legend>
-          <SegmentedControl
-            kind="radio"
-            size="small"
-            idPrefix="input-mode"
-            label="Como enviar"
-            options={MODES}
-            value={draft.mode}
-            onChange={(mode) => onChange((d) => ({ ...d, mode }))}
-          />
-
-          {draft.mode === 'image' ? (
-            <ImageInput
-              image={draft.image}
-              error={imageError}
-              hint={copy.imageHint}
-              onSelect={selectImage}
-              onRemove={removeImage}
+          <fieldset className="card">
+            <legend className="card-title">Entrada</legend>
+            <SegmentedControl
+              kind="radio"
+              size="small"
+              idPrefix="input-mode"
+              label="Como enviar"
+              options={MODES}
+              value={draft.mode}
+              onChange={(mode) => onChange((d) => ({ ...d, mode }))}
             />
-          ) : draft.mode === 'audio' ? (
-            <>
-              <AudioInput
-                audio={draft.audio}
-                hint={copy.audioHint}
-                onChange={setAudio}
-                onUseText={() => onChange((d) => ({ ...d, mode: 'text' }))}
+
+            {draft.mode === 'image' ? (
+              <ImageInput
+                image={draft.image}
+                error={imageError}
+                hint={copy.imageHint}
+                onSelect={selectImage}
+                onRemove={removeImage}
               />
-              {!audioExampleHere && draft.audio === null && (
-                <p className="field-help">O exemplo de áudio fica em Responder conversa.</p>
-              )}
-            </>
-          ) : (
+            ) : draft.mode === 'audio' ? (
+              <>
+                <AudioInput
+                  audio={draft.audio}
+                  hint={copy.audioHint}
+                  onChange={setAudio}
+                  onUseText={() => onChange((d) => ({ ...d, mode: 'text' }))}
+                />
+                {!audioExampleHere && draft.audio === null && (
+                  <p className="field-help">O exemplo de áudio fica em Responder conversa.</p>
+                )}
+              </>
+            ) : (
+              <div className="field">
+                <label htmlFor="conversation-text" className="field-label">
+                  {copy.textLabel}
+                  {usingExample && <span className="tag">Exemplo fictício</span>}
+                </label>
+                <textarea
+                  id="conversation-text"
+                  rows={7}
+                  value={draft.text}
+                  placeholder={copy.textPlaceholder}
+                  onChange={(e) => onChange((d) => ({ ...d, text: e.target.value }))}
+                />
+              </div>
+            )}
+          </fieldset>
+
+          <div className="card">
             <div className="field">
-              <label htmlFor="conversation-text" className="field-label">
-                {copy.textLabel}
-                {usingExample && <span className="tag">Exemplo fictício</span>}
+              <label htmlFor="extra-context" className="field-label">
+                Contexto <span className="optional">opcional</span>
               </label>
               <textarea
-                id="conversation-text"
-                rows={7}
-                value={draft.text}
-                placeholder={copy.textPlaceholder}
-                onChange={(e) => onChange((d) => ({ ...d, text: e.target.value }))}
+                id="extra-context"
+                rows={3}
+                value={draft.context}
+                placeholder="Ex.: a gente se conheceu no app há 3 dias e ela sumiu ontem."
+                onChange={(e) => onChange((d) => ({ ...d, context: e.target.value }))}
               />
             </div>
-          )}
-        </fieldset>
-
-        <div className="card">
-          <div className="field">
-            <label htmlFor="extra-context" className="field-label">
-              Contexto <span className="optional">opcional</span>
-            </label>
-            <textarea
-              id="extra-context"
-              rows={3}
-              value={draft.context}
-              placeholder="Ex.: a gente se conheceu no app há 3 dias e ela sumiu ontem."
-              onChange={(e) => onChange((d) => ({ ...d, context: e.target.value }))}
-            />
           </div>
-        </div>
 
-        <fieldset className="card">
-          <legend className="card-title">Objetivo</legend>
-          <div className="chips" role="radiogroup" aria-label="Objetivo">
-            {GOALS.map((g) => (
-              <label key={g.id} className="chip">
-                <input
-                  type="radio"
-                  name="goal"
-                  value={g.id}
-                  checked={draft.goal === g.id}
-                  onChange={() => onChange((d) => ({ ...d, goal: g.id }))}
-                />
-                <span>{g.label}</span>
-              </label>
-            ))}
+          <fieldset className="card">
+            <legend className="card-title">Objetivo</legend>
+            <div className="chips" role="radiogroup" aria-label="Objetivo">
+              {GOALS.map((g) => (
+                <label key={g.id} className="chip">
+                  <input
+                    type="radio"
+                    name="goal"
+                    value={g.id}
+                    checked={draft.goal === g.id}
+                    onChange={() => onChange((d) => ({ ...d, goal: g.id }))}
+                  />
+                  <span>{g.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="actions">
+            <p className="demo-notice">{DEMO_NOTICE}</p>
+            <button type="submit" className="btn-primary" disabled={!canGenerate} aria-describedby="generate-help">
+              {loading ? (
+                <>
+                  <span className="spinner" aria-hidden="true" /> Gerando…
+                </>
+              ) : (
+                'Gerar sugestões'
+              )}
+            </button>
+            <p id="generate-help" className="privacy-note">
+              {hasValidInput(draft) ? (
+                <>
+                  <LockIcon /> Print, texto e áudio ficam só neste navegador.
+                </>
+              ) : (
+                EMPTY_HELP[draft.mode]
+              )}
+            </p>
           </div>
-        </fieldset>
-
-        <div className="actions">
-          <p className="demo-notice">{DEMO_NOTICE}</p>
-          <button type="submit" className="btn-primary" disabled={!canGenerate} aria-describedby="generate-help">
-            {loading ? (
-              <>
-                <span className="spinner" aria-hidden="true" /> Gerando…
-              </>
-            ) : (
-              'Gerar sugestões'
-            )}
-          </button>
-          <p id="generate-help" className="privacy-note">
-            {hasValidInput(draft) ? (
-              <>
-                <LockIcon /> Print, texto e áudio ficam só neste navegador.
-              </>
-            ) : (
-              EMPTY_HELP[draft.mode]
-            )}
-          </p>
-        </div>
-      </form>
+        </form>
+      </div>
 
       <Results workspace="assistant" status={status} onRetry={retry} onToast={onToast} />
 

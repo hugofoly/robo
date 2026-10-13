@@ -1,0 +1,50 @@
+/**
+ * Tipos dos exemplos locais. Estes arquivos (src/data) são só dados: nenhum componente nem lógica.
+ * Na integração futura com IA, o conteúdo virá de outra fonte com este mesmo formato.
+ */
+
+export type Tone = 'light' | 'confident' | 'bold'
+
+export type Adjustment = 'shorter' | 'natural' | 'bolder' | 'softer' | 'another'
+
+export interface DemoCard {
+  text: string
+  /** "Por que usar esta?": intenção da mensagem e próximo passo. */
+  why: { intent: string; next: string }
+  variants: Record<Adjustment, string>
+}
+
+export interface FollowUps {
+  /** Resposta para "Por que essa resposta?", sobre a mensagem recomendada. */
+  why: string
+  /** Resposta para "O que faço depois?". */
+  next: string
+  /** Resposta para "Ela respondeu isso.": uma resposta fictícia dela, a leitura e a sugestão. */
+  herReply: { message: string; reading: string; suggestion: string }
+}
+
+/** Conteúdo de resultado de um cenário fictício, escrito à mão. Nada aqui vem da entrada do usuário. */
+export interface DemoContent {
+  /** Uma linha descrevendo o cenário, mostrada junto da leitura. */
+  summary: string
+  reading: string
+  cards: Record<Tone, DemoCard>
+  recommended: Tone
+  reason: string
+  followUps: FollowUps
+}
+
+/** Cenário do Assistente: o conteúdo e o exemplo que "Usar exemplo" coloca nos campos. */
+export interface DemoScenario extends DemoContent {
+  text: string
+  context: string
+}
+
+export function card(
+  text: string,
+  intent: string,
+  next: string,
+  [shorter, natural, bolder, softer, another]: [string, string, string, string, string],
+): DemoCard {
+  return { text, why: { intent, next }, variants: { shorter, natural, bolder, softer, another } }
+}
