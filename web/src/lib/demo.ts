@@ -790,6 +790,9 @@ export interface DemoRequest {
   content: DemoContent
   /** Rótulo do resultado, ex.: "Responder conversa · Flertar". */
   label: string
+  /** Partes do rótulo, usadas ao salvar: modo (aba ou modo especial) e objetivo/caminho. */
+  modeLabel: string
+  goalLabel: string | null
   /** Prefixo da chave de feedback na sessão. */
   feedbackKey: string
   source: DemoSource
@@ -808,6 +811,8 @@ export function toDemoRequest(draft: AssistantDraft): DemoRequest {
   return {
     content: getScenario(draft.tab, draft.goal),
     label: `${tab} · ${goal}`,
+    modeLabel: tab,
+    goalLabel: goal,
     feedbackKey: `${draft.tab}/${draft.goal}`,
     source: sourceOf(draft),
   }

@@ -1,8 +1,11 @@
-import { REASONS, useSessionFeedback } from '../lib/feedback'
+import { REASONS } from '../lib/feedback'
+import { useActions, useAppState } from '../lib/StoreProvider'
 import { ThumbDownIcon, ThumbUpIcon } from './Icons'
 
 export function FeedbackControl({ id, storageKey }: { id: string; storageKey: string }) {
-  const [feedback, update] = useSessionFeedback(storageKey)
+  const feedback = useAppState((s) => s.feedback[storageKey] ?? null)
+  const { updateFeedback } = useActions()
+  const update = (action: Parameters<typeof updateFeedback>[1]) => updateFeedback(storageKey, action)
 
   return (
     <div className="feedback">
@@ -45,7 +48,7 @@ export function FeedbackControl({ id, storageKey }: { id: string; storageKey: st
       )}
 
       <p className="fb-saved" aria-live="polite">
-        {feedback && 'Obrigado! Fica salvo só nesta sessão, e dá para mudar quando quiser.'}
+        {feedback && 'Obrigado! Fica só na memória desta página (some ao recarregar) e dá para mudar quando quiser.'}
       </p>
     </div>
   )

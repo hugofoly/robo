@@ -4,46 +4,57 @@ import type { DemoRequest } from './demo'
 /** Duração do carregamento simulado. Nenhuma requisição é feita. */
 const SIMULATED_DELAY_MS = 1400
 
-export type Generation =
+/** Estado transitório da geração; o resultado em si vai para o store da área. */
+export type GenerationStatus =
   | { status: 'idle' }
   | { status: 'loading'; request: DemoRequest }
-  | { status: 'success'; request: DemoRequest; runId: number }
   | { status: 'error'; request: DemoRequest }
 
 /**
- * Geração simulada e efêmera (sem histórico), compartilhada pelo Assistente e pelos Modos especiais.
- * A trava síncrona impede que um duplo clique inicie duas gerações.
+ * Geração simulada, compartilhada pelo Assistente e pelos Modos especiais. A trava síncrona
+ * impede que um duplo clique inicie duas gerações. Gerar não salva nada no histórico.
  */
-export function useDemoGeneration() {
-  const [generation, setGeneration] = useState<Generation>({ status: 'idle' })
+export function useDemoGeneration(onSuccess: (request: DemoRequest) => void) {
+  const [status, setStatus] = useState<GenerationStatus>({ status: 'idle' })
   const [failNext, setFailNext] = useState(false)
   const failNextRef = useRef(false)
   failNextRef.current = failNext
+  const onSuccessRef = useRef(onSuccess)
+  onSuccessRef.current = onSuccess
+  const statusRef = useRef(status)
+  statusRef.current = status
   const inFlight = useRef(false)
   const timer = useRef<number | undefined>(undefined)
-  const runId = useRef(0)
-  const generationRef = useRef(generation)
-  generationRef.current = generation
 
-  useEffect(() => () => window.clearTimeout(timer.current), [])
+  useEffect(
+    () => () => {
+      window.clearTimeout(timer.current)
+      inFlight.current = false
+    },
+    [],
+  )
 
   const run = useCallback((request: DemoRequest) => {
     if (inFlight.current) return
     inFlight.current = true
     const shouldFail = failNextRef.current
     if (shouldFail) setFailNext(false)
-    setGeneration({ status: 'loading', request })
+    setStatus({ status: 'loading', request })
     timer.current = window.setTimeout(() => {
       inFlight.current = false
-      runId.current += 1
-      setGeneration(shouldFail ? { status: 'error', request } : { status: 'success', request, runId: runId.current })
+      if (shouldFail) {
+        setStatus({ status: 'error', request })
+      } else {
+        setStatus({ status: 'idle' })
+        onSuccessRef.current(request)
+      }
     }, SIMULATED_DELAY_MS)
   }, [])
 
   const retry = useCallback(() => {
-    const g = generationRef.current
-    if (g.status === 'error') run(g.request)
+    const s = statusRef.current
+    if (s.status === 'error') run(s.request)
   }, [run])
 
-  return { generation, run, retry, failNext, setFailNext, loading: generation.status === 'loading' }
+  return { status, run, retry, failNext, setFailNext, loading: status.status === 'loading' }
 }

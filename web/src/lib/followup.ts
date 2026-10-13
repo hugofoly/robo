@@ -15,7 +15,13 @@ export type FollowUpAnswer =
   /** Pergunta livre: não há resposta preparada e nada é interpretado. */
   | { kind: 'not-connected' }
 
-const normalize = (s: string) =>
+export interface FollowUpEntry {
+  id: number
+  question: string
+  answer: FollowUpAnswer
+}
+
+export const normalize = (s: string) =>
   s
     .toLocaleLowerCase('pt-BR')
     .normalize('NFD')

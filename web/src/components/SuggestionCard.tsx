@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { ADJUSTMENTS, cardText, type DemoCard, type Version } from '../lib/demo'
+import { explain, type Detail } from '../lib/preferences'
 import { COPY_FALLBACK_MESSAGE, useCopy } from '../lib/useCopy'
 import { CopyButton } from './CopyButton'
 import { FeedbackControl } from './FeedbackControl'
@@ -13,14 +14,19 @@ interface Props {
   reason?: string
   /** Prefixo da chave do feedback; a versão exibida é acrescentada. */
   feedbackKey: string
+  /** Versão exibida (controlada pelo store, para poder salvar e continuar). */
+  version: Version
+  onVersionChange: (version: Version) => void
+  /** É o tom padrão escolhido nas preferências. */
+  preferred: boolean
+  detail: Detail | null
   onCopied: () => void
 }
 
 type Panel = 'none' | 'adjust' | 'why'
 
-export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKey, onCopied }: Props) {
-  // Cada card guarda a própria versão: ajustar um nunca toca nos outros.
-  const [version, setVersion] = useState<Version>('original')
+export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKey, version, onVersionChange, preferred, detail, onCopied }: Props) {
+  // A versão é por card: ajustar um nunca toca nos outros.
   const [panel, setPanel] = useState<Panel>('none')
   const [announcement, setAnnouncement] = useState('')
   const textRef = useRef<HTMLParagraphElement>(null)
@@ -29,7 +35,7 @@ export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKe
   const versionLabel = ADJUSTMENTS.find((a) => a.id === version)?.label
 
   function choose(next: Version) {
-    setVersion(next)
+    onVersionChange(next)
     resetCopy()
     setPanel('none')
     const label = ADJUSTMENTS.find((a) => a.id === next)?.label
@@ -44,11 +50,14 @@ export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKe
         <h3 id={`${id}-tone`} className="suggestion-tone">
           {tone}
         </h3>
-        {recommended && (
-          <span className="badge badge-recommended">
-            <StarIcon /> Recomendada
-          </span>
-        )}
+        <span className="suggestion-badges">
+          {preferred && <span className="badge badge-demo">Seu tom</span>}
+          {recommended && (
+            <span className="badge badge-recommended">
+              <StarIcon /> Recomendada
+            </span>
+          )}
+        </span>
       </header>
 
       <p ref={textRef} key={version} id={`${id}-text`} className="suggestion-text">
@@ -66,7 +75,7 @@ export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKe
 
       {recommended && reason && (
         <p className="suggestion-reason">
-          <strong>Recomendada porque:</strong> {reason}
+          <strong>Recomendada porque:</strong> {explain(reason, detail)}
         </p>
       )}
 
@@ -113,9 +122,11 @@ export function SuggestionCard({ id, tone, card, recommended, reason, feedbackKe
           <p>
             <strong>Intenção:</strong> {card.why.intent}
           </p>
-          <p>
-            <strong>Próximo passo:</strong> {card.why.next}
-          </p>
+          {detail !== 'short' && (
+            <p>
+              <strong>Próximo passo:</strong> {card.why.next}
+            </p>
+          )}
         </div>
       )}
 

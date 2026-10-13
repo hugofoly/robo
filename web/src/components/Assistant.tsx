@@ -1,10 +1,13 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { GOALS, TABS, TAB_COPY, hasValidInput, type AssistantDraft, type AudioInput as AudioValue, type InputMode } from '../lib/assistant'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { GOALS, TABS, TAB_COPY, hasValidInput, type AudioInput as AudioValue, type InputMode } from '../lib/assistant'
 import { AUDIO_EXAMPLE } from '../lib/audio'
 import { AUDIO_EXAMPLE_TARGET, DEMO_NOTICE, getScenario, isUsingExample, toDemoRequest } from '../lib/demo'
+import { useActions, useAppState } from '../lib/StoreProvider'
+import { snapshotAssistantDraft, type InputSnapshot } from '../lib/store'
 import { validateImage } from '../lib/upload'
 import { useDemoGeneration } from '../lib/useDemoGeneration'
 import { AudioInput } from './AudioInput'
+import { ContinuingBanner } from './ContinuingBanner'
 import { ImageInput } from './ImageInput'
 import { LockIcon, MicIcon, PhotoIcon, TextIcon } from './Icons'
 import { Results } from './Results'
@@ -12,8 +15,6 @@ import { SegmentedControl } from './SegmentedControl'
 import { TestTools } from './TestTools'
 
 interface Props {
-  draft: AssistantDraft
-  onChange: (update: (d: AssistantDraft) => AssistantDraft) => void
   onToast: (message: string) => void
 }
 
@@ -29,10 +30,17 @@ const EMPTY_HELP: Record<InputMode, string> = {
   audio: 'Grave ou envie um áudio para continuar.',
 }
 
-export function Assistant({ draft, onChange, onToast }: Props) {
+export function Assistant({ onToast }: Props) {
+  // Rascunho e resultado ficam no store em memória: sobrevivem à navegação, somem ao recarregar.
+  const draft = useAppState((s) => s.assistantDraft)
+  const { updateAssistantDraft: onChange, setResult } = useActions()
   const [imageError, setImageError] = useState<string | null>(null)
-  // O resultado vive só enquanto o Assistente está aberto: gerar não cria histórico.
-  const { generation, run, retry, failNext, setFailNext, loading } = useDemoGeneration()
+  // Gerar só preenche o resultado atual; histórico só existe ao clicar em "Salvar conversa".
+  // A entrada é fotografada no clique em "Gerar" (sem arquivos) e salva junto com o resultado.
+  const pendingInput = useRef<InputSnapshot | null>(null)
+  const { status, run, retry, failNext, setFailNext, loading } = useDemoGeneration((request) => {
+    if (pendingInput.current) setResult('assistant', request, pendingInput.current)
+  })
 
   const copy = TAB_COPY[draft.tab]
   const canGenerate = hasValidInput(draft) && !loading
@@ -40,7 +48,8 @@ export function Assistant({ draft, onChange, onToast }: Props) {
   const audioExampleHere = draft.tab === AUDIO_EXAMPLE_TARGET.tab
 
   function generate() {
-    if (!hasValidInput(draft)) return
+    if (!hasValidInput(draft) || loading) return
+    pendingInput.current = snapshotAssistantDraft(draft)
     run(toDemoRequest(draft))
   }
 
@@ -105,6 +114,8 @@ export function Assistant({ draft, onChange, onToast }: Props) {
       <h2 id="assistant-title" className="visually-hidden">
         Assistente
       </h2>
+
+      <ContinuingBanner workspace="assistant" />
 
       <SegmentedControl
         kind="tabs"
@@ -237,7 +248,7 @@ export function Assistant({ draft, onChange, onToast }: Props) {
         </div>
       </form>
 
-      <Results generation={generation} onRetry={retry} onCopied={() => onToast('Mensagem copiada.')} />
+      <Results workspace="assistant" status={status} onRetry={retry} onToast={onToast} />
 
       <TestTools failNext={failNext} onChange={setFailNext} />
     </section>

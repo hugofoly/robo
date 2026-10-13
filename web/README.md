@@ -29,7 +29,7 @@ npm run build      # typecheck + build em dist/
     têm respostas preparadas por cenário. Qualquer outro texto recebe "a resposta real será conectada depois", sem
     interpretação (`src/lib/followup.ts` só reconhece o texto exato dos atalhos).
   - Feedback **Usaria / Não usaria** com motivos (Genérica, Exagerada, Não parece comigo), por card e por versão,
-    guardado só no `sessionStorage` da aba e alterável a qualquer momento.
+    só em memória e alterável a qualquer momento.
   - **Áudio** (terceira forma de entrada): gravar só após clique em "Gravar" ou enviar arquivo (MP3, M4A, OGG,
     OPUS, WAV, WEBM). Timer, parar, cancelar, reproduzir e remover. Limite de 3 minutos de gravação (para sozinho)
     e 10 MB por arquivo. O microfone é liberado ao parar, cancelar, trocar de entrada/seção ou sair da página.
@@ -38,7 +38,7 @@ npm run build      # typecheck + build em dist/
     no modo Áudio carrega um **exemplo identificado** (transcrição fictícia e editável, sem áudio real), que
     substitui o áudio próprio em vez de ficar ao lado dele.
   - "Ferramentas de teste" (rodapé) simula um erro na próxima geração, para testar o "Tentar novamente".
-  - Gerar não cria histórico: o resultado e a conversa somem ao sair do Assistente ou gerar de novo.
+  - O resultado atual de cada área continua ao navegar entre seções; histórico só existe ao salvar.
   - O rascunho é compartilhado entre as abas e sobrevive à troca de seção.
 - **Modos especiais** (todos liberados no Beta), com formulário curto e os mesmos cards de resultado, cada um com
   exemplos próprios (`src/lib/modes.ts`):
@@ -47,9 +47,18 @@ npm run build      # typecheck + build em dist/
   - **Protocolo Nudes**: comunicação consensual entre adultos; sem upload de imagens; confirmação de maioridade.
   - **Sexo Express**: interesse em intimidade de forma não gráfica, com espaço explícito para recusa; confirmação de
     maioridade.
-- **Minhas conversas**: estado vazio explicando o que virá.
+- **Minhas conversas** (histórico temporário, só em memória): "Salvar conversa" no resultado registra nome, modo,
+  objetivo, contexto, sugestões (com a versão escolhida em cada card) e acompanhamento, sem arquivos de print ou
+  áudio. Salvar de novo atualiza a mesma conversa. Dá para buscar pelo nome, abrir e continuar, renomear e excluir
+  (com confirmação). Gerar sem salvar não cria histórico.
+- **Preferências** opcionais (em Minhas conversas): tom padrão (Leve, Confiante, Ousado) vem primeiro nos resultados;
+  explicação Curta (só o essencial) ou Detalhada (acrescenta o próximo passo). Valem até recarregar.
 
-## Privacidade
+## Estado e privacidade
+
+Todo o estado (navegação, rascunhos, resultados, conversas salvas, preferências e feedback) vive num store em
+memória (`src/lib/store.ts`). Não há login, banco, `localStorage`, `sessionStorage`, IndexedDB nem cookies:
+recarregar a página apaga tudo.
 
 Nenhum arquivo sai do navegador: o preview usa `URL.createObjectURL` e não há chamadas de rede.
 O áudio gravado ou enviado vira um `blob:` local só para reprodução.

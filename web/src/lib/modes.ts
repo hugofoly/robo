@@ -552,6 +552,8 @@ export function toModeRequest(def: ModeDef, draft: ModeDraft): DemoRequest {
   return {
     content: getModeContent(def.id, draft.path),
     label: isPostDate ? `${def.title} · ${pathLabel}` : def.title,
+    modeLabel: def.title,
+    goalLabel: isPostDate ? (pathLabel ?? null) : null,
     feedbackKey: isPostDate ? `mode/${def.id}/${draft.path}` : `mode/${def.id}`,
     source: isModeExample(def, draft) ? 'example' : 'own-text',
   }

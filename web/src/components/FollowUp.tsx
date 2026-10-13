@@ -1,25 +1,25 @@
 import { useRef, useState, type FormEvent } from 'react'
 import type { DemoContent } from '../lib/demo'
-import { SHORTCUTS, answerFor, matchShortcut, type FollowUpAnswer, type Shortcut } from '../lib/followup'
+import { SHORTCUTS, answerFor, matchShortcut, type FollowUpAnswer, type FollowUpEntry, type Shortcut } from '../lib/followup'
+import { explain, type Detail } from '../lib/preferences'
 import { COPY_FALLBACK_MESSAGE, useCopy } from '../lib/useCopy'
 import { CopyButton } from './CopyButton'
 import { SendIcon } from './Icons'
 
-interface Entry {
-  id: number
-  question: string
-  answer: FollowUpAnswer
+interface Props {
+  scenario: DemoContent
+  /** Acompanhamento do resultado atual (no store, para salvar e continuar). */
+  entries: FollowUpEntry[]
+  onAdd: (entry: Omit<FollowUpEntry, 'id'>) => void
+  detail: Detail | null
+  onCopied: () => void
 }
 
-export function FollowUp({ scenario, onCopied }: { scenario: DemoContent; onCopied: () => void }) {
-  // Conversa efêmera: vive só neste resultado e some numa nova geração.
-  const [entries, setEntries] = useState<Entry[]>([])
+export function FollowUp({ scenario, entries, onAdd, detail, onCopied }: Props) {
   const [input, setInput] = useState('')
-  const nextId = useRef(0)
 
   function ask(question: string, shortcut: Shortcut | null) {
-    nextId.current += 1
-    setEntries((list) => [...list, { id: nextId.current, question, answer: answerFor(scenario, shortcut) }])
+    onAdd({ question, answer: answerFor(scenario, shortcut) })
   }
 
   function onSubmit(e: FormEvent) {
@@ -49,7 +49,7 @@ export function FollowUp({ scenario, onCopied }: { scenario: DemoContent; onCopi
           {entries.map((e) => (
             <li key={e.id} className="thread-item">
               <p className="bubble bubble-user">{e.question}</p>
-              <Answer entryId={e.id} answer={e.answer} onCopied={onCopied} />
+              <Answer entryId={e.id} answer={e.answer} detail={detail} onCopied={onCopied} />
             </li>
           ))}
         </ol>
@@ -75,7 +75,17 @@ export function FollowUp({ scenario, onCopied }: { scenario: DemoContent; onCopi
   )
 }
 
-function Answer({ entryId, answer, onCopied }: { entryId: number; answer: FollowUpAnswer; onCopied: () => void }) {
+function Answer({
+  entryId,
+  answer,
+  detail,
+  onCopied,
+}: {
+  entryId: number
+  answer: FollowUpAnswer
+  detail: Detail | null
+  onCopied: () => void
+}) {
   if (answer.kind === 'not-connected') {
     return (
       <div className="bubble bubble-bot is-muted">
@@ -91,9 +101,9 @@ function Answer({ entryId, answer, onCopied }: { entryId: number; answer: Follow
     <div className="bubble bubble-bot">
       <span className="tag">Exemplo preparado</span>
       {answer.kind === 'her-reply' ? (
-        <HerReply entryId={entryId} answer={answer} onCopied={onCopied} />
+        <HerReply entryId={entryId} answer={answer} detail={detail} onCopied={onCopied} />
       ) : (
-        <p>{answer.text}</p>
+        <p>{explain(answer.text, detail)}</p>
       )}
     </div>
   )
@@ -102,10 +112,12 @@ function Answer({ entryId, answer, onCopied }: { entryId: number; answer: Follow
 function HerReply({
   entryId,
   answer,
+  detail,
   onCopied,
 }: {
   entryId: number
   answer: Extract<FollowUpAnswer, { kind: 'her-reply' }>
+  detail: Detail | null
   onCopied: () => void
 }) {
   const ref = useRef<HTMLParagraphElement>(null)
@@ -116,7 +128,7 @@ function HerReply({
       <p>Imagine que, no cenário de exemplo, ela respondeu:</p>
       <blockquote className="her-message">{answer.message}</blockquote>
       <p>
-        <strong>Leitura:</strong> {answer.reading}
+        <strong>Leitura:</strong> {explain(answer.reading, detail)}
       </p>
       <div className="her-suggestion">
         <p className="her-suggestion-label">Sugestão de resposta</p>

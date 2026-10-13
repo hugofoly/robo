@@ -1,4 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { useActions, useAppState } from '../lib/StoreProvider'
+import type { InputSnapshot, WorkspaceId } from '../lib/store'
+import { ContinuingBanner } from './ContinuingBanner'
 import { DEMO_NOTICE } from '../lib/demo'
 import {
   MODES,
@@ -18,22 +21,18 @@ import { Results } from './Results'
 import { SegmentedControl } from './SegmentedControl'
 import { TestTools } from './TestTools'
 
-interface Props {
-  openMode: ModeId | null
-  onOpen: (mode: ModeId | null) => void
-  drafts: Record<ModeId, ModeDraft>
-  onDraftChange: (mode: ModeId, update: (d: ModeDraft) => ModeDraft) => void
-  onToast: (message: string) => void
-}
+export function SpecialModes({ onToast }: { onToast: (message: string) => void }) {
+  const openMode = useAppState((s) => s.openMode)
+  const drafts = useAppState((s) => s.modeDrafts)
+  const { setOpenMode: onOpen, updateModeDraft } = useActions()
 
-export function SpecialModes({ openMode, onOpen, drafts, onDraftChange, onToast }: Props) {
   if (openMode) {
     return (
       <ModeView
         key={openMode}
         mode={openMode}
         draft={drafts[openMode]}
-        onChange={(u) => onDraftChange(openMode, u)}
+        onChange={(u) => updateModeDraft(openMode, u)}
         onBack={() => onOpen(null)}
         onToast={onToast}
       />
@@ -74,8 +73,13 @@ interface ViewProps {
 
 function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
   const def = getMode(mode)
-  // Resultado efêmero: sair do modo descarta, sem histórico.
-  const { generation, run, retry, failNext, setFailNext, loading } = useDemoGeneration()
+  const workspace: WorkspaceId = `mode:${mode}`
+  const { setResult } = useActions()
+  // Entrada fotografada no clique em "Gerar"; o resultado vai para o store (sem histórico até salvar).
+  const pendingInput = useRef<InputSnapshot | null>(null)
+  const { status, run, retry, failNext, setFailNext, loading } = useDemoGeneration((request) => {
+    if (pendingInput.current) setResult(workspace, request, pendingInput.current)
+  })
   const titleRef = useRef<HTMLHeadingElement>(null)
   const valid = isModeValid(def, draft)
   const usingExample = isModeExample(def, draft)
@@ -107,11 +111,15 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         <span className="badge">Beta</span>
       </div>
 
+      <ContinuingBanner workspace={workspace} />
+
       <form
         className="panel"
         onSubmit={(e) => {
           e.preventDefault()
-          if (valid) run(toModeRequest(def, draft))
+          if (!valid || loading) return
+          pendingInput.current = { kind: 'mode', mode, draft: { ...draft, values: { ...draft.values } } }
+          run(toModeRequest(def, draft))
         }}
       >
         <div className="panel-intro-row">
@@ -207,7 +215,7 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         </div>
       </form>
 
-      <Results generation={generation} onRetry={retry} onCopied={() => onToast('Mensagem copiada.')} />
+      <Results workspace={workspace} status={status} onRetry={retry} onToast={onToast} />
       <TestTools failNext={failNext} onChange={setFailNext} />
     </section>
   )
