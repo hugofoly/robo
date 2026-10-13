@@ -34,7 +34,7 @@ export interface Workspace {
 /** Entrada salva, sem arquivos: print e áudio próprios nunca entram aqui. */
 export type InputSnapshot =
   | { kind: 'assistant'; draft: AssistantDraft; hadImage: boolean; hadAudio: boolean }
-  | { kind: 'mode'; mode: ModeId; draft: ModeDraft }
+  | { kind: 'mode'; mode: ModeId; draft: ModeDraft; photoCount?: number }
 
 export interface SavedConversation {
   id: string
@@ -113,6 +113,16 @@ export function searchConversations(list: SavedConversation[], query: string): S
   const q = normalize(query)
   if (!q) return list
   return list.filter((c) => normalize(c.name).includes(q))
+}
+
+/** Entrada de um modo para salvar: sem as fotos (só a quantidade). */
+export function snapshotModeDraft(mode: ModeId, draft: ModeDraft): InputSnapshot {
+  return {
+    kind: 'mode',
+    mode,
+    draft: { ...draft, values: { ...draft.values }, photos: undefined },
+    photoCount: draft.photos?.length ?? 0,
+  }
 }
 
 /** Contexto em texto para listar: o que o usuário escreveu, nunca arquivos. */
@@ -272,6 +282,7 @@ export function createStore(initial: AppState = initialState()) {
           revokeDraftUrls(state.assistantDraft)
           next.assistantDraft = { ...conv.input.draft, audio: conv.input.draft.audio ? { ...conv.input.draft.audio } : null }
         } else {
+          state.modeDrafts[conv.input.mode].photos?.forEach((p) => URL.revokeObjectURL(p.previewUrl))
           next.modeDrafts = { ...state.modeDrafts, [conv.input.mode]: { ...conv.input.draft, values: { ...conv.input.draft.values } } }
         }
       }
@@ -334,5 +345,5 @@ export function workspaceHasUnsavedWork(state: AppState, id: WorkspaceId, convId
   }
   const mode = id.slice('mode:'.length) as ModeId
   const md = state.modeDrafts[mode]
-  return ws.conversationId === null && hasTypedModeInput(getMode(mode), md)
+  return ws.conversationId === null && (hasTypedModeInput(getMode(mode), md) || Boolean(md.photos?.length))
 }

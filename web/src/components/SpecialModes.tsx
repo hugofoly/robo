@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useActions, useAppState } from '../lib/StoreProvider'
-import type { InputSnapshot, WorkspaceId } from '../lib/store'
+import { snapshotModeDraft, type InputSnapshot, type WorkspaceId } from '../lib/store'
 import { ContinuingBanner } from './ContinuingBanner'
+import { ProfilePhotos } from './ProfilePhotos'
 import { DEMO_NOTICE } from '../lib/demo'
 import {
   POST_DATE_PATHS,
@@ -93,7 +94,7 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const valid = isModeValid(def, draft)
   const usingExample = isModeExample(def, draft)
-  const firstTextField = def.fields.find((f) => f.kind !== 'choice')
+  const firstTextField = def.fields.find((f) => f.kind === 'text' || f.kind === 'textarea')
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -103,7 +104,11 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
   function applyExample() {
     if (hasOwnModeInput(def, draft) && !window.confirm('Substituir o que você escreveu pelo exemplo?')) return
     const values = getModeExampleValues(mode, draft.path)
-    onChange((d) => ({ ...d, values: { ...values } }))
+    onChange((d) => {
+      // O exemplo tem fotos fictícias (descritas em texto); as fotos próprias saem para não se misturarem.
+      d.photos?.forEach((p) => URL.revokeObjectURL(p.previewUrl))
+      return { ...d, values: { ...values }, photos: undefined }
+    })
   }
 
   function setValue(id: string, value: string) {
@@ -130,7 +135,7 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         onSubmit={(e) => {
           e.preventDefault()
           if (!valid || loading) return
-          pendingInput.current = { kind: 'mode', mode, draft: { ...draft, values: { ...draft.values } } }
+          pendingInput.current = snapshotModeDraft(mode, draft)
           run(toModeRequest(def, draft))
         }}
       >
@@ -172,9 +177,10 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         <div className="card mode-fields">
           {def.fields.map((f) => (
             <div key={f.id} className="field">
-              {f.kind === 'choice' ? (
+              {f.kind === 'choice' || f.kind === 'photos' ? (
                 <span id={`mode-${f.id}-label`} className="field-label">
                   {f.label}
+                  {f.kind === 'photos' && <span className="optional">opcional</span>}
                 </span>
               ) : (
                 <label htmlFor={`mode-${f.id}`} className="field-label">
@@ -183,7 +189,9 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
                   {usingExample && f === firstTextField && <span className="tag">Exemplo fictício</span>}
                 </label>
               )}
-              {f.kind === 'choice' ? (
+              {f.kind === 'photos' ? (
+                <ProfilePhotos photos={draft.photos ?? []} onChange={(photos) => onChange((d) => ({ ...d, photos }))} />
+              ) : f.kind === 'choice' ? (
                 <SegmentedControl
                   kind="radio"
                   size="small"

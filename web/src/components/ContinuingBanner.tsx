@@ -16,7 +16,9 @@ export function ContinuingBanner({ workspace }: { workspace: WorkspaceId }) {
       ? 'O print desta conversa não foi salvo: envie de novo se quiser.'
       : input.kind === 'assistant' && input.hadAudio
         ? 'O áudio desta conversa não foi salvo: grave ou envie de novo se quiser.'
-        : null
+        : input.kind === 'mode' && input.photoCount
+          ? 'As fotos desta conversa não foram salvas: envie de novo se quiser.'
+          : null
 
   return (
     <div className="continuing" role="status">

@@ -169,3 +169,15 @@ export const CameraIcon = ({ size = 22 }: Props) => (
     <circle cx="12" cy="13" r="3.5" />
   </svg>
 )
+
+export const MoveIcon = ({ size = 14 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4" />
+  </svg>
+)
+
+export const PlusIcon = ({ size = 22 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+)

@@ -1,5 +1,6 @@
 import { MATCH_EXAMPLE } from '../data/matchExample'
 import { EXPRESS, NUDES, POST_DATE, QUICK_DATE, type ModeExample } from '../data/modeExamples'
+import type { ImageSelection } from './assistant'
 import type { DemoContent, DemoRequest } from './demo'
 
 export type ModeId = 'quick-date' | 'post-date' | 'nudes' | 'express' | 'match'
@@ -14,8 +15,8 @@ export const POST_DATE_PATHS: { id: PostDatePath; label: string }[] = [
 export interface ModeField {
   id: string
   label: string
-  /** `choice` vira um seletor segmentado; o valor salvo é o rótulo da opção. */
-  kind: 'textarea' | 'text' | 'choice'
+  /** `choice` vira um seletor segmentado (valor = rótulo da opção); `photos` é o envio de fotos do perfil. */
+  kind: 'textarea' | 'text' | 'choice' | 'photos'
   placeholder: string
   required: boolean
   options?: string[]
@@ -140,6 +141,7 @@ export const MODES: ModeDef[] = [
         required: true,
       },
       { id: 'bio', label: 'Bio atual', kind: 'textarea', placeholder: 'Cole a bio que você usa hoje.', required: false },
+      { id: 'photos', label: 'Fotos do perfil', kind: 'photos', placeholder: '', required: false },
     ],
   }
 ]
@@ -193,7 +195,12 @@ export interface ModeDraft {
   values: Values
   path: PostDatePath
   adult: boolean
+  /** Robô de Match: fotos do perfil (URLs `blob:` locais). Nunca são salvas nem enviadas. */
+  photos?: ImageSelection[]
 }
+
+/** Campos de texto livre (não contam escolha nem fotos). */
+const isTextField = (f: ModeField) => f.kind === 'text' || f.kind === 'textarea'
 
 export const emptyModeDraft = (): ModeDraft => ({ values: {}, path: 'casual', adult: false })
 
@@ -209,7 +216,7 @@ export function defaultModeDraft(mode: ModeId): ModeDraft {
 
 /** Há texto digitado pelo usuário (campos de escolha não contam). */
 export function hasTypedModeInput(def: ModeDef, draft: ModeDraft): boolean {
-  return def.fields.some((f) => f.kind !== 'choice' && (draft.values[f.id] ?? '').trim() !== '')
+  return def.fields.some((f) => isTextField(f) && (draft.values[f.id] ?? '').trim() !== '')
 }
 
 export function isModeValid(def: ModeDef, draft: ModeDraft): boolean {
@@ -220,11 +227,15 @@ export function isModeValid(def: ModeDef, draft: ModeDraft): boolean {
 /** Exemplo intacto do modo (e do caminho, no Pós-Date). Qualquer edição conta como entrada própria. */
 export function isModeExample(def: ModeDef, draft: ModeDraft): boolean {
   const example = getModeExampleValues(def.id, draft.path)
-  return def.fields.every((f) => (draft.values[f.id] ?? '').trim() === (example[f.id] ?? ''))
+  // Fotos próprias tiram do exemplo: as fotos do exemplo são fictícias (descritas em texto).
+  if (draft.photos?.length) return false
+  return def.fields
+    .filter((f) => f.kind !== 'photos')
+    .every((f) => (draft.values[f.id] ?? '').trim() === (example[f.id] ?? ''))
 }
 
 export function hasOwnModeInput(def: ModeDef, draft: ModeDraft): boolean {
-  return hasTypedModeInput(def, draft) && !isModeExample(def, draft)
+  return (hasTypedModeInput(def, draft) || Boolean(draft.photos?.length)) && !isModeExample(def, draft)
 }
 
 export function toModeRequest(def: ModeDef, draft: ModeDraft): DemoRequest {
@@ -238,6 +249,7 @@ export function toModeRequest(def: ModeDef, draft: ModeDraft): DemoRequest {
     modeLabel: def.title,
     goalLabel: detail,
     feedbackKey: isPostDate ? `mode/${def.id}/${draft.path}` : `mode/${def.id}`,
-    source: isModeExample(def, draft) ? 'example' : 'own-text',
+    source: isModeExample(def, draft) ? 'example' : def.id === 'match' ? 'own-profile' : 'own-text',
+    photoCount: draft.photos?.length ?? 0,
   }
 }

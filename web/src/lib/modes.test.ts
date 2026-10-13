@@ -37,7 +37,19 @@ describe('modos especiais', () => {
     expect(req.source).toBe('example')
     expect(req.label).toBe('Robô de Match · Tinder')
     expect(req.content.followUps.herReply).toBeUndefined()
-    expect(toModeRequest(def, { ...ex, values: { ...ex.values, app: 'Hinge' } }).source).toBe('own-text')
+    expect(toModeRequest(def, { ...ex, values: { ...ex.values, app: 'Hinge' } }).source).toBe('own-profile')
+    expect(req.content.profile).toBeDefined()
+  })
+
+  it('Robô de Match: fotos próprias tiram do exemplo (nunca recebem a nota do exemplo)', () => {
+    const def = getMode('match')
+    const ex = { ...defaultModeDraft('match'), values: getModeExampleValues('match') }
+    const photo = { file: new File(['x'], 'eu.jpg', { type: 'image/jpeg' }), previewUrl: 'blob:eu' }
+    const withPhotos = { ...ex, photos: [photo, photo] }
+    const req = toModeRequest(def, withPhotos)
+    expect(req.source).toBe('own-profile')
+    expect(req.photoCount).toBe(2)
+    expect(hasOwnModeInput(def, { ...defaultModeDraft('match'), photos: [photo] })).toBe(true)
   })
 
   it('Pós-Date inclui os três caminhos com exemplos próprios', () => {

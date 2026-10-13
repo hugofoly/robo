@@ -24,6 +24,27 @@ export interface FollowUps {
   herReply?: { message: string; reading: string; suggestion: string }
 }
 
+/** Critério da nota de força do perfil (0–100), com peso na média e a nota antes/depois das sugestões. */
+export interface ProfileDimension {
+  id: string
+  label: string
+  /** Peso na média ponderada (os pesos somam 100). */
+  weight: number
+  now: number
+  after: number
+  note: string
+}
+
+export type PhotoVerdict = 'keep' | 'move' | 'replace'
+
+/** Revisão de perfil do Robô de Match: só existe para o exemplo identificado (fotos fictícias, descritas em texto). */
+export interface ProfileReview {
+  dimensions: ProfileDimension[]
+  photos: { description: string; verdict: PhotoVerdict; note: string }[]
+  missing: string[]
+  order: string
+}
+
 /** Conteúdo de resultado de um cenário fictício, escrito à mão. Nada aqui vem da entrada do usuário. */
 export interface DemoContent {
   /** Uma linha descrevendo o cenário, mostrada junto da leitura. */
@@ -33,6 +54,8 @@ export interface DemoContent {
   recommended: Tone
   reason: string
   followUps: FollowUps
+  /** Só no Robô de Match: nota de força do perfil e revisão das fotos do exemplo. */
+  profile?: ProfileReview
 }
 
 /** Cenário do Assistente: o conteúdo e o exemplo que "Usar exemplo" coloca nos campos. */

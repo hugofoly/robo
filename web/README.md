@@ -57,8 +57,12 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
 - **Fotos de Impacto**: galeria de prompts para criar fotos de perfil no gerador de imagens do usuário (ChatGPT,
   Gemini etc.), com filtro por categoria e botão Copiar. O app não gera nem recebe fotos. Para trocar os prompts,
   edite `src/data/photoPrompts.ts` (campo opcional `image` para ilustrar cada card com um arquivo de `public/`).
-- **Robô de Match**: otimização de perfil (app, sobre você e bio atual) com três bios nos mesmos cards de resultado,
-  ajustes, explicações, acompanhamento e salvar/continuar. Exemplo local em `src/data/matchExample.ts`.
+- **Robô de Match**: otimização de perfil (app, sobre você, bio atual e até 6 fotos do perfil, que ficam só no
+  navegador) com três bios nos mesmos cards de resultado, ajustes, explicações, acompanhamento e salvar/continuar.
+  - **Força do perfil (0–100%)**: média ponderada de Fotos (50%), Bio (30%) e Perfil completo (20%), com a nota de
+    hoje, o ganho com as sugestões e a revisão foto a foto (Manter / Mover / Trocar). Só aparece para o perfil de
+    exemplo (fotos fictícias, descritas em texto); um perfil próprio não recebe nota inventada e vê que a análise
+    será conectada depois. Exemplo local em `src/data/matchExample.ts`; cálculo em `src/lib/profile.ts`.
 - **Minhas conversas** (histórico temporário, só em memória): "Salvar conversa" no resultado registra nome, modo,
   objetivo, contexto, sugestões (com a versão escolhida em cada card) e acompanhamento, sem arquivos de print ou
   áudio. Salvar de novo atualiza a mesma conversa. Dá para buscar pelo nome, abrir e continuar, renomear e excluir
@@ -83,7 +87,8 @@ Pontos onde uma integração real entraria (nenhum endpoint existe hoje):
   aba/objetivo/modo, sem ler a entrada. Uma fonte real geraria `DemoContent` a partir da entrada.
 - `useDemoGeneration` (`src/lib/useDemoGeneration.ts`): hoje simula 1,4 s de carregamento; seria a chamada real.
 - `answerFor` (`src/lib/followup.ts`): hoje só responde aos atalhos; perguntas livres seriam conectadas aqui.
-- Transcrição de áudio e leitura de print: hoje não existem (a interface diz que serão conectadas depois).
+- Transcrição de áudio, leitura de print e análise das fotos/nota do perfil: hoje não existem (a interface diz que
+  serão conectadas depois).
 
 ## Estado e privacidade
 

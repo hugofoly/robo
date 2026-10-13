@@ -5,6 +5,7 @@ import { useActions, useAppState } from '../lib/StoreProvider'
 import type { ResultState, WorkspaceId } from '../lib/store'
 import type { GenerationStatus } from '../lib/useDemoGeneration'
 import { FollowUp } from './FollowUp'
+import { ProfileReview } from './ProfileReview'
 import { AlertIcon } from './Icons'
 import { SuggestionCard } from './SuggestionCard'
 
@@ -142,6 +143,8 @@ function SuccessBody({
           cenário de exemplo, não à sua conversa.
         </p>
       )}
+
+      {content.profile && <ProfileReview review={content.profile} source={source} photoCount={request.photoCount ?? 0} />}
 
       <div className="card reading">
         <h3 className="card-title">Leitura do cenário de exemplo</h3>

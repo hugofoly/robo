@@ -52,6 +52,58 @@ export const MATCH_EXAMPLE: { values: Record<string, string>; content: DemoConte
     },
     recommended: 'confident',
     reason: 'Troca fatos genéricos por detalhes concretos e termina com uma pergunta, o que facilita a primeira mensagem.',
+    profile: {
+      dimensions: [
+        {
+          id: 'photos',
+          label: 'Fotos',
+          weight: 50,
+          now: 45,
+          after: 80,
+          note: 'Abre com uma selfie de óculos escuros e não há foto de rosto nítida.',
+        },
+        {
+          id: 'bio',
+          label: 'Bio',
+          weight: 30,
+          now: 35,
+          after: 85,
+          note: 'Genérica (profissão, altura, "gosto de viajar") e sem gancho para conversa.',
+        },
+        {
+          id: 'complete',
+          label: 'Perfil completo',
+          weight: 20,
+          now: 80,
+          after: 95,
+          note: 'Profissão e interesses preenchidos; falta responder um prompt do app.',
+        },
+      ],
+      photos: [
+        {
+          description: 'Selfie no carro com óculos escuros',
+          verdict: 'replace',
+          note: 'Rosto coberto e ângulo de baixo. Não use como primeira foto.',
+        },
+        {
+          description: 'Foto em grupo num casamento, com 4 pessoas',
+          verdict: 'move',
+          note: 'Difícil saber quem é você. Coloque depois das fotos em que você aparece sozinho.',
+        },
+        {
+          description: 'Correndo a meia maratona, com a medalha',
+          verdict: 'keep',
+          note: 'Mostra um hábito que a bio cita. Ótima como segunda foto.',
+        },
+        {
+          description: 'No sofá com o gato Pixel',
+          verdict: 'keep',
+          note: 'Dá assunto pronto para a conversa. Deixe entre as três primeiras.',
+        },
+      ],
+      missing: ['Uma foto de rosto nítida e sorrindo para abrir o perfil.', 'Uma foto de corpo inteiro.'],
+      order: 'Retrato sorrindo (nova) → corrida → gato Pixel → corpo inteiro (nova) → grupo do casamento.',
+    },
     followUps: {
       why: 'A recomendada (Confiante) troca o que todo perfil tem (profissão solta, altura, "gosto de viajar") por detalhes que só você tem e fecha com uma pergunta. Isso dá à outra pessoa um motivo pronto para escrever primeiro.',
       next: 'Atualize a bio e depois revise as fotos: rosto bem iluminado na primeira, uma de corpo inteiro e uma fazendo algo que a bio cita (correndo, cozinhando ou com o Pixel). Em Fotos de Impacto há prompts para montar essas fotos.',

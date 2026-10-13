@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { INITIAL_DRAFT, type AssistantDraft } from './assistant'
 import { getScenario, toDemoRequest } from './demo'
-import { getMode, getModeExampleValues, toModeRequest } from './modes'
-import { createStore, searchConversations, snapshotAssistantDraft, tabOf, workspaceHasUnsavedWork, type Store } from './store'
+import { defaultModeDraft, getMode, getModeExampleValues, toModeRequest } from './modes'
+import { createStore, searchConversations, snapshotAssistantDraft, snapshotModeDraft, tabOf, workspaceHasUnsavedWork, type Store } from './store'
 
 const draft: AssistantDraft = {
   ...INITIAL_DRAFT,
@@ -218,5 +218,17 @@ describe('abas (como no iOS)', () => {
     expect(tabOf(s.getState().section)).toBeNull()
     s.actions.goBack()
     expect(s.getState().section).toBe('match')
+  })
+})
+
+describe('fotos do perfil não são salvas', () => {
+  it('snapshot do modo guarda só a quantidade de fotos', () => {
+    const photo = { file: new File(['x'], 'eu.jpg', { type: 'image/jpeg' }), previewUrl: 'blob:eu' }
+    const snap = snapshotModeDraft('match', { ...defaultModeDraft('match'), photos: [photo, photo, photo] })
+    expect(snap.kind).toBe('mode')
+    if (snap.kind !== 'mode') return
+    expect(snap.draft.photos).toBeUndefined()
+    expect(snap.photoCount).toBe(3)
+    expect(JSON.stringify(snap)).not.toContain('blob:')
   })
 })

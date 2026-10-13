@@ -56,7 +56,7 @@ export function isUsingExample(draft: AssistantDraft): boolean {
   return draft.mode === 'text' && draft.text.trim() === scenario.text && draft.context.trim() === scenario.context
 }
 
-export type DemoSource = 'example' | 'own-image' | 'own-text' | 'own-audio' | 'own-transcript'
+export type DemoSource = 'example' | 'own-image' | 'own-text' | 'own-audio' | 'own-transcript' | 'own-profile'
 
 /** Aviso exibido no resultado quando a entrada não é o exemplo: nada foi analisado. */
 export const OWN_INPUT_MESSAGES: Record<Exclude<DemoSource, 'example'>, string> = {
@@ -64,6 +64,7 @@ export const OWN_INPUT_MESSAGES: Record<Exclude<DemoSource, 'example'>, string> 
   'own-text': 'Seu texto não foi analisado.',
   'own-audio': 'Seu áudio não foi transcrito nem analisado.',
   'own-transcript': 'Essa transcrição não é a do exemplo e não foi analisada.',
+  'own-profile': 'Seu perfil e suas fotos não foram analisados.',
 }
 
 export interface DemoRequest {
@@ -75,6 +76,8 @@ export interface DemoRequest {
   goalLabel: string | null
   /** Prefixo da chave de feedback na sessão. */
   feedbackKey: string
+  /** Robô de Match: quantas fotos próprias foram enviadas (as fotos em si nunca entram no pedido). */
+  photoCount?: number
   source: DemoSource
 }
 
