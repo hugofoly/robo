@@ -1,14 +1,19 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { GOALS, TABS, TAB_COPY, hasValidInput, type AssistantDraft, type InputMode } from '../lib/assistant'
+import { DEMO_NOTICE, getScenario, isUsingExample, toDemoRequest, type DemoRequest } from '../lib/demo'
 import { validateImage } from '../lib/upload'
 import { ImageInput } from './ImageInput'
 import { LockIcon, PhotoIcon, TextIcon } from './Icons'
+import { Results, type Generation } from './Results'
 import { SegmentedControl } from './SegmentedControl'
+
+/** Duração do carregamento simulado. Nenhuma requisição é feita. */
+const SIMULATED_DELAY_MS = 1400
 
 interface Props {
   draft: AssistantDraft
   onChange: (update: (d: AssistantDraft) => AssistantDraft) => void
-  onGenerate: () => void
+  onToast: (message: string) => void
 }
 
 const MODES: { id: InputMode; label: ReactNode }[] = [
@@ -16,10 +21,53 @@ const MODES: { id: InputMode; label: ReactNode }[] = [
   { id: 'text', label: <><TextIcon size={16} /> Texto</> },
 ]
 
-export function Assistant({ draft, onChange, onGenerate }: Props) {
+export function Assistant({ draft, onChange, onToast }: Props) {
   const [imageError, setImageError] = useState<string | null>(null)
+  // O resultado vive só enquanto o Assistente está aberto: gerar não cria histórico.
+  const [generation, setGeneration] = useState<Generation>({ status: 'idle' })
+  const [failNext, setFailNext] = useState(false)
+  const inFlight = useRef(false)
+  const timer = useRef<number | undefined>(undefined)
+  const runId = useRef(0)
+
   const copy = TAB_COPY[draft.tab]
-  const canGenerate = hasValidInput(draft)
+  const loading = generation.status === 'loading'
+  const canGenerate = hasValidInput(draft) && !loading
+  const usingExample = isUsingExample(draft)
+
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  function run(request: DemoRequest) {
+    // Trava síncrona: um segundo clique antes do re-render não inicia outra geração.
+    if (inFlight.current) return
+    inFlight.current = true
+    const shouldFail = failNext
+    if (shouldFail) setFailNext(false)
+    setGeneration({ status: 'loading', request })
+    timer.current = window.setTimeout(() => {
+      inFlight.current = false
+      runId.current += 1
+      setGeneration(shouldFail ? { status: 'error', request } : { status: 'success', request, runId: runId.current })
+    }, SIMULATED_DELAY_MS)
+  }
+
+  function generate() {
+    if (!hasValidInput(draft)) return
+    run(toDemoRequest(draft))
+  }
+
+  function retry() {
+    if (generation.status === 'error') run(generation.request)
+  }
+
+  function applyExample() {
+    const scenario = getScenario(draft.tab, draft.goal)
+    const hasOwnText = draft.text.trim() !== '' || draft.context.trim() !== ''
+    if (hasOwnText && !usingExample && !window.confirm('Substituir o texto e o contexto que você escreveu pelo exemplo?')) {
+      return
+    }
+    onChange((d) => ({ ...d, mode: 'text', text: scenario.text, context: scenario.context }))
+  }
 
   function selectImage(file: File) {
     const error = validateImage(file)
@@ -74,10 +122,15 @@ export function Assistant({ draft, onChange, onGenerate }: Props) {
         className="panel"
         onSubmit={(e) => {
           e.preventDefault()
-          if (canGenerate) onGenerate()
+          generate()
         }}
       >
-        <p className="panel-intro">{copy.intro}</p>
+        <div className="panel-intro-row">
+          <p className="panel-intro">{copy.intro}</p>
+          <button type="button" className="btn-link" onClick={applyExample}>
+            Usar exemplo
+          </button>
+        </div>
 
         <fieldset className="card">
           <legend className="card-title">Entrada</legend>
@@ -103,6 +156,7 @@ export function Assistant({ draft, onChange, onGenerate }: Props) {
             <div className="field">
               <label htmlFor="conversation-text" className="field-label">
                 {copy.textLabel}
+                {usingExample && <span className="tag">Exemplo fictício</span>}
               </label>
               <textarea
                 id="conversation-text"
@@ -149,22 +203,39 @@ export function Assistant({ draft, onChange, onGenerate }: Props) {
         </fieldset>
 
         <div className="actions">
+          <p className="demo-notice">{DEMO_NOTICE}</p>
           <button type="submit" className="btn-primary" disabled={!canGenerate} aria-describedby="generate-help">
-            Gerar sugestões
+            {loading ? (
+              <>
+                <span className="spinner" aria-hidden="true" /> Gerando…
+              </>
+            ) : (
+              'Gerar sugestões'
+            )}
           </button>
           <p id="generate-help" className="privacy-note">
-            {canGenerate ? (
+            {hasValidInput(draft) ? (
               <>
                 <LockIcon /> Seu print e seu texto ficam só neste navegador.
               </>
             ) : draft.mode === 'image' ? (
-              'Envie um print para continuar.'
+              'Envie um print, cole um texto ou use o exemplo para continuar.'
             ) : (
-              'Cole a conversa ou escreva um relato para continuar.'
+              'Cole a conversa, escreva um relato ou use o exemplo para continuar.'
             )}
           </p>
         </div>
       </form>
+
+      <Results generation={generation} onRetry={retry} onCopied={() => onToast('Mensagem copiada.')} />
+
+      <details className="test-tools">
+        <summary>Ferramentas de teste</summary>
+        <label className="toggle-row">
+          <input type="checkbox" checked={failNext} onChange={(e) => setFailNext(e.target.checked)} />
+          <span>Simular erro na próxima geração</span>
+        </label>
+      </details>
     </section>
   )
 }

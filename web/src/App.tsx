@@ -32,7 +32,7 @@ export default function App() {
           <Assistant
             draft={draft}
             onChange={setDraft}
-            onGenerate={() => showToast('A demonstração das sugestões será adicionada em breve.')}
+            onToast={showToast}
           />
         )}
 
@@ -52,10 +52,12 @@ export default function App() {
         {section === 'conversations' && (
           <EmptyState icon={<BubblesIcon size={34} />} title="Nenhuma conversa ainda">
             <p>
-              Quando a geração de sugestões estiver ativa, suas conversas analisadas aparecem aqui para você retomar de
-              onde parou.
+              Quando a análise real estiver ativa, suas conversas aparecem aqui para você retomar de onde parou.
             </p>
-            <p className="muted">Nada é salvo nesta versão: prints e textos ficam apenas no seu navegador.</p>
+            <p className="muted">
+              As demonstrações não ficam salvas. Nada é guardado nesta versão: prints e textos ficam apenas no seu
+              navegador.
+            </p>
             <button type="button" className="btn-secondary" onClick={() => setSection('assistant')}>
               Ir para o Assistente
             </button>
