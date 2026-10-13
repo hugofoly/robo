@@ -46,7 +46,6 @@ export function SpecialModes({ onToast }: { onToast: (message: string) => void }
       </button>
       <div className="modes-head">
         <h2 id="modes-title">Modos especiais</h2>
-        <span className="badge">Liberados no Beta</span>
       </div>
       <p className="panel-intro">Fluxos curtos para momentos específicos. Todos usam exemplos locais nesta versão.</p>
       <ul className="mode-list">
@@ -122,7 +121,6 @@ function ModeView({ mode, draft, onChange, onBack, onToast }: ViewProps) {
         <h2 id="mode-title" ref={titleRef} tabIndex={-1}>
           {def.title}
         </h2>
-        <span className="badge">Beta</span>
       </div>
 
       <ContinuingBanner workspace={workspace} />

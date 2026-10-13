@@ -17,7 +17,6 @@ export function PhotoGallery({ onToast }: { onToast: (message: string) => void }
     <section className="gallery" aria-labelledby="gallery-title">
       <div className="modes-head">
         <h2 id="gallery-title">Fotos de Impacto</h2>
-        <span className="badge">Beta</span>
       </div>
       <p className="panel-intro">
         Prompts para criar fotos de perfil no gerador de imagens que você já usa, como ChatGPT ou Gemini. O Robô de Date

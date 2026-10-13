@@ -1,4 +1,4 @@
-# Robô de Date · Web (Beta)
+# Robô de Date · Web
 
 Frontend inicial do Robô de Date. Vite + React + TypeScript, sem backend.
 
@@ -47,7 +47,7 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
   - "Ferramentas de teste" (rodapé) simula um erro na próxima geração, para testar o "Tentar novamente".
   - O resultado atual de cada área continua ao navegar entre seções; histórico só existe ao salvar.
   - O rascunho é compartilhado entre as abas e sobrevive à troca de seção.
-- **Modos especiais** (todos liberados no Beta), com formulário curto e os mesmos cards de resultado, cada um com
+- **Modos especiais** (todos liberados), com formulário curto e os mesmos cards de resultado, cada um com
   exemplos próprios (`src/lib/modes.ts`):
   - **Date Rápido**: contexto e disponibilidade.
   - **Pós-Date**: caminhos Casual, Buscar namoro e Tentar segundo encontro, cada um com seu exemplo.

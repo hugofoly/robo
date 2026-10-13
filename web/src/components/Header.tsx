@@ -16,7 +16,6 @@ export function Header() {
             <h1 className="brand-name">
               Robô de <span className="accent">Date</span>
             </h1>
-            <span className="badge">Beta</span>
           </div>
           <p className="tagline">A mensagem certa muda o jogo</p>
         </div>
