@@ -232,3 +232,20 @@ describe('fotos do perfil não são salvas', () => {
     expect(JSON.stringify(snap)).not.toContain('blob:')
   })
 })
+
+describe('onboarding', () => {
+  it('primeira abertura começa nas boas-vindas; tour, fechar e rever', () => {
+    const s = createStore()
+    expect(s.getState().onboarding).toEqual({ stage: 'welcome', step: 0 })
+    s.actions.selectTab('photos')
+    s.actions.startTour()
+    expect(s.getState().section).toBe('assistant')
+    expect(s.getState().onboarding.stage).toBe('tour')
+    s.actions.setTourStep(3)
+    expect(s.getState().onboarding.step).toBe(3)
+    s.actions.closeOnboarding()
+    expect(s.getState().onboarding.stage).toBe('done')
+    s.actions.reopenOnboarding()
+    expect(s.getState().onboarding).toEqual({ stage: 'welcome', step: 0 })
+  })
+})

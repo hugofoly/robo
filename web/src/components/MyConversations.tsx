@@ -66,6 +66,7 @@ export function MyConversations({ onToast }: { onToast: (message: string) => voi
       )}
 
       <PreferencesCard />
+      <ReviewTour />
     </section>
   )
 }
@@ -185,5 +186,17 @@ function ConversationRow({ conversation: c, onToast }: { conversation: SavedConv
         </button>
       </div>
     </li>
+  )
+}
+
+function ReviewTour() {
+  const { reopenOnboarding } = useActions()
+  return (
+    <button type="button" className="entry-row review-tour" onClick={reopenOnboarding}>
+      <span className="entry-text">
+        <span className="entry-title">Rever apresentação</span>
+        <span className="entry-sub">Boas-vindas e tour pelas abas do app.</span>
+      </span>
+    </button>
   )
 }

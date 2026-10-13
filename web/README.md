@@ -18,6 +18,11 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
 - **Assistente** (inclui a entrada para Modos especiais), **Robô de Match** e **Fotos de Impacto** são as abas.
 - **Minhas conversas** (com as preferências) abre pelo botão no canto do cabeçalho, com contador de conversas salvas
   e "Voltar" para a tela de origem.
+- **Onboarding de navegação** no primeiro acesso: boas-vindas (as 3 abas, com aviso de demonstração) e tour de 5
+  passos que destaca os elementos reais (abas, Modos especiais e Minhas conversas), com Voltar/Próximo, Pular, Esc e
+  foco preso no diálogo. "Rever apresentação" fica em Minhas conversas. Sem login nem armazenamento, "primeiro
+  acesso" é a primeira abertura da página na sessão (recarregar mostra de novo); com login, trocar `isFirstVisit`
+  (`src/lib/store.ts`) por um campo do usuário. Textos do tour em `src/lib/onboarding.ts`.
 
 - **Assistente** (tela inicial) com as abas Responder conversa, Puxar assunto e Responder story.
   - Entrada por print (PNG/JPEG/WebP até 10 MB, com preview local, trocar e remover; aceita arrastar e colar) ou por texto.

@@ -67,6 +67,18 @@ export interface AppState {
   returnTo: Section
   /** Última tela dentro da aba Assistente (o próprio Assistente ou Modos especiais), para restaurar ao voltar à aba. */
   assistantTabSection: 'assistant' | 'modes'
+  /** Onboarding de navegação: boas-vindas → tour de 5 passos → concluído. */
+  onboarding: { stage: OnboardingStage; step: number }
+}
+
+export type OnboardingStage = 'welcome' | 'tour' | 'done'
+
+/**
+ * Primeiro acesso. Sem login nem armazenamento no navegador, "primeiro acesso" = primeira abertura da página
+ * nesta sessão (recarregar mostra de novo). Com login, trocar por um campo do usuário (ex.: onboardingConcluidoEm).
+ */
+export function isFirstVisit(): boolean {
+  return true
 }
 
 export type Tab = 'assistant' | 'match' | 'photos'
@@ -96,6 +108,7 @@ export function initialState(): AppState {
     photoCategory: 'all',
     returnTo: 'assistant',
     assistantTabSection: 'assistant',
+    onboarding: { stage: isFirstVisit() ? 'welcome' : 'done', step: 0 },
   }
 }
 
@@ -173,6 +186,20 @@ export function createStore(initial: AppState = initialState()) {
       if (tab !== 'assistant') return actions.setSection(tab)
       if (tabOf(state.section) === 'assistant') return set({ ...state, section: 'assistant', openMode: null })
       set({ ...state, section: state.assistantTabSection })
+    },
+    /** Começa o tour no início do Assistente (onde estão a tab bar e a linha de Modos especiais). */
+    startTour() {
+      set({ ...state, section: 'assistant', openMode: null, onboarding: { stage: 'tour', step: 0 } })
+    },
+    setTourStep(step: number) {
+      set({ ...state, onboarding: { stage: 'tour', step } })
+    },
+    closeOnboarding() {
+      set({ ...state, onboarding: { stage: 'done', step: 0 } })
+    },
+    /** "Rever apresentação" (Minhas conversas). */
+    reopenOnboarding() {
+      set({ ...state, onboarding: { stage: 'welcome', step: 0 } })
     },
     /** "Voltar" de Minhas conversas para a tela de onde o usuário veio. */
     goBack() {
