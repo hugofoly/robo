@@ -1,4 +1,5 @@
-import type { AssistantDraft, AssistantTab, Goal } from './assistant'
+import { GOALS, TABS, type AssistantDraft, type AssistantTab, type Goal } from './assistant'
+import { AUDIO_EXAMPLE } from './audio'
 
 export const DEMO_NOTICE = 'Demonstração: as respostas são exemplos e não analisam o conteúdo enviado.'
 
@@ -39,13 +40,10 @@ export interface FollowUps {
   herReply: { message: string; reading: string; suggestion: string }
 }
 
-/** Cenário fictício e conhecido, com respostas escritas à mão. Nada aqui é gerado a partir da entrada do usuário. */
-export interface DemoScenario {
+/** Conteúdo de resultado de um cenário fictício, escrito à mão. Nada aqui vem da entrada do usuário. */
+export interface DemoContent {
   /** Uma linha descrevendo o cenário, mostrada junto da leitura. */
   summary: string
-  /** Conteúdo que "Usar exemplo" coloca no campo de texto. */
-  text: string
-  context: string
   reading: string
   cards: Record<Tone, DemoCard>
   recommended: Tone
@@ -53,7 +51,13 @@ export interface DemoScenario {
   followUps: FollowUps
 }
 
-function card(
+/** Cenário do Assistente: o conteúdo e o exemplo que "Usar exemplo" coloca nos campos. */
+export interface DemoScenario extends DemoContent {
+  text: string
+  context: string
+}
+
+export function card(
   text: string,
   intent: string,
   next: string,
@@ -751,22 +755,60 @@ export function getScenario(tab: AssistantTab, goal: Goal): DemoScenario {
   return DEMO_SCENARIOS[tab][goal]
 }
 
+/** Cenário do exemplo de áudio identificado (a transcrição fictícia é da Marina). */
+export const AUDIO_EXAMPLE_TARGET = { tab: 'reply', goal: 'continue' } as const
+
 /**
  * Verdadeiro só quando a entrada é exatamente o exemplo da aba e do objetivo atuais.
- * Qualquer edição, print ou outra combinação conta como entrada própria, que nunca recebe leitura.
+ * Qualquer edição, print, áudio próprio ou outra combinação conta como entrada própria, que nunca recebe leitura.
  */
 export function isUsingExample(draft: AssistantDraft): boolean {
+  if (draft.mode === 'audio') {
+    return (
+      draft.audio?.kind === 'example' &&
+      draft.tab === AUDIO_EXAMPLE_TARGET.tab &&
+      draft.goal === AUDIO_EXAMPLE_TARGET.goal &&
+      draft.audio.transcript.trim() === AUDIO_EXAMPLE.transcript &&
+      draft.context.trim() === getScenario(AUDIO_EXAMPLE_TARGET.tab, AUDIO_EXAMPLE_TARGET.goal).context
+    )
+  }
   const scenario = getScenario(draft.tab, draft.goal)
   return draft.mode === 'text' && draft.text.trim() === scenario.text && draft.context.trim() === scenario.context
 }
 
+export type DemoSource = 'example' | 'own-image' | 'own-text' | 'own-audio' | 'own-transcript'
+
+/** Aviso exibido no resultado quando a entrada não é o exemplo: nada foi analisado. */
+export const OWN_INPUT_MESSAGES: Record<Exclude<DemoSource, 'example'>, string> = {
+  'own-image': 'Seu print não foi analisado.',
+  'own-text': 'Seu texto não foi analisado.',
+  'own-audio': 'Seu áudio não foi transcrito nem analisado.',
+  'own-transcript': 'Essa transcrição não é a do exemplo e não foi analisada.',
+}
+
 export interface DemoRequest {
-  tab: AssistantTab
-  goal: Goal
-  source: 'example' | 'own-image' | 'own-text'
+  content: DemoContent
+  /** Rótulo do resultado, ex.: "Responder conversa · Flertar". */
+  label: string
+  /** Prefixo da chave de feedback na sessão. */
+  feedbackKey: string
+  source: DemoSource
+}
+
+function sourceOf(draft: AssistantDraft): DemoSource {
+  if (isUsingExample(draft)) return 'example'
+  if (draft.mode === 'image') return 'own-image'
+  if (draft.mode === 'audio') return draft.audio?.kind === 'example' ? 'own-transcript' : 'own-audio'
+  return 'own-text'
 }
 
 export function toDemoRequest(draft: AssistantDraft): DemoRequest {
-  const source = isUsingExample(draft) ? 'example' : draft.mode === 'image' ? 'own-image' : 'own-text'
-  return { tab: draft.tab, goal: draft.goal, source }
+  const tab = TABS.find((t) => t.id === draft.tab)!.label
+  const goal = GOALS.find((g) => g.id === draft.goal)!.label
+  return {
+    content: getScenario(draft.tab, draft.goal),
+    label: `${tab} · ${goal}`,
+    feedbackKey: `${draft.tab}/${draft.goal}`,
+    source: sourceOf(draft),
+  }
 }

@@ -2,15 +2,24 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Assistant } from './components/Assistant'
 import { EmptyState } from './components/EmptyState'
 import { Header } from './components/Header'
-import { BubblesIcon, WandIcon } from './components/Icons'
+import { BubblesIcon } from './components/Icons'
 import { Navigation, type Section } from './components/Navigation'
+import { SpecialModes } from './components/SpecialModes'
 import { Toast } from './components/Toast'
 import { INITIAL_DRAFT, type AssistantDraft } from './lib/assistant'
+import { emptyModeDraft, type ModeDraft, type ModeId } from './lib/modes'
 
 export default function App() {
   const [section, setSection] = useState<Section>('assistant')
   // O rascunho vive aqui para sobreviver à troca de abas e de seções.
   const [draft, setDraft] = useState<AssistantDraft>(INITIAL_DRAFT)
+  const [openMode, setOpenMode] = useState<ModeId | null>(null)
+  const [modeDrafts, setModeDrafts] = useState<Record<ModeId, ModeDraft>>(() => ({
+    'quick-date': emptyModeDraft(),
+    'post-date': emptyModeDraft(),
+    nudes: emptyModeDraft(),
+    express: emptyModeDraft(),
+  }))
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | undefined>(undefined)
 
@@ -25,7 +34,14 @@ export default function App() {
   return (
     <div className="app">
       <Header />
-      <Navigation current={section} onChange={setSection} />
+      <Navigation
+        current={section}
+        onChange={(next) => {
+          // Como numa tab bar do iOS: tocar de novo na seção atual volta ao início dela.
+          if (next === 'modes' && section === 'modes') setOpenMode(null)
+          setSection(next)
+        }}
+      />
 
       <main className="app-main">
         {section === 'assistant' && (
@@ -37,16 +53,13 @@ export default function App() {
         )}
 
         {section === 'modes' && (
-          <EmptyState icon={<WandIcon size={34} />} title="Modos especiais">
-            <p>
-              Aqui vão ficar fluxos dedicados para momentos específicos, como reverter um vácuo, mandar a primeira
-              mensagem depois do match ou combinar o primeiro encontro.
-            </p>
-            <p className="muted">Ainda não disponível no Beta. Por enquanto, use o Assistente.</p>
-            <button type="button" className="btn-secondary" onClick={() => setSection('assistant')}>
-              Ir para o Assistente
-            </button>
-          </EmptyState>
+          <SpecialModes
+            openMode={openMode}
+            onOpen={setOpenMode}
+            drafts={modeDrafts}
+            onDraftChange={(mode, update) => setModeDrafts((all) => ({ ...all, [mode]: update(all[mode]) }))}
+            onToast={showToast}
+          />
         )}
 
         {section === 'conversations' && (

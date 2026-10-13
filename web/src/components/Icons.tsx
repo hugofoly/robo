@@ -106,3 +106,53 @@ export const SendIcon = ({ size = 18 }: Props) => (
     <path d="M12 19V5M6 11l6-6 6 6" />
   </svg>
 )
+
+export const MicIcon = ({ size = 18 }: Props) => (
+  <svg {...base(size)}>
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M5 11a7 7 0 0014 0M12 18v3" />
+  </svg>
+)
+
+export const WaveIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
+  </svg>
+)
+
+export const PlayIcon = ({ size = 18 }: Props) => (
+  <svg {...base(size)} fill="currentColor" strokeWidth={0}>
+    <path d="M8 5.5v13a1 1 0 001.5.9l10.5-6.5a1 1 0 000-1.8L9.5 4.6A1 1 0 008 5.5z" />
+  </svg>
+)
+
+export const PauseIcon = ({ size = 18 }: Props) => (
+  <svg {...base(size)} fill="currentColor" strokeWidth={0}>
+    <rect x="6" y="5" width="4" height="14" rx="1.2" />
+    <rect x="14" y="5" width="4" height="14" rx="1.2" />
+  </svg>
+)
+
+export const StopIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)} fill="currentColor" strokeWidth={0}>
+    <rect x="6" y="6" width="12" height="12" rx="2.5" />
+  </svg>
+)
+
+export const ChevronIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M9 5l7 7-7 7" />
+  </svg>
+)
+
+export const BackIcon = ({ size = 18 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M15 5l-7 7 7 7" />
+  </svg>
+)
+
+export const ShieldIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
+  </svg>
+)

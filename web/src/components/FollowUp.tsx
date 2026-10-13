@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
-import type { DemoScenario } from '../lib/demo'
+import type { DemoContent } from '../lib/demo'
 import { SHORTCUTS, answerFor, matchShortcut, type FollowUpAnswer, type Shortcut } from '../lib/followup'
 import { COPY_FALLBACK_MESSAGE, useCopy } from '../lib/useCopy'
 import { CopyButton } from './CopyButton'
@@ -11,7 +11,7 @@ interface Entry {
   answer: FollowUpAnswer
 }
 
-export function FollowUp({ scenario, onCopied }: { scenario: DemoScenario; onCopied: () => void }) {
+export function FollowUp({ scenario, onCopied }: { scenario: DemoContent; onCopied: () => void }) {
   // Conversa efêmera: vive só neste resultado e some numa nova geração.
   const [entries, setEntries] = useState<Entry[]>([])
   const [input, setInput] = useState('')

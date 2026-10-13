@@ -1,15 +1,9 @@
 import { useEffect, useRef } from 'react'
-import { GOALS, TABS } from '../lib/assistant'
-import { DEMO_NOTICE, TONES, getScenario, type DemoRequest } from '../lib/demo'
-import { AlertIcon } from './Icons'
+import { DEMO_NOTICE, OWN_INPUT_MESSAGES, TONES, type DemoRequest } from '../lib/demo'
+import type { Generation } from '../lib/useDemoGeneration'
 import { FollowUp } from './FollowUp'
+import { AlertIcon } from './Icons'
 import { SuggestionCard } from './SuggestionCard'
-
-export type Generation =
-  | { status: 'idle' }
-  | { status: 'loading'; request: DemoRequest }
-  | { status: 'success'; request: DemoRequest; runId: number }
-  | { status: 'error'; request: DemoRequest }
 
 interface Props {
   generation: Generation
@@ -35,8 +29,6 @@ export function Results({ generation, onRetry, onCopied }: Props) {
   if (generation.status === 'idle') return null
 
   const { request } = generation
-  const tabLabel = TABS.find((t) => t.id === request.tab)?.label
-  const goalLabel = GOALS.find((g) => g.id === request.goal)?.label
 
   return (
     <section ref={regionRef} className="results" aria-labelledby="results-title" aria-busy={generation.status === 'loading'}>
@@ -46,9 +38,7 @@ export function Results({ generation, onRetry, onCopied }: Props) {
         </h2>
         <span className="badge badge-demo">Demonstração</span>
       </header>
-      <p className="results-meta">
-        {tabLabel} · {goalLabel}
-      </p>
+      <p className="results-meta">{request.label}</p>
       <p className="demo-notice">{DEMO_NOTICE}</p>
 
       {generation.status === 'loading' && <Loading />}
@@ -66,9 +56,7 @@ export function Results({ generation, onRetry, onCopied }: Props) {
         </div>
       )}
 
-      {generation.status === 'success' && (
-        <SuccessBody request={request} runId={generation.runId} onCopied={onCopied} />
-      )}
+      {generation.status === 'success' && <SuccessBody request={request} runId={generation.runId} onCopied={onCopied} />}
     </section>
   )
 }
@@ -96,22 +84,21 @@ function Loading() {
 }
 
 function SuccessBody({ request, runId, onCopied }: { request: DemoRequest; runId: number; onCopied: () => void }) {
-  const scenario = getScenario(request.tab, request.goal)
-  const ownInput = request.source !== 'example'
+  const { content, source } = request
 
   return (
     <div className="results-body">
-      {ownInput && (
+      {source !== 'example' && (
         <p className="own-input-note">
-          <strong>{request.source === 'own-image' ? 'Seu print não foi analisado.' : 'Seu texto não foi analisado.'}</strong> Para você
-          testar a interface, as mensagens abaixo respondem a um cenário de exemplo, não à sua conversa.
+          <strong>{OWN_INPUT_MESSAGES[source]}</strong> Para você testar a interface, as mensagens abaixo respondem a um
+          cenário de exemplo, não à sua conversa.
         </p>
       )}
 
       <div className="card reading">
         <h3 className="card-title">Leitura do cenário de exemplo</h3>
-        <p className="reading-scenario">{scenario.summary}</p>
-        <p className="reading-text">{scenario.reading}</p>
+        <p className="reading-scenario">{content.summary}</p>
+        <p className="reading-text">{content.reading}</p>
       </div>
 
       <div className="suggestions">
@@ -120,16 +107,16 @@ function SuccessBody({ request, runId, onCopied }: { request: DemoRequest; runId
             key={`${runId}-${t.id}`}
             id={`suggestion-${t.id}`}
             tone={t.label}
-            card={scenario.cards[t.id]}
-            recommended={scenario.recommended === t.id}
-            reason={scenario.reason}
-            feedbackKey={`${request.tab}/${request.goal}/${t.id}`}
+            card={content.cards[t.id]}
+            recommended={content.recommended === t.id}
+            reason={content.reason}
+            feedbackKey={`${request.feedbackKey}/${t.id}`}
             onCopied={onCopied}
           />
         ))}
       </div>
 
-      <FollowUp key={runId} scenario={scenario} onCopied={onCopied} />
+      <FollowUp key={runId} scenario={content} onCopied={onCopied} />
     </div>
   )
 }

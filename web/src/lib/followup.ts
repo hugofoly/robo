@@ -1,4 +1,4 @@
-import type { DemoScenario } from './demo'
+import type { DemoContent } from './demo'
 
 export type Shortcut = 'why' | 'next' | 'her-reply'
 
@@ -33,7 +33,7 @@ export function matchShortcut(input: string): Shortcut | null {
   return SHORTCUTS.find((s) => normalize(s.label) === n)?.id ?? null
 }
 
-export function answerFor(scenario: DemoScenario, shortcut: Shortcut | null): FollowUpAnswer {
+export function answerFor(scenario: DemoContent, shortcut: Shortcut | null): FollowUpAnswer {
   switch (shortcut) {
     case 'why':
       return { kind: 'why', text: scenario.followUps.why }

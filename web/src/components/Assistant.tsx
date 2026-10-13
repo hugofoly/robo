@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { GOALS, TABS, TAB_COPY, hasValidInput, type AssistantDraft, type InputMode } from '../lib/assistant'
-import { DEMO_NOTICE, getScenario, isUsingExample, toDemoRequest, type DemoRequest } from '../lib/demo'
+import { useEffect, useState, type ReactNode } from 'react'
+import { GOALS, TABS, TAB_COPY, hasValidInput, type AssistantDraft, type AudioInput as AudioValue, type InputMode } from '../lib/assistant'
+import { AUDIO_EXAMPLE } from '../lib/audio'
+import { AUDIO_EXAMPLE_TARGET, DEMO_NOTICE, getScenario, isUsingExample, toDemoRequest } from '../lib/demo'
 import { validateImage } from '../lib/upload'
+import { useDemoGeneration } from '../lib/useDemoGeneration'
+import { AudioInput } from './AudioInput'
 import { ImageInput } from './ImageInput'
-import { LockIcon, PhotoIcon, TextIcon } from './Icons'
-import { Results, type Generation } from './Results'
+import { LockIcon, MicIcon, PhotoIcon, TextIcon } from './Icons'
+import { Results } from './Results'
 import { SegmentedControl } from './SegmentedControl'
-
-/** Duração do carregamento simulado. Nenhuma requisição é feita. */
-const SIMULATED_DELAY_MS = 1400
+import { TestTools } from './TestTools'
 
 interface Props {
   draft: AssistantDraft
@@ -19,48 +20,47 @@ interface Props {
 const MODES: { id: InputMode; label: ReactNode }[] = [
   { id: 'image', label: <><PhotoIcon size={16} /> Print</> },
   { id: 'text', label: <><TextIcon size={16} /> Texto</> },
+  { id: 'audio', label: <><MicIcon size={16} /> Áudio</> },
 ]
+
+const EMPTY_HELP: Record<InputMode, string> = {
+  image: 'Envie um print, cole um texto ou use o exemplo para continuar.',
+  text: 'Cole a conversa, escreva um relato ou use o exemplo para continuar.',
+  audio: 'Grave ou envie um áudio para continuar.',
+}
 
 export function Assistant({ draft, onChange, onToast }: Props) {
   const [imageError, setImageError] = useState<string | null>(null)
   // O resultado vive só enquanto o Assistente está aberto: gerar não cria histórico.
-  const [generation, setGeneration] = useState<Generation>({ status: 'idle' })
-  const [failNext, setFailNext] = useState(false)
-  const inFlight = useRef(false)
-  const timer = useRef<number | undefined>(undefined)
-  const runId = useRef(0)
+  const { generation, run, retry, failNext, setFailNext, loading } = useDemoGeneration()
 
   const copy = TAB_COPY[draft.tab]
-  const loading = generation.status === 'loading'
   const canGenerate = hasValidInput(draft) && !loading
   const usingExample = isUsingExample(draft)
-
-  useEffect(() => () => window.clearTimeout(timer.current), [])
-
-  function run(request: DemoRequest) {
-    // Trava síncrona: um segundo clique antes do re-render não inicia outra geração.
-    if (inFlight.current) return
-    inFlight.current = true
-    const shouldFail = failNext
-    if (shouldFail) setFailNext(false)
-    setGeneration({ status: 'loading', request })
-    timer.current = window.setTimeout(() => {
-      inFlight.current = false
-      runId.current += 1
-      setGeneration(shouldFail ? { status: 'error', request } : { status: 'success', request, runId: runId.current })
-    }, SIMULATED_DELAY_MS)
-  }
+  const audioExampleHere = draft.tab === AUDIO_EXAMPLE_TARGET.tab
 
   function generate() {
     if (!hasValidInput(draft)) return
     run(toDemoRequest(draft))
   }
 
-  function retry() {
-    if (generation.status === 'error') run(generation.request)
+  function setAudio(next: AudioValue | null) {
+    onChange((d) => {
+      if (d.audio?.kind === 'own' && d.audio !== next) URL.revokeObjectURL(d.audio.url)
+      return { ...d, audio: next }
+    })
   }
 
   function applyExample() {
+    // No modo Áudio de "Responder conversa", o exemplo é a transcrição fictícia identificada.
+    if (draft.mode === 'audio' && audioExampleHere) {
+      const scenario = getScenario(AUDIO_EXAMPLE_TARGET.tab, AUDIO_EXAMPLE_TARGET.goal)
+      const hasOwn = draft.audio?.kind === 'own' || (draft.context.trim() !== '' && draft.context.trim() !== scenario.context)
+      if (hasOwn && !window.confirm('Substituir seu áudio e o contexto pelo exemplo? O exemplo não tem áudio real.')) return
+      setAudio({ kind: 'example', transcript: AUDIO_EXAMPLE.transcript })
+      onChange((d) => ({ ...d, goal: AUDIO_EXAMPLE_TARGET.goal, context: scenario.context }))
+      return
+    }
     const scenario = getScenario(draft.tab, draft.goal)
     const hasOwnText = draft.text.trim() !== '' || draft.context.trim() !== ''
     if (hasOwnText && !usingExample && !window.confirm('Substituir o texto e o contexto que você escreveu pelo exemplo?')) {
@@ -152,6 +152,18 @@ export function Assistant({ draft, onChange, onToast }: Props) {
               onSelect={selectImage}
               onRemove={removeImage}
             />
+          ) : draft.mode === 'audio' ? (
+            <>
+              <AudioInput
+                audio={draft.audio}
+                hint={copy.audioHint}
+                onChange={setAudio}
+                onUseText={() => onChange((d) => ({ ...d, mode: 'text' }))}
+              />
+              {!audioExampleHere && draft.audio === null && (
+                <p className="field-help">O exemplo de áudio fica em Responder conversa.</p>
+              )}
+            </>
           ) : (
             <div className="field">
               <label htmlFor="conversation-text" className="field-label">
@@ -216,12 +228,10 @@ export function Assistant({ draft, onChange, onToast }: Props) {
           <p id="generate-help" className="privacy-note">
             {hasValidInput(draft) ? (
               <>
-                <LockIcon /> Seu print e seu texto ficam só neste navegador.
+                <LockIcon /> Print, texto e áudio ficam só neste navegador.
               </>
-            ) : draft.mode === 'image' ? (
-              'Envie um print, cole um texto ou use o exemplo para continuar.'
             ) : (
-              'Cole a conversa, escreva um relato ou use o exemplo para continuar.'
+              EMPTY_HELP[draft.mode]
             )}
           </p>
         </div>
@@ -229,13 +239,7 @@ export function Assistant({ draft, onChange, onToast }: Props) {
 
       <Results generation={generation} onRetry={retry} onCopied={() => onToast('Mensagem copiada.')} />
 
-      <details className="test-tools">
-        <summary>Ferramentas de teste</summary>
-        <label className="toggle-row">
-          <input type="checkbox" checked={failNext} onChange={(e) => setFailNext(e.target.checked)} />
-          <span>Simular erro na próxima geração</span>
-        </label>
-      </details>
+      <TestTools failNext={failNext} onChange={setFailNext} />
     </section>
   )
 }
