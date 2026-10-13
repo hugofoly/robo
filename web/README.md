@@ -22,8 +22,16 @@ npm run build      # typecheck + build em dist/
   - Entrada própria (print ou texto editado) nunca recebe leitura: o resultado avisa que ela não foi analisada
     e mostra o cenário de exemplo.
   - Copiar usa o texto visível do card; se a área de transferência falhar, o texto fica selecionado para cópia manual.
+  - Cada card tem **Ajustar** (Mais curto, Mais natural, Mais provocativo, Menos ousado, Outra opção), com
+    variantes escritas à mão. O ajuste muda só aquele card, e Copiar usa a versão exibida.
+  - **Por que usar esta?** mostra a intenção da mensagem e o próximo passo, específicos do cenário.
+  - **Pergunte ou conte o que aconteceu**: os atalhos (Por que essa resposta?, O que faço depois?, Ela respondeu isso.)
+    têm respostas preparadas por cenário. Qualquer outro texto recebe "a resposta real será conectada depois", sem
+    interpretação (`src/lib/followup.ts` só reconhece o texto exato dos atalhos).
+  - Feedback **Usaria / Não usaria** com motivos (Genérica, Exagerada, Não parece comigo), por card e por versão,
+    guardado só no `sessionStorage` da aba e alterável a qualquer momento.
   - "Ferramentas de teste" (rodapé) simula um erro na próxima geração, para testar o "Tentar novamente".
-  - Gerar não cria histórico: o resultado some ao sair do Assistente e nada vai para o storage.
+  - Gerar não cria histórico: o resultado e a conversa somem ao sair do Assistente ou gerar de novo.
   - O rascunho é compartilhado entre as abas e sobrevive à troca de seção.
 - **Modos especiais** e **Minhas conversas**: estados vazios explicando o que virá.
 

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { GOALS, TABS } from '../lib/assistant'
 import { DEMO_NOTICE, TONES, getScenario, type DemoRequest } from '../lib/demo'
 import { AlertIcon } from './Icons'
+import { FollowUp } from './FollowUp'
 import { SuggestionCard } from './SuggestionCard'
 
 export type Generation =
@@ -119,13 +120,16 @@ function SuccessBody({ request, runId, onCopied }: { request: DemoRequest; runId
             key={`${runId}-${t.id}`}
             id={`suggestion-${t.id}`}
             tone={t.label}
-            text={scenario.messages[t.id]}
+            card={scenario.cards[t.id]}
             recommended={scenario.recommended === t.id}
             reason={scenario.reason}
+            feedbackKey={`${request.tab}/${request.goal}/${t.id}`}
             onCopied={onCopied}
           />
         ))}
       </div>
+
+      <FollowUp key={runId} scenario={scenario} onCopied={onCopied} />
     </div>
   )
 }

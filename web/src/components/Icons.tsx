@@ -88,3 +88,21 @@ export const StarIcon = ({ size = 14 }: Props) => (
     <path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" />
   </svg>
 )
+
+export const ThumbUpIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M7 10v10H4V10zM7 10l4-7a2 2 0 012.6 2.4L12.5 9H18a2 2 0 012 2.3l-1.2 7A2 2 0 0116.8 20H7" />
+  </svg>
+)
+
+export const ThumbDownIcon = ({ size = 16 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M7 14V4H4v10zM7 14l4 7a2 2 0 002.6-2.4L12.5 15H18a2 2 0 002-2.3l-1.2-7A2 2 0 0016.8 4H7" />
+  </svg>
+)
+
+export const SendIcon = ({ size = 18 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M12 19V5M6 11l6-6 6 6" />
+  </svg>
+)
