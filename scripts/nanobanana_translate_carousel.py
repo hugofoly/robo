@@ -2,13 +2,18 @@
 """Translate a folder of English carousel slides to Brazilian Portuguese
 using the Gemini image model known as "Nano Banana" (gemini-3.1-flash-image).
 
-Only the text on each slide is translated/rebranded; the background, photos,
-icons, logos and app mockups are meant to stay pixel-identical. Quality
-depends on the model, so always spot-check the output before publishing.
+Only the text on each slide is translated; the rest of the image is meant to
+stay identical. Brand names are never replaced. Quality depends on the model,
+so always spot-check the output before publishing.
+
+Use only with creatives that belong to Robô de Date or that you are licensed
+to adapt. Translating a third party's ad (its photos, models, illustrations or
+app screens) needs the rights holder's authorization, and swapping a
+competitor's brand into it would turn their claims and testimonials into ours.
 
 Usage:
     export GEMINI_API_KEY=...
-    python3 nanobanana_translate_carousel.py <input_dir> <output_dir>
+    python3 nanobanana_translate_carousel.py <input_dir> <output_dir> --criativos-proprios
 
 Requires only the Python standard library.
 """
@@ -33,11 +38,9 @@ TRANSLATION_PROMPT = (
     "Keep the exact same layout, position, font style, weight, size and color "
     "for each text block. Do not change, redraw, move or restyle anything else "
     "in the image: same background, same photos, illustrations, logos, icons "
-    "and app mockups, pixel-identical outside of the translated text. If any "
-    "text mentions a competitor brand or product name (for example 'Wing AI' "
-    "or 'Wing'), replace that name with 'Robô de Date' (exactly with the "
-    "circumflex accent on the o) in the translated text only -- never alter "
-    "any logo, icon or graphical brand element. If the literal translation is "
+    "and app mockups, pixel-identical outside of the translated text. Keep "
+    "every brand, product and person name exactly as written: do not replace, "
+    "add or remove any brand name. If the literal translation is "
     "too long to fit the original text box, shorten it naturally without "
     "losing the meaning. Output only the edited image."
 )
@@ -109,7 +112,18 @@ def main() -> None:
     parser.add_argument("output_dir", help="Pasta de saída para os slides em português")
     parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Modelo Gemini (default: {DEFAULT_MODEL})")
     parser.add_argument("--key-file", default=None, help="Arquivo com a GEMINI_API_KEY (senão usa a env var)")
+    parser.add_argument(
+        "--criativos-proprios",
+        action="store_true",
+        help="Confirma que os criativos são do Robô de Date ou licenciados para adaptação (obrigatório)",
+    )
     args = parser.parse_args()
+
+    if not args.criativos_proprios:
+        sys.exit(
+            "Use só com criativos do Robô de Date ou licenciados. Confirme com --criativos-proprios.\n"
+            "Anúncios de terceiros (fotos, modelos, ilustrações, telas de app) precisam de autorização de quem tem os direitos."
+        )
 
     api_key = load_api_key(args.key_file)
     os.makedirs(args.output_dir, exist_ok=True)

@@ -1,15 +1,13 @@
 ---
 name: carrossel-drive-nanobanana
 description: >
-  Automatiza a tradução de carrosséis de anúncio em inglês pra português
-  usando a API do Gemini (modelo "Nano Banana"), lendo os slides de uma
-  pasta do Google Drive e subindo o resultado numa pasta nova, irmã da
-  original, com sufixo " (PT-BR)". Traduz o texto de cada slide preservando
-  fundo/fotos/logo/ícone/layout e troca menção de marca concorrente (ex.
-  "Wing AI") por "Robô de Date" no texto. Use sempre que o usuário pedir
-  pra "traduzir a pasta X do Drive", "automatizar tradução de carrossel",
-  "pegar os carrosséis em inglês e subir em português", ou apontar um
-  link/nome de pasta do Drive com carrosséis em inglês pra traduzir.
+  Automatiza a tradução de carrosséis de anúncio PRÓPRIOS (do Robô de Date ou
+  licenciados) de inglês pra português usando a API do Gemini (modelo "Nano
+  Banana"), lendo os slides de uma pasta do Google Drive e subindo o resultado
+  numa pasta nova, irmã da original, com sufixo " (PT-BR)". Traduz só o texto
+  e nunca troca nomes de marca. Use quando o usuário pedir pra "traduzir a
+  pasta X do Drive" ou "traduzir nossos carrosséis". Não use com anúncios de
+  concorrentes ou de terceiros sem autorização.
 ---
 # Tradução de carrossel via Drive + Nano Banana
 
@@ -26,6 +24,15 @@ modelo de imagem do Gemini, chamado via API.
   chat; se ele insistir, salve só em arquivo fora do repositório (nunca
   commitar) e trate como segredo.
 - Script `scripts/nanobanana_translate_carousel.py` (neste repo).
+
+## Regra de uso (obrigatória)
+- Só criativos do Robô de Date ou licenciados para adaptação. Antes de começar,
+  pergunte ao usuário se os slides são próprios/licenciados; se forem de outra
+  marca (ex.: anúncios de concorrentes), não rode o fluxo.
+- Nunca troque o nome de outra marca por "Robô de Date": isso transformaria
+  depoimentos e alegações de terceiros em nossos (publicidade enganosa) e
+  reproduziria fotos, modelos e telas de outra empresa (direito autoral, de
+  imagem e concorrência desleal).
 
 ## Passo a passo
 
@@ -49,10 +56,11 @@ modelo de imagem do Gemini, chamado via API.
 4. **Rodar o script de tradução:**
    ```bash
    export GEMINI_API_KEY=...   # já deve estar setada no ambiente
-   python3 scripts/nanobanana_translate_carousel.py <scratch>/in <scratch>/out
+   python3 scripts/nanobanana_translate_carousel.py <scratch>/in <scratch>/out --criativos-proprios
    ```
    O script já usa o modelo certo (`gemini-3.1-flash-image`), aplica o
-   prompt de tradução + rebrand pra "Robô de Date", e tenta 3x por slide em
+   prompt de tradução (sem trocar marcas), exige a confirmação
+   `--criativos-proprios` e tenta 3x por slide em
    caso de erro. Slides que falharem aparecem listados no final — não
    invente conteúdo pra eles, avise o usuário.
 
@@ -60,8 +68,7 @@ modelo de imagem do Gemini, chamado via API.
    Read antes de subir, especialmente o primeiro e o que tiver mais texto —
    o modelo às vezes erra acento ou deixa uma palavra em inglês. Se algo
    sair claramente errado, rode de novo só aquele slide (pode ajustar o
-   prompt em `TRANSLATION_PROMPT` do script se for um erro recorrente,
-   como troca de marca sem acento).
+   prompt em `TRANSLATION_PROMPT` do script se for um erro recorrente).
 
 6. **Criar a pasta de destino no Drive**, irmã da pasta original, com o
    nome `<nome original> (PT-BR)`, usando `create_file` com
