@@ -115,3 +115,10 @@ Nenhum arquivo sai do navegador: o preview usa `URL.createObjectURL` e não há 
 O áudio gravado ou enviado vira um `blob:` local só para reprodução.
 O build injeta uma Content-Security-Policy com `connect-src 'none'`, `form-action 'none'` e `media-src 'self' blob:`
 (ver `vite.config.ts`), então mesmo um envio acidental seria bloqueado pelo navegador.
+
+O build também gera `dist/_headers` (formato de Netlify e Cloudflare Pages) com os cabeçalhos de segurança de
+produção: a mesma CSP mais `frame-ancestors 'none'`, HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options:
+DENY`, `Referrer-Policy: no-referrer` e `Permissions-Policy` (microfone só no próprio app; câmera, localização e
+pagamento bloqueados). `npm run preview` serve o build com esses cabeçalhos. Em outro host (Vercel, nginx, S3 +
+CloudFront), configurar os mesmos valores de `SECURITY_HEADERS` em `vite.config.ts`. Ao conectar uma API de IA,
+liberar o domínio dela em `connect-src` (e só ele).
