@@ -41,7 +41,7 @@ export function ProfileReview({ review, source, photoCount }: Props) {
           <span className="score-unit">%</span>
         </p>
         <p className="score-delta">
-          <strong>+{after - now} pontos</strong> com as sugestões, chegando a {after}%
+          <strong>+{after - now} pontos</strong> estimados com as sugestões, chegando a {after}%
         </p>
 
         <div className="meter-legend" aria-hidden="true">
@@ -78,10 +78,12 @@ export function ProfileReview({ review, source, photoCount }: Props) {
         </ul>
 
         <details className="score-method">
-          <summary>Como a nota é calculada</summary>
+          <summary>Como a estimativa é calculada</summary>
           <p>
-            Média ponderada de {review.dimensions.map((d) => `${d.label} (${d.weight}%)`).join(', ')}, de 0 a 100. Nesta
-            demonstração a nota é de um perfil fictício, escrita à mão; a análise real ainda não está conectada.
+            Média ponderada de {review.dimensions.map((d) => `${d.label} (${d.weight}%)`).join(', ')}, de 0 a 100. Os
+            critérios e pesos são do Robô de Date: é uma estimativa, não uma medida dos apps de relacionamento nem uma
+            garantia de matches. Nesta demonstração a nota é de um perfil fictício, escrita à mão; a análise real ainda
+            não está conectada.
           </p>
         </details>
       </section>
@@ -151,7 +153,7 @@ function PendingScore({ photoCount }: { photoCount: number }) {
         –<span className="score-unit">%</span>
       </p>
       <p className="score-delta">
-        A nota do seu perfil será calculada quando a análise real estiver conectada.
+        A estimativa do seu perfil será calculada quando a análise real estiver conectada.
         {photoCount === 1 && ' Sua foto ficou só neste navegador e não foi analisada.'}
         {photoCount > 1 && ` Suas ${photoCount} fotos ficaram só neste navegador e não foram analisadas.`}
       </p>

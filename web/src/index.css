@@ -3161,3 +3161,9 @@ textarea:focus {
   outline: 2px solid var(--accent);
   outline-offset: -4px;
 }
+
+.gallery-rules {
+  margin: 12px 4px 0;
+  color: var(--text-2);
+  font-size: 14px;
+}

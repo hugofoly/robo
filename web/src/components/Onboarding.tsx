@@ -39,8 +39,8 @@ function useDialogKeys(onEscape: () => void) {
 
 const FEATURES = [
   { icon: <SparklesIcon size={24} />, title: 'Assistente', body: 'Respostas para conversas, para puxar assunto e para stories.' },
-  { icon: <HeartIcon size={24} />, title: 'Robô de Match', body: 'Bio, fotos e a força do seu perfil, de 0 a 100%.' },
-  { icon: <CameraIcon size={24} />, title: 'Fotos de Impacto', body: 'Prompts para criar fotos de perfil que chamam atenção.' },
+  { icon: <HeartIcon size={24} />, title: 'Robô de Match', body: 'Bio, fotos e uma estimativa da força do seu perfil.' },
+  { icon: <CameraIcon size={24} />, title: 'Fotos de Impacto', body: 'Prompts para criar fotos de perfil no seu gerador de imagens.' },
 ]
 
 /** Foca o título ao abrir e trava a rolagem da página por trás. */

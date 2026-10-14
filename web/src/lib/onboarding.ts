@@ -19,7 +19,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     target: '.app-nav .nav-item[aria-label="Robô de Match"]',
     title: 'Robô de Match',
-    body: 'Envie sua bio e suas fotos para receber bios novas, a revisão das fotos e a força do seu perfil.',
+    body: 'Envie sua bio e suas fotos para receber bios novas, a revisão das fotos e uma estimativa da força do seu perfil.',
   },
   {
     target: '.app-nav .nav-item[aria-label="Fotos de Impacto"]',

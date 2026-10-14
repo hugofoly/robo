@@ -32,6 +32,10 @@ export function PhotoGallery({ onToast }: { onToast: (message: string) => void }
         <li>No seu gerador de imagens, anexe uma foto sua recente e nítida.</li>
         <li>Cole o prompt e gere. Use só resultados que pareçam com você hoje.</li>
       </ol>
+      <p className="gallery-rules">
+        Antes de publicar, confira as regras do seu app de relacionamento: alguns proíbem ou limitam fotos editadas ou
+        geradas por IA.
+      </p>
 
       <fieldset className="gallery-filter">
         <legend className="visually-hidden">Categoria</legend>
