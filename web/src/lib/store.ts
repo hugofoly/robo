@@ -69,9 +69,15 @@ export interface AppState {
   assistantTabSection: 'assistant' | 'modes'
   /** Onboarding de navegação: boas-vindas → tour de 5 passos → concluído. */
   onboarding: { stage: OnboardingStage; step: number }
+  /**
+   * Confirmou ter 18 anos ou mais nas boas-vindas. Só vale nesta sessão (recarregar pede de novo).
+   * Com login, trocar por um campo do usuário com data da confirmação.
+   */
+  ageConfirmed: boolean
 }
 
-export type OnboardingStage = 'welcome' | 'tour' | 'done'
+/** 'underage': a pessoa disse ter menos de 18; o app fica bloqueado nesta sessão. */
+export type OnboardingStage = 'welcome' | 'tour' | 'done' | 'underage'
 
 /**
  * Primeiro acesso. Sem login nem armazenamento no navegador, "primeiro acesso" = primeira abertura da página
@@ -109,6 +115,7 @@ export function initialState(): AppState {
     returnTo: 'assistant',
     assistantTabSection: 'assistant',
     onboarding: { stage: isFirstVisit() ? 'welcome' : 'done', step: 0 },
+    ageConfirmed: false,
   }
 }
 
@@ -189,16 +196,29 @@ export function createStore(initial: AppState = initialState()) {
     },
     /** Começa o tour no início do Assistente (onde estão a tab bar e a linha de Modos especiais). */
     startTour() {
+      if (!state.ageConfirmed) return
       set({ ...state, section: 'assistant', openMode: null, onboarding: { stage: 'tour', step: 0 } })
     },
     setTourStep(step: number) {
+      if (!state.ageConfirmed) return
       set({ ...state, onboarding: { stage: 'tour', step } })
     },
+    /** Sem a confirmação de idade, as boas-vindas não fecham (nem por Esc, "Agora não" ou "Pular"). */
     closeOnboarding() {
+      if (!state.ageConfirmed) return
       set({ ...state, onboarding: { stage: 'done', step: 0 } })
+    },
+    setAgeConfirmed(ageConfirmed: boolean) {
+      if (state.onboarding.stage === 'underage') return
+      set({ ...state, ageConfirmed })
+    },
+    /** "Tenho menos de 18": bloqueia o app nesta sessão. */
+    declareUnderage() {
+      set({ ...state, ageConfirmed: false, onboarding: { stage: 'underage', step: 0 } })
     },
     /** "Rever apresentação" (Minhas conversas). */
     reopenOnboarding() {
+      if (state.onboarding.stage === 'underage') return
       set({ ...state, onboarding: { stage: 'welcome', step: 0 } })
     },
     /** "Voltar" de Minhas conversas para a tela de onde o usuário veio. */

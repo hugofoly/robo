@@ -2972,3 +2972,40 @@ textarea:focus {
   flex: none;
   white-space: nowrap;
 }
+
+/* Confirmação de idade nas boas-vindas */
+.age-gate {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.age-gate .consent-row {
+  margin: 0;
+}
+
+.age-hint {
+  margin: 4px 0 0;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.btn-plain:disabled {
+  color: var(--text-3);
+  background: none;
+  cursor: not-allowed;
+}
+
+.btn-quiet {
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Bloqueio de menor de idade: esconde o app por completo. */
+.onboarding-backdrop.is-opaque {
+  background: var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

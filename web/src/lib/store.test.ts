@@ -237,6 +237,7 @@ describe('onboarding', () => {
   it('primeira abertura começa nas boas-vindas; tour, fechar e rever', () => {
     const s = createStore()
     expect(s.getState().onboarding).toEqual({ stage: 'welcome', step: 0 })
+    s.actions.setAgeConfirmed(true)
     s.actions.selectTab('photos')
     s.actions.startTour()
     expect(s.getState().section).toBe('assistant')
@@ -247,5 +248,42 @@ describe('onboarding', () => {
     expect(s.getState().onboarding.stage).toBe('done')
     s.actions.reopenOnboarding()
     expect(s.getState().onboarding).toEqual({ stage: 'welcome', step: 0 })
+  })
+})
+
+describe('confirmação de idade', () => {
+  it('sem confirmar 18+, as boas-vindas não fecham nem abrem o tour', () => {
+    const s = createStore()
+    expect(s.getState().ageConfirmed).toBe(false)
+    s.actions.closeOnboarding()
+    s.actions.startTour()
+    s.actions.setTourStep(2)
+    expect(s.getState().onboarding).toEqual({ stage: 'welcome', step: 0 })
+    s.actions.setAgeConfirmed(true)
+    s.actions.closeOnboarding()
+    expect(s.getState().onboarding.stage).toBe('done')
+  })
+
+  it('menos de 18 bloqueia a sessão sem saída', () => {
+    const s = createStore()
+    s.actions.setAgeConfirmed(true)
+    s.actions.declareUnderage()
+    expect(s.getState().onboarding.stage).toBe('underage')
+    expect(s.getState().ageConfirmed).toBe(false)
+    s.actions.setAgeConfirmed(true)
+    s.actions.closeOnboarding()
+    s.actions.reopenOnboarding()
+    s.actions.startTour()
+    expect(s.getState().onboarding.stage).toBe('underage')
+  })
+
+  it('rever a apresentação mantém a idade já confirmada', () => {
+    const s = createStore()
+    s.actions.setAgeConfirmed(true)
+    s.actions.closeOnboarding()
+    s.actions.reopenOnboarding()
+    expect(s.getState().ageConfirmed).toBe(true)
+    s.actions.closeOnboarding()
+    expect(s.getState().onboarding.stage).toBe('done')
   })
 })

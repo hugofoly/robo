@@ -23,6 +23,10 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
   foco preso no diálogo. "Rever apresentação" fica em Minhas conversas. Sem login nem armazenamento, "primeiro
   acesso" é a primeira abertura da página na sessão (recarregar mostra de novo); com login, trocar `isFirstVisit`
   (`src/lib/store.ts`) por um campo do usuário. Textos do tour em `src/lib/onboarding.ts`.
+- **Confirmação de idade (18+)** nas boas-vindas: sem marcar "Tenho 18 anos ou mais", nem os botões nem o Esc
+  fecham a tela; "Tenho menos de 18 anos" bloqueia o app na sessão. É autodeclaração e vale só na sessão
+  (`ageConfirmed` no store); com login, guardar a confirmação com data no cadastro. Os modos adultos continuam
+  pedindo a confirmação de que as duas pessoas são maiores.
 
 - **Assistente** (tela inicial) com as abas Responder conversa, Puxar assunto e Responder story.
   - Entrada por print (PNG/JPEG/WebP até 10 MB, com preview local, trocar e remover; aceita arrastar e colar) ou por texto.
@@ -49,7 +53,8 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
   - O áudio nunca é transcrito: aparece "a transcrição será conectada depois". Em Responder conversa, "Usar exemplo"
     no modo Áudio carrega um **exemplo identificado** (transcrição fictícia e editável, sem áudio real), que
     substitui o áudio próprio em vez de ficar ao lado dele.
-  - "Ferramentas de teste" (rodapé) simula um erro na próxima geração, para testar o "Tentar novamente".
+  - "Ferramentas de teste" (rodapé) simula um erro na próxima geração, para testar o "Tentar novamente". Só
+    aparece em desenvolvimento (`npm run dev`) ou com `?ferramentas` na URL; o build de produção não a mostra.
   - O resultado atual de cada área continua ao navegar entre seções; histórico só existe ao salvar.
   - O rascunho é compartilhado entre as abas e sobrevive à troca de seção.
 - **Modos especiais** (todos liberados), com formulário curto e os mesmos cards de resultado, cada um com

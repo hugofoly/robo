@@ -9,6 +9,7 @@ export function Onboarding() {
   const { stage, step } = useAppState((s) => s.onboarding)
   if (stage === 'welcome') return <Welcome />
   if (stage === 'tour') return <Tour step={step} />
+  if (stage === 'underage') return <Underage />
   return null
 }
 
@@ -41,21 +42,28 @@ const FEATURES = [
   { icon: <CameraIcon size={24} />, title: 'Fotos de Impacto', body: 'Prompts para criar fotos de perfil que chamam atenção.' },
 ]
 
-function Welcome() {
-  const { startTour, closeOnboarding } = useActions()
+/** Foca o título ao abrir e trava a rolagem da página por trás. */
+function useSheetOpen() {
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const onKeyDown = useDialogKeys(closeOnboarding)
-
   useEffect(() => {
-    // Foco no título: o leitor de tela anuncia as boas-vindas; Tab leva aos botões.
+    // Foco no título: o leitor de tela anuncia a tela; Tab leva aos controles.
     titleRef.current?.focus()
-    // Trava a rolagem da página por trás da tela de boas-vindas.
     const previous = document.documentElement.style.overflow
     document.documentElement.style.overflow = 'hidden'
     return () => {
       document.documentElement.style.overflow = previous
     }
   }, [])
+  return titleRef
+}
+
+function Welcome() {
+  const { startTour, closeOnboarding, setAgeConfirmed, declareUnderage } = useActions()
+  const ageConfirmed = useAppState((s) => s.ageConfirmed)
+  // Quem já confirmou a idade (ex.: "Rever apresentação") não vê a caixa de novo.
+  const [askAge] = useState(!ageConfirmed)
+  const titleRef = useSheetOpen()
+  const onKeyDown = useDialogKeys(closeOnboarding)
 
   return (
     <div className="onboarding-backdrop">
@@ -81,13 +89,55 @@ function Welcome() {
           </ul>
           <p className="welcome-note">Nesta versão, as respostas são exemplos de demonstração.</p>
         </div>
+        {askAge && (
+          <div className="age-gate">
+            <label className="toggle-row consent-row">
+              <input
+                type="checkbox"
+                checked={ageConfirmed}
+                aria-describedby="age-hint"
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+              />
+              <span>Tenho 18 anos ou mais.</span>
+            </label>
+            <p id="age-hint" className="age-hint">
+              O Robô de Date é só para maiores de 18 anos.
+            </p>
+          </div>
+        )}
         <div className="welcome-actions">
-          <button type="button" className="btn-primary" onClick={startTour}>
+          <button type="button" className="btn-primary" onClick={startTour} disabled={!ageConfirmed}>
             Fazer o tour
           </button>
-          <button type="button" className="btn-plain" onClick={closeOnboarding}>
+          <button type="button" className="btn-plain" onClick={closeOnboarding} disabled={!ageConfirmed}>
             Agora não
           </button>
+          {askAge && (
+            <button type="button" className="btn-plain btn-quiet" onClick={declareUnderage}>
+              Tenho menos de 18 anos
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Bloqueio para quem disse ter menos de 18. Não há como fechar nesta sessão. */
+function Underage() {
+  const titleRef = useSheetOpen()
+  return (
+    <div className="onboarding-backdrop is-opaque">
+      <div className="welcome" role="alertdialog" aria-modal="true" aria-labelledby="underage-title" aria-describedby="underage-body">
+        <div className="welcome-body">
+          <AppIcon size={72} />
+          <h2 id="underage-title" ref={titleRef} tabIndex={-1}>
+            Volte quando tiver 18 anos
+          </h2>
+          <p id="underage-body" className="welcome-sub">
+            O Robô de Date é só para maiores de 18 anos, porque fala de encontros e de temas adultos. Nada do que você
+            fez aqui foi guardado.
+          </p>
         </div>
       </div>
     </div>
