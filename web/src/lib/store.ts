@@ -1,3 +1,4 @@
+import type { LegalPageId } from '../data/legal'
 import { INITIAL_DRAFT, type AssistantDraft } from './assistant'
 import type { DemoRequest, Tone, Version } from './demo'
 import { nextFeedback, type Feedback, type Verdict, type Reason } from './feedback'
@@ -74,6 +75,8 @@ export interface AppState {
    * Com login, trocar por um campo do usuário com data da confirmação.
    */
   ageConfirmed: boolean
+  /** Página legal aberta por cima do app (e das boas-vindas), ou null. */
+  legalPage: LegalPageId | null
 }
 
 /** 'underage': a pessoa disse ter menos de 18; o app fica bloqueado nesta sessão. */
@@ -116,6 +119,7 @@ export function initialState(): AppState {
     assistantTabSection: 'assistant',
     onboarding: { stage: isFirstVisit() ? 'welcome' : 'done', step: 0 },
     ageConfirmed: false,
+    legalPage: null,
   }
 }
 
@@ -211,6 +215,12 @@ export function createStore(initial: AppState = initialState()) {
     setAgeConfirmed(ageConfirmed: boolean) {
       if (state.onboarding.stage === 'underage') return
       set({ ...state, ageConfirmed })
+    },
+    openLegal(legalPage: LegalPageId) {
+      set({ ...state, legalPage })
+    },
+    closeLegal() {
+      set({ ...state, legalPage: null })
     },
     /** "Tenho menos de 18": bloqueia o app nesta sessão. */
     declareUnderage() {

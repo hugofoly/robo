@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Assistant } from './components/Assistant'
 import { Header } from './components/Header'
+import { LegalLinks, LegalSheet } from './components/LegalSheet'
 import { MyConversations } from './components/MyConversations'
 import { Onboarding } from './components/Onboarding'
 import { Navigation } from './components/Navigation'
@@ -22,6 +23,7 @@ function Shell() {
   const section = useAppState((s) => s.section)
   // Com o onboarding aberto, a página fica inerte (fora do foco e dos leitores de tela).
   const onboardingOpen = useAppState((s) => s.onboarding.stage !== 'done')
+  const legalOpen = useAppState((s) => s.legalPage !== null)
   const { selectTab } = useActions()
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | undefined>(undefined)
@@ -50,7 +52,7 @@ function Shell() {
 
   return (
     <>
-      <div className="app" inert={onboardingOpen}>
+      <div className="app" inert={onboardingOpen || legalOpen}>
         <Header />
         <Navigation current={section} onChange={selectTab} />
 
@@ -62,9 +64,16 @@ function Shell() {
           {section === 'conversations' && <MyConversations onToast={showToast} />}
         </main>
 
+        <footer className="app-footer">
+          <LegalLinks />
+        </footer>
+
         <Toast message={toast} />
       </div>
-      <Onboarding />
+      <div className="onboarding-layer" inert={legalOpen}>
+        <Onboarding />
+      </div>
+      <LegalSheet />
     </>
   )
 }

@@ -3009,3 +3009,155 @@ textarea:focus {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* ---------- Páginas legais (Privacidade, Termos, Contato) ---------- */
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+}
+
+.link-button {
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--accent-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.link-button:hover {
+  background: var(--accent-soft);
+}
+
+.app-footer {
+  margin: 32px 0 0;
+  padding-bottom: 8px;
+}
+
+.welcome-legal {
+  margin: 16px 0 0;
+  color: var(--text-2);
+  font-size: 13px;
+  text-align: center;
+}
+
+.welcome-legal-links {
+  margin-top: 4px;
+}
+
+.legal-backdrop {
+  z-index: 60;
+}
+
+.legal-sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px 28px 0 0;
+  background: var(--surface);
+  box-shadow: var(--glass-shadow);
+  animation: sheet-up 0.35s var(--ease);
+}
+
+@media (min-width: 600px) {
+  .legal-sheet {
+    max-height: calc(100% - 48px);
+    border-radius: 28px;
+  }
+}
+
+.legal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 12px 8px 16px;
+  border-bottom: 0.5px solid var(--glass-border);
+}
+
+.legal-switch {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  min-width: 0;
+}
+
+.legal-switch button {
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.legal-switch button[aria-current='page'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.legal-close {
+  flex: none;
+}
+
+.legal-scroll {
+  overflow-y: auto;
+  padding: 20px 24px calc(28px + env(safe-area-inset-bottom));
+}
+
+.legal-scroll h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.legal-scroll h2:focus {
+  outline: none;
+}
+
+.legal-draft {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.legal-section h3 {
+  margin: 22px 0 6px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.legal-section p {
+  margin: 0 0 8px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+@media (pointer: coarse) {
+  .link-button,
+  .legal-switch button {
+    min-height: 44px;
+  }
+}
+
+.legal-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}

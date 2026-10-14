@@ -27,6 +27,11 @@ onde o usuário estava; tocar na aba ativa volta ao início dela.
   fecham a tela; "Tenho menos de 18 anos" bloqueia o app na sessão. É autodeclaração e vale só na sessão
   (`ageConfirmed` no store); com login, guardar a confirmação com data no cadastro. Os modos adultos continuam
   pedindo a confirmação de que as duas pessoas são maiores.
+- **Privacidade, Termos de uso e Contato** (`src/components/LegalSheet.tsx`, textos em `src/data/legal.ts`): folha
+  aberta pelo rodapé e pelas boas-vindas. São **rascunhos marcados "Versão preliminar, em revisão jurídica"** e
+  descrevem só o que esta versão faz (nada enviado, nada guardado). Dados da empresa ficam "a definir" até haver
+  o dado real; nunca preencher com valores inventados. Revisar os textos antes de conectar IA, login, pagamento
+  ou analytics.
 
 - **Assistente** (tela inicial) com as abas Responder conversa, Puxar assunto e Responder story.
   - Entrada por print (PNG/JPEG/WebP até 10 MB, com preview local, trocar e remover; aceita arrastar e colar) ou por texto.

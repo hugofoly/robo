@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Keyboar
 import { TOUR_STEPS } from '../lib/onboarding'
 import { useActions, useAppState } from '../lib/StoreProvider'
 import { CameraIcon, HeartIcon, SparklesIcon } from './Icons'
+import { LegalLinks } from './LegalSheet'
 import { AppIcon } from './Logo'
 
 /** Onboarding de navegação: tela de boas-vindas e tour com destaque nos elementos reais da interface. */
@@ -22,7 +23,7 @@ function useDialogKeys(onEscape: () => void) {
       return
     }
     if (e.key !== 'Tab') return
-    const focusables = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled])'))
+    const focusables = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])'))
     if (focusables.length === 0) return
     const first = focusables[0]
     const last = focusables[focusables.length - 1]
@@ -105,6 +106,10 @@ function Welcome() {
             </p>
           </div>
         )}
+        <p className="welcome-legal">
+          Ao continuar, você concorda com os Termos de uso e a Política de privacidade.
+          <LegalLinks className="welcome-legal-links" />
+        </p>
         <div className="welcome-actions">
           <button type="button" className="btn-primary" onClick={startTour} disabled={!ageConfirmed}>
             Fazer o tour
