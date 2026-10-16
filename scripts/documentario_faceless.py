@@ -60,8 +60,9 @@ RATE_LIMIT_WAITS = 30  # esperas por limite de requisições/minuto antes de des
 
 FPS = 30
 SCENE_TAIL_SECONDS = 0.5  # respiro depois de cada fala
-FADE_SECONDS = 0.25
-KEN_BURNS_ZOOM = 0.12  # quanto a câmera aproxima/afasta ao longo da cena
+FADE_SECONDS = 0.12  # cortes quase secos: mais ritmo que fade longo
+KEN_BURNS_ZOOM = 0.16  # quanto a câmera aproxima/afasta ao longo da cena
+CORTE_INTERNO_APOS = 7.0  # cena de imagem mais longa que isso ganha um 2º enquadramento
 FONT_NAME = "DejaVu Sans"
 COR_DESTAQUE = "#F5B700"
 COR_FUNDO = "#0C0C10"
@@ -365,19 +366,38 @@ def montar_clipe(entrada: str, filtro_video: str, audio: str, dur: float, out_pa
 
 
 def ken_burns(imagem: str, w: int, h: int, dur: float, indice: int) -> str:
-    """Filtro de zoom lento sobre a imagem, cobrindo o quadro w x h."""
+    """Movimento de câmera sobre a imagem, cobrindo o quadro w x h.
+
+    Alterna 4 movimentos (aproximar, panorâmica pra direita, afastar,
+    panorâmica pra esquerda). Cenas longas ganham um corte no meio pra um
+    segundo enquadramento mais fechado num terço da imagem, como se fosse
+    outra câmera, pra quebrar a imagem parada."""
     frames = max(int(round(dur * FPS)), 1)
-    passo = KEN_BURNS_ZOOM / frames
-    if indice % 2:  # alterna aproximar/afastar para não ficar monótono
-        zoom = f"min(1+{passo:.6f}*on,{1 + KEN_BURNS_ZOOM})"
+    fim = max(frames - 1, 1)
+    z = KEN_BURNS_ZOOM
+    movimento = indice % 4
+    if movimento == 0:
+        za, xa, ya = f"1+{z}*on/{fim}", "(iw-iw/zoom)/2", "(ih-ih/zoom)/2"
+    elif movimento == 1:
+        za, xa, ya = f"{1 + z}", f"(iw-iw/zoom)*on/{fim}", "(ih-ih/zoom)/2"
+    elif movimento == 2:
+        za, xa, ya = f"{1 + z}-{z}*on/{fim}", "(iw-iw/zoom)/2", "(ih-ih/zoom)/2"
     else:
-        zoom = f"max({1 + KEN_BURNS_ZOOM}-{passo:.6f}*on,1)"
+        za, xa, ya = f"{1 + z}", f"(iw-iw/zoom)*(1-on/{fim})", "(ih-ih/zoom)/2"
+    if dur > CORTE_INTERNO_APOS:
+        meio = frames // 2
+        fx = 0.3 if indice % 2 else 0.7
+        zb = f"1.36+0.08*(on-{meio})/{max(fim - meio, 1)}"
+        zoom = f"if(lt(on,{meio}),{za},{zb})"
+        x = f"if(lt(on,{meio}),{xa},(iw-iw/zoom)*{fx})"
+        y = f"if(lt(on,{meio}),{ya},(ih-ih/zoom)*0.42)"
+    else:
+        zoom, x, y = za, xa, ya
     # Escala grande (1,5x) antes do zoompan evita o "tremido" típico do filtro.
     gw, gh = w * 3 // 2, h * 3 // 2
     return (
         f"scale={gw}:{gh}:force_original_aspect_ratio=increase,crop={gw}:{gh},"
-        f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        f":d={frames}:s={w}x{h}:fps={FPS},vignette=PI/5"
+        f"zoompan=z='{zoom}':x='{x}':y='{y}':d={frames}:s={w}x{h}:fps={FPS},vignette=PI/5"
     )
 
 
@@ -387,7 +407,8 @@ def imagem_vertical(imagem: str) -> bool:
 
 
 def render_cena(cena: dict, imagem: str | None, audio: str, saidas: dict[str, str],
-                indice: int, cor_destaque: str, cor_fundo: str) -> float:
+                indice: int, cor_destaque: str, cor_fundo: str,
+                imagem_fundo: str | None = None) -> float:
     """Cena + narração -> um clipe por formato pedido (saidas: "16x9"/"9x16" -> caminho).
 
     Imagem ganha Ken Burns e vinheta (sem grão animado: ele multiplica o
@@ -403,11 +424,13 @@ def render_cena(cena: dict, imagem: str | None, audio: str, saidas: dict[str, st
     )
     tamanhos = {"16x9": (1920, 1080), "9x16": (1080, 1920)}
     if tipo_cena(cena) != "imagem":
+        # Sem fade de entrada: o motion já entra com soco de zoom + flash.
+        so_saida = f"fade=t=out:st={dur - FADE_SECONDS:.3f}:d={FADE_SECONDS},format=yuv420p"
         for nome, out_path in saidas.items():
             w, h = tamanhos[nome]
             motion = out_path.replace(".mp4", "_motion.mp4")
-            render_motion(cena, dur, motion, FPS, cor_destaque, w, h, cor_fundo)
-            montar_clipe(motion, fades, audio, dur, out_path)
+            render_motion(cena, dur, motion, FPS, cor_destaque, w, h, cor_fundo, imagem_fundo)
+            montar_clipe(motion, so_saida, audio, dur, out_path)
         return dur
 
     vertical = imagem_vertical(imagem)
@@ -506,6 +529,15 @@ def ass_filter_path(path: str) -> str:
     return path.replace("\\", "/").replace(":", "\\:").replace("'", "\\'")
 
 
+def imagem_vizinha(projeto: str, cenas: list[dict], i: int) -> str | None:
+    """Imagem da cena de imagem mais próxima (anterior primeiro): vira o fundo
+    desfocado das cenas de motion, pra elas não parecerem slides soltos."""
+    for j in sorted(range(1, len(cenas) + 1), key=lambda j: (abs(j - i), j > i)):
+        if j != i and tipo_cena(cenas[j - 1]) == "imagem" and existe_imagem(projeto, j):
+            return existe_imagem(projeto, j)
+    return None
+
+
 def render(args: argparse.Namespace) -> None:
     roteiro = carregar_roteiro(args.projeto)
     cenas = roteiro["cenas"]
@@ -528,7 +560,8 @@ def render(args: argparse.Namespace) -> None:
         saidas_cena = {nome: os.path.join(build, f"cena_{i:02d}_{nome}.mp4") for nome in clipes}
         print(f"render: cena {i:02d}/{len(cenas)} ({tipo_cena(cena)})", flush=True)
         duracoes.append(render_cena(cena, existe_imagem(args.projeto, i), audio, saidas_cena,
-                                    i, args.cor_destaque, args.cor_fundo))
+                                    i, args.cor_destaque, args.cor_fundo,
+                                    imagem_vizinha(args.projeto, cenas, i)))
         falas.append(duracao(audio))
         for nome, caminho in saidas_cena.items():
             clipes[nome].append(caminho)

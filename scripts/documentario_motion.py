@@ -2,32 +2,40 @@
 
 Cada cena é desenhada frame a frame com Pillow e enviada crua pro FFmpeg, sem
 Node/Remotion. Três tipos:
-  - texto:  tipografia animada, palavra por palavra; *palavra* entre asteriscos
-            vira destaque na cor de marca, com sublinhado.
-  - numero: contador que sobe até o valor ("90%", "3x", "R$ 1.200") + legenda.
-  - chat:   conversa estilo app de mensagens, bolhas entrando em sequência,
-            com selo opcional de mensagem "ruim"/"boa".
+  - texto:  tipografia cinética: cada palavra entra com escala elástica e foco
+            puxado (desfocado -> nítido); *palavra* entre asteriscos ganha
+            marca-texto na cor de destaque, com brilho.
+  - numero: contador que sobe até o valor ("90%", "3x", "R$ 1.200") dentro de
+            um anel de progresso sincronizado, com brilho + legenda.
+  - chat:   conversa dentro de um celular: "digitando..." antes da resposta
+            dela, bolhas com mola, selos ruim/boa que batem na tela e rolagem
+            quando a conversa passa da altura da tela.
 
-A animação de entrada ocupa o começo da cena e depois o quadro fica parado
-enquanto a narração termina; os frames parados são reaproveitados, então o
-custo de render fica concentrado nos primeiros segundos.
+Linguagem visual comum (o que deixa o motion "cinematográfico"):
+  - fundo vivo: a imagem da cena vizinha desfocada e escurecida (continuidade
+    com o resto do vídeo), luzes na cor de destaque flutuando, grão de filme
+    fixo e vinheta;
+  - câmera: entra com um "soco" de zoom + flash curto e segue num avanço
+    lento contínuo, então nenhum frame fica parado.
 """
 from __future__ import annotations
 
 import functools
+import math
+import os
+import random
 import re
 import subprocess
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 TIPOS_MOTION = ("texto", "numero", "chat")
 
 FG = (242, 242, 245)
 MUTED = (160, 160, 172)
-BOLHA_ELA = (44, 44, 52)
+BOLHA_ELA = (44, 47, 58)
 VERMELHO = (235, 72, 72)
 VERDE = (52, 199, 89)
-ENTRADA = 0.35  # duração da animação de entrada de cada elemento (s)
 
 FONTES_NEGRITO = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -58,38 +66,57 @@ def hex_para_rgb(cor: str) -> tuple[int, int, int]:
     return tuple(int(cor[i:i + 2], 16) for i in (0, 2, 4))  # type: ignore[return-value]
 
 
+# --------------------------------------------------------------------------
+# Curvas de animação
+# --------------------------------------------------------------------------
+
+def clamp(x: float) -> float:
+    return min(max(x, 0.0), 1.0)
+
+
 def ease_out(x: float) -> float:
-    x = min(max(x, 0.0), 1.0)
-    return 1 - (1 - x) ** 3
+    return 1 - (1 - clamp(x)) ** 3
 
 
-def progresso(t: float, inicio: float, duracao: float = ENTRADA) -> float:
-    return ease_out((t - inicio) / duracao)
+def ease_in_out(x: float) -> float:
+    x = clamp(x)
+    return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
 
 
-@functools.lru_cache(maxsize=4)
-def fundo(W: int, H: int, BG: tuple = (12, 12, 16)) -> Image.Image:
-    """Gradiente radial a partir da cor de fundo (centro um pouco mais claro):
-    calculado pequeno e ampliado (rápido e suave)."""
-    BG_CENTRO = tuple(min(c + 20, 255) for c in BG)
-    pw, ph = W // 30, H // 30
-    img = Image.new("RGB", (pw, ph))
-    px = img.load()
-    for y in range(ph):
-        for x in range(pw):
-            d = min((((x - pw / 2) / (pw / 2)) ** 2 + ((y - ph / 2) / (ph / 2)) ** 2) ** 0.5, 1)
-            px[x, y] = tuple(int(c + (b - c) * d) for c, b in zip(BG_CENTRO, BG))
-    return img.resize((W, H), Image.BICUBIC).convert("RGBA")
+def ease_out_back(x: float, s: float = 1.9) -> float:
+    """Passa um pouco do alvo e volta: a "mola" das entradas."""
+    x = clamp(x) - 1
+    return 1 + (s + 1) * x ** 3 + s * x ** 2
 
 
-def camada_texto(texto: str, fnt: ImageFont.FreeTypeFont, cor) -> Image.Image:
+def prog(t: float, inicio: float, duracao: float) -> float:
+    return clamp((t - inicio) / duracao)
+
+
+# --------------------------------------------------------------------------
+# Camadas utilitárias
+# --------------------------------------------------------------------------
+
+def camada_texto(texto: str, fnt: ImageFont.FreeTypeFont, cor, margem: int = 2) -> Image.Image:
     """Altura fixa pela métrica da fonte (não pelo recorte do texto), pra todas
     as palavras de uma linha dividirem a mesma linha de base."""
     x0, _, x1, _ = fnt.getbbox(texto)
     subida, descida = fnt.getmetrics()
-    img = Image.new("RGBA", (x1 - x0 + 4, subida + descida + 4), (0, 0, 0, 0))
-    ImageDraw.Draw(img).text((2 - x0, 2), texto, font=fnt, fill=cor)
+    img = Image.new("RGBA", (x1 - x0 + 2 * margem, subida + descida + 2 * margem), (0, 0, 0, 0))
+    ImageDraw.Draw(img).text((margem - x0, margem), texto, font=fnt, fill=cor)
     return img
+
+
+def brilho(img: Image.Image, cor, raio: int, forca: float = 1.0) -> Image.Image:
+    """Halo desfocado na cor dada, do tamanho da camada + margem do raio."""
+    m = raio * 2
+    base = Image.new("RGBA", (img.width + 2 * m, img.height + 2 * m), (0, 0, 0, 0))
+    mascara = Image.new("L", base.size, 0)
+    mascara.paste(img.getchannel("A"), (m, m))
+    mascara = mascara.filter(ImageFilter.GaussianBlur(raio)).point(lambda v: min(255, int(v * forca)))
+    halo = Image.new("RGBA", base.size, (*cor, 255))
+    halo.putalpha(mascara)
+    return halo
 
 
 def com_alpha(img: Image.Image, a: float) -> Image.Image:
@@ -100,10 +127,23 @@ def com_alpha(img: Image.Image, a: float) -> Image.Image:
     return out
 
 
-def colar(base: Image.Image, img: Image.Image, x: float, y: float, a: float = 1.0) -> None:
-    if a <= 0:
+def colar_centro(base: Image.Image, img: Image.Image, cx: float, cy: float,
+                 escala: float = 1.0, a: float = 1.0) -> None:
+    """Cola img centralizada em (cx, cy), com escala e opacidade."""
+    if a <= 0.01 or escala <= 0.01:
         return
-    base.alpha_composite(com_alpha(img, a), (int(x), int(y)))
+    if abs(escala - 1) > 0.005:
+        img = img.resize((max(1, int(img.width * escala)), max(1, int(img.height * escala))),
+                         Image.BILINEAR)
+    img = com_alpha(img, a)
+    x, y = int(cx - img.width / 2), int(cy - img.height / 2)
+    # alpha_composite não aceita destino negativo: recorta o que sai da tela.
+    sx, sy = max(0, -x), max(0, -y)
+    if sx >= img.width or sy >= img.height:
+        return
+    if sx or sy:
+        img = img.crop((sx, sy, img.width, img.height))
+    base.alpha_composite(img, (x + sx, y + sy))
 
 
 def quebrar(palavras: list[str], fnt: ImageFont.FreeTypeFont, largura: int) -> list[list[str]]:
@@ -118,62 +158,179 @@ def quebrar(palavras: list[str], fnt: ImageFont.FreeTypeFont, largura: int) -> l
 
 
 # --------------------------------------------------------------------------
-# Tipo "texto": tipografia animada
+# Fundo vivo + câmera
 # --------------------------------------------------------------------------
 
-def cena_texto(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
-    destaque = cores["destaque"]
+class Palco:
+    """Fundo animado e câmera compartilhados por todos os tipos de cena."""
+
+    MARGEM = 1.12  # fundo maior que o quadro, pra poder deslizar
+
+    def __init__(self, W: int, H: int, cores: dict, dur: float, imagem_fundo: str | None, semente: int):
+        self.W, self.H, self.dur = W, H, dur
+        self.rng = random.Random(semente)
+        bw, bh = int(W * self.MARGEM), int(H * self.MARGEM)
+        fundo_cor = cores["fundo"]
+        if imagem_fundo and os.path.exists(imagem_fundo):
+            with Image.open(imagem_fundo) as im:
+                im = im.convert("RGB")
+                esc = max(bw / im.width, bh / im.height)
+                im = im.resize((int(im.width * esc) + 1, int(im.height * esc) + 1), Image.BILINEAR)
+                im = im.crop(((im.width - bw) // 2, (im.height - bh) // 2,
+                              (im.width - bw) // 2 + bw, (im.height - bh) // 2 + bh))
+            # Desfoque em resolução baixa (rápido) e escurecido na cor de fundo.
+            pequeno = im.resize((bw // 8, bh // 8), Image.BILINEAR).filter(ImageFilter.GaussianBlur(4))
+            im = pequeno.resize((bw, bh), Image.BICUBIC)
+            fundo = Image.blend(im, Image.new("RGB", (bw, bh), fundo_cor), 0.72)
+        else:
+            fundo = Image.new("RGB", (bw, bh), fundo_cor)
+        self.fundo = fundo.convert("RGBA")
+        # Deslize lento do fundo em direção aleatória (parallax de fundo).
+        ang = self.rng.uniform(0, 2 * math.pi)
+        self.desl = (math.cos(ang) * (bw - W) / 2.2, math.sin(ang) * (bh - H) / 2.2)
+
+        # Luzes na cor de destaque, grandes e suaves, flutuando.
+        lado = int(min(W, H) * 1.1)
+        luz = Image.new("L", (lado, lado), 0)
+        ImageDraw.Draw(luz).ellipse([lado * 0.2, lado * 0.2, lado * 0.8, lado * 0.8], fill=46)
+        luz = luz.resize((lado // 6, lado // 6), Image.BILINEAR).filter(ImageFilter.GaussianBlur(10))
+        luz = luz.resize((lado, lado), Image.BICUBIC)
+        self.luz = Image.new("RGBA", (lado, lado), (*cores["destaque"], 255))
+        self.luz.putalpha(luz)
+        self.luzes = [
+            (self.rng.uniform(0.15, 0.85), self.rng.uniform(0.15, 0.85),
+             self.rng.uniform(0.08, 0.16), self.rng.uniform(0, 2 * math.pi))
+            for _ in range(2)
+        ]
+        self.vinheta = _vinheta(W, H)
+        self.grao = _grao(W, H)
+
+    def base(self, t: float) -> Image.Image:
+        W, H = self.W, self.H
+        p = ease_in_out(t / max(self.dur, 0.01))
+        ox = (self.fundo.width - W) / 2 + self.desl[0] * (p * 2 - 1)
+        oy = (self.fundo.height - H) / 2 + self.desl[1] * (p * 2 - 1)
+        img = self.fundo.crop((int(ox), int(oy), int(ox) + W, int(oy) + H))
+        for fx, fy, vel, fase in self.luzes:
+            cx = W * (fx + 0.12 * math.sin(t * vel * 2 * math.pi + fase))
+            cy = H * (fy + 0.10 * math.cos(t * vel * 1.6 * math.pi + fase))
+            colar_centro(img, self.luz, cx, cy)
+        return img
+
+    def camera(self, img: Image.Image, t: float) -> Image.Image:
+        """Grão + vinheta, soco de zoom na entrada, avanço lento e flash."""
+        img.alpha_composite(self.grao)
+        img.alpha_composite(self.vinheta)
+        soco = 0.14 * (1 - ease_out(t / 0.45))
+        escala = 1 + 0.045 * (t / max(self.dur, 0.01)) + soco
+        W, H = self.W, self.H
+        if escala > 1.002:
+            nw, nh = int(W * escala), int(H * escala)
+            img = img.resize((nw, nh), Image.BILINEAR)
+            img = img.crop(((nw - W) // 2, (nh - H) // 2, (nw - W) // 2 + W, (nh - H) // 2 + H))
+        flash = 0.22 * (1 - clamp(t / 0.18))
+        if flash > 0.01:
+            img = Image.blend(img, Image.new("RGBA", (W, H), (255, 255, 255, 255)), flash)
+        return img
+
+
+@functools.lru_cache(maxsize=4)
+def _vinheta(W: int, H: int) -> Image.Image:
+    pw, ph = 48, int(48 * H / W)
+    m = Image.new("L", (pw, ph))
+    px = m.load()
+    for y in range(ph):
+        for x in range(pw):
+            d = (((x - pw / 2) / (pw / 2)) ** 2 + ((y - ph / 2) / (ph / 2)) ** 2) ** 0.5
+            px[x, y] = int(255 * clamp((d - 0.55) / 0.75) ** 1.6 * 0.85)
+    m = m.resize((W, H), Image.BICUBIC)
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+    out.putalpha(m)
+    return out
+
+
+@functools.lru_cache(maxsize=4)
+def _grao(W: int, H: int) -> Image.Image:
+    """Grão fixo (não muda por frame, pra não explodir o bitrate)."""
+    ruido = Image.frombytes("L", (W // 2, H // 2), os.urandom((W // 2) * (H // 2)))
+    ruido = ruido.resize((W, H), Image.NEAREST)
+    out = Image.new("RGBA", (W, H), (255, 255, 255, 255))
+    out.putalpha(ruido.point(lambda v: v * 14 // 255))
+    return out
+
+
+# --------------------------------------------------------------------------
+# Tipo "texto": tipografia cinética
+# --------------------------------------------------------------------------
+
+def cena_texto(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco):
     bruto = (cena.get("texto_tela") or "").split()
     if not bruto:
         raise ValueError("cena 'texto' sem 'texto_tela'")
-    tokens = [(p.strip("*"), p.startswith("*") or p.endswith("*")) for p in bruto]
+    tokens = [(p.replace("*", ""), "*" in p) for p in bruto]
     palavras = [p for p, _ in tokens]
+    destaque = cores["destaque"]
 
-    tamanho = 120 if W > H else 104
-    max_linhas = 4 if W > H else 6
+    vertical = H > W
+    tamanho = 112 if vertical else 116
+    max_linhas = 6 if vertical else 4
     while True:
         fnt = fonte(tamanho)
-        linhas = quebrar(palavras, fnt, int(W * 0.84))
+        linhas = quebrar(palavras, fnt, int(W * 0.82))
         if len(linhas) <= max_linhas or tamanho <= 56:
             break
         tamanho -= 8
-    espaco = fnt.getlength(" ")
-    altura_linha = int(tamanho * 1.25)
+    espaco = fnt.getlength(" ") * 1.1
+    altura_linha = int(tamanho * 1.32)
     topo = (H - altura_linha * len(linhas)) / 2
 
-    janela = min(dur * 0.55, 0.28 * len(tokens))
-    passo = janela / max(len(tokens), 1)
-    elementos = []  # (camada, x, y, inicio, destaque?, largura)
+    passo = min(0.22, dur * 0.5 / max(len(tokens), 1))
+    elementos = []
     i = 0
     for n, linha in enumerate(linhas):
-        largura = sum(fnt.getlength(p) for p in linha) + espaco * (len(linha) - 1)
-        x = (W - largura) / 2
-        for p in linha:
+        larguras = [fnt.getlength(p) for p in linha]
+        x = (W - sum(larguras) - espaco * (len(linha) - 1)) / 2
+        for p, larg in zip(linha, larguras):
             _, marcado = tokens[i]
-            cor = destaque if marcado else FG
-            elementos.append((camada_texto(p, fnt, cor), x, topo + n * altura_linha,
-                              0.15 + i * passo, marcado, fnt.getlength(p)))
-            x += fnt.getlength(p) + espaco
+            nitida = camada_texto(p, fnt, FG, margem=12)
+            desfocada = nitida.filter(ImageFilter.GaussianBlur(9))
+            halo = brilho(nitida, destaque, 18, 1.4) if marcado else None
+            cx = x + larg / 2
+            cy = topo + n * altura_linha + altura_linha / 2
+            elementos.append((nitida, desfocada, halo, cx, cy, larg, 0.12 + i * passo, marcado))
+            x += larg + espaco
             i += 1
-    fim = 0.15 + janela + ENTRADA + 0.4
 
     def frame(t: float) -> Image.Image:
-        img = fundo(W, H, cores["fundo"]).copy()
+        img = palco.base(t)
         draw = ImageDraw.Draw(img)
-        for camada, x, y, inicio, marcado, largura in elementos:
-            p = progresso(t, inicio)
-            colar(img, camada, x, y + (1 - p) * 40, p)
-            if marcado and p > 0:
-                s = progresso(t, inicio + 0.2, 0.4)
-                yb = y + tamanho * 1.08
-                draw.rectangle([x, yb, x + largura * s, yb + max(tamanho // 14, 4)], fill=destaque)
-        return img
+        flutua = math.sin(t * 1.3) * 6
+        for nitida, desfocada, halo, cx, cy, larg, inicio, marcado in elementos:
+            p = prog(t, inicio, 0.5)
+            if p <= 0:
+                continue
+            escala = 0.55 + 0.45 * ease_out_back(p)
+            dy = (1 - ease_out(p)) * 70 + flutua
+            foco = ease_out(prog(t, inicio, 0.32))
+            if marcado:
+                # Marca-texto que varre da esquerda pra direita atrás da palavra.
+                q = ease_out(prog(t, inicio + 0.18, 0.35))
+                if q > 0:
+                    alt = tamanho * 0.98
+                    x0 = cx - larg / 2 - 14
+                    draw.rounded_rectangle(
+                        [x0, cy - alt / 2 + dy, x0 + (larg + 28) * q, cy + alt / 2 + dy],
+                        radius=int(tamanho * 0.16), fill=(*destaque, 255))
+                    colar_centro(img, halo, cx, cy + dy, escala, q * 0.9)
+            colar_centro(img, desfocada, cx, cy + dy, escala, (1 - foco) * min(1, p * 2.5))
+            colar_centro(img, nitida, cx, cy + dy, escala, foco)
+        return palco.camera(img, t)
 
-    return frame, fim
+    return frame
 
 
 # --------------------------------------------------------------------------
-# Tipo "numero": contador
+# Tipo "numero": contador com anel
 # --------------------------------------------------------------------------
 
 def _parse_numero(texto: str):
@@ -200,52 +357,82 @@ def _formatar(valor: float, casas: int, milhar: bool) -> str:
     return s if milhar or casas else s.replace(".", "")
 
 
-def cena_numero(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
-    destaque = cores["destaque"]
+def cena_numero(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco):
     alvo = (cena.get("numero") or "").strip()
     if not alvo:
         raise ValueError("cena 'numero' sem 'numero'")
+    destaque = cores["destaque"]
     legenda = (cena.get("texto_tela") or "").replace("*", "")
     parsed = _parse_numero(alvo)
-    tamanho_num = 260
-    while fonte(tamanho_num).getlength(alvo) > W * 0.88 and tamanho_num > 100:
+
+    tamanho_num = 300
+    while fonte(tamanho_num).getlength(alvo) > W * 0.62 and tamanho_num > 100:
         tamanho_num -= 20
     fnt_num = fonte(tamanho_num)
-    fnt_leg = fonte(64)
-    largura_leg = int(W * (0.7 if W > H else 0.84))
-    linhas_leg = [" ".join(l) for l in quebrar(legenda.split(), fnt_leg, largura_leg)] if legenda else []
-    camadas_leg = [camada_texto(l, fnt_leg, FG) for l in linhas_leg]
-    contagem = 1.3
+    fnt_leg = fonte(60)
+    largura_leg = int(W * (0.7 if W > H else 0.82))
+    camadas_leg = [camada_texto(" ".join(l), fnt_leg, FG, margem=6)
+                   for l in quebrar(legenda.split(), fnt_leg, largura_leg)] if legenda else []
+
+    raio = int(max(fnt_num.getlength(alvo) * 0.62, tamanho_num * 0.95))
+    raio = min(raio, int(min(W, H) * 0.42))
+    espessura = max(int(raio * 0.06), 10)
+    cx = W / 2
+    alt_leg = len(camadas_leg) * 76
+    cy = (H - alt_leg - 60) / 2
+    contagem = 1.4
+
+    def anel(p: float) -> Image.Image:
+        lado = 2 * raio + 4 * espessura
+        img = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        caixa = [2 * espessura, 2 * espessura, lado - 2 * espessura, lado - 2 * espessura]
+        d.ellipse(caixa, outline=(255, 255, 255, 38), width=espessura)
+        if p > 0:
+            d.arc(caixa, -90, -90 + 360 * p, fill=(*destaque, 255), width=espessura)
+            # Ponta luminosa do arco.
+            ang = math.radians(-90 + 360 * p)
+            px = lado / 2 + raio * math.cos(ang)
+            py = lado / 2 + raio * math.sin(ang)
+            r = espessura * 0.9
+            d.ellipse([px - r, py - r, px + r, py + r], fill=(255, 255, 255, 255))
+        return img
 
     def texto_em(t: float) -> str:
         if not parsed:
             return alvo
         prefixo, valor, casas, milhar, sufixo = parsed
-        v = valor * ease_out((t - 0.2) / contagem)
+        v = valor * ease_out(prog(t, 0.25, contagem))
         if casas == 0:
             v = round(v)
         return f"{prefixo}{_formatar(v, casas, milhar)}{sufixo}"
 
-    alt_num = sum(fnt_num.getmetrics())
-    altura_bloco = alt_num + 20 + len(camadas_leg) * 84
-    topo = (H - altura_bloco) / 2
-    fim = 0.2 + contagem + 0.9 + ENTRADA
+    halo_final = brilho(camada_texto(alvo, fnt_num, destaque), destaque, 28, 1.2)
 
     def frame(t: float) -> Image.Image:
-        img = fundo(W, H, cores["fundo"]).copy()
-        p = progresso(t, 0.1)
-        num = camada_texto(texto_em(t), fnt_num, destaque)
-        colar(img, num, (W - num.width) / 2, topo + (1 - p) * 30, p)
+        img = palco.base(t)
+        p_anel = ease_in_out(prog(t, 0.2, contagem + 0.1))
+        entrada = ease_out_back(prog(t, 0.05, 0.55))
+        a = anel(p_anel)
+        colar_centro(img, brilho(a, destaque, 14, 0.9) if p_anel > 0 else a, cx, cy, entrada, 0.55)
+        colar_centro(img, a, cx, cy, entrada)
+        num = camada_texto(texto_em(t), fnt_num, FG)
+        terminou = prog(t, 0.25 + contagem, 0.4)
+        if terminou > 0:  # pulso de brilho quando a contagem fecha
+            colar_centro(img, halo_final, cx, cy, 1 + 0.06 * (1 - terminou), 0.9 * (1 - terminou * 0.5))
+        colar_centro(img, num, cx, cy, 0.7 + 0.3 * entrada, min(1, entrada * 1.4))
+        topo_leg = cy + raio + 2 * espessura + 50
         for k, camada in enumerate(camadas_leg):
-            q = progresso(t, 0.9 + k * 0.15)
-            colar(img, camada, (W - camada.width) / 2, topo + alt_num + 20 + k * 84 + (1 - q) * 20, q)
-        return img
+            q = prog(t, 0.25 + contagem * 0.7 + k * 0.12, 0.45)
+            colar_centro(img, camada, W / 2, topo_leg + k * 76 + (1 - ease_out(q)) * 40,
+                         1, ease_out(q))
+        return palco.camera(img, t)
 
-    return frame, fim
+    return frame
 
 
 # --------------------------------------------------------------------------
-# Tipo "chat": conversa de app de mensagens
+# Tipo "chat": conversa dentro de um celular
 # --------------------------------------------------------------------------
 
 def _bolha(texto: str, cor, tamanho: int, largura_max: int) -> Image.Image:
@@ -256,8 +443,7 @@ def _bolha(texto: str, cor, tamanho: int, largura_max: int) -> Image.Image:
     px, py = int(tamanho * 0.6), int(tamanho * 0.45)
     img = Image.new("RGBA", (larg + 2 * px, alt_linha * len(linhas) + 2 * py), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, img.width - 1, img.height - 1], radius=int(tamanho * 0.75),
-                        fill=cor)
+    d.rounded_rectangle([0, 0, img.width - 1, img.height - 1], radius=int(tamanho * 0.75), fill=cor)
     for k, linha in enumerate(linhas):
         d.text((px, py + k * alt_linha), linha, font=fnt, fill=FG)
     return img
@@ -279,62 +465,166 @@ def _selo(avaliacao: str, raio: int) -> Image.Image:
     return img
 
 
-def cena_chat(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
+def cena_chat(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco):
     mensagens = cena.get("mensagens") or []
     if not mensagens:
         raise ValueError("cena 'chat' sem 'mensagens'")
+    destaque = cores["destaque"]
+    vertical = H > W
     titulo = (cena.get("texto_tela") or "").replace("*", "")
-    tam_titulo = 54
-    while titulo and fonte(tam_titulo).getlength(titulo) > W * 0.9 and tam_titulo > 30:
-        tam_titulo -= 4
-    camada_titulo = camada_texto(titulo, fonte(tam_titulo), MUTED) if titulo else None
 
-    # Horizontal: coluna central estreita. Vertical: quase a largura toda.
-    margem = 0.24 if W > H else 0.1
-    coluna_esq, coluna_dir = int(W * margem), int(W * (1 - margem))
-    tamanho = 46 if W > H else 44
-    while True:  # diminui a fonte até a conversa caber na tela
-        largura_max = int((coluna_dir - coluna_esq) * 0.72)
-        # "voce" usa a cor de destaque (marca); "ela" fica cinza neutro.
-        bolhas = [_bolha(m["texto"], cores["destaque"] if m.get("de") == "voce" else BOLHA_ELA,
-                         tamanho, largura_max) for m in mensagens]
-        gap = int(tamanho * 0.5)
-        total = sum(b.height for b in bolhas) + gap * (len(bolhas) - 1)
-        total += 100 if camada_titulo else 0
-        if total <= H * (0.82 if W > H else 0.6) or tamanho <= 28:
-            break
-        tamanho -= 4
+    # Celular: proporção de tela de smartphone, ocupando boa parte do quadro.
+    ph = int(H * (0.70 if vertical else 0.92))
+    pw = int(ph * (0.50 if vertical else 0.56))
+    if pw > W * 0.86:
+        pw = int(W * 0.86)
+        ph = int(pw / 0.50)
+    raio_cel = int(pw * 0.11)
+    borda = max(pw // 60, 6)
+    tela_x0, tela_y0 = borda + 8, borda + 8
+    tela_w, tela_h = pw - 2 * tela_x0, ph - 2 * tela_y0
+    cab_h = int(tela_h * 0.11)
 
-    y = (H - total) / 2
-    titulo_pos = None
-    if camada_titulo:
-        titulo_pos = ((W - camada_titulo.width) / 2, y)
-        y += 100
-    janela = min(dur * 0.65, 1.1 * len(bolhas))
-    passo = janela / len(bolhas)
-    raio = int(tamanho * 0.6)
-    elementos = []  # (bolha, x, y, inicio, selo, xs, ys)
-    for k, (m, b) in enumerate(zip(mensagens, bolhas)):
-        de_voce = m.get("de") == "voce"
-        x = coluna_dir - b.width if de_voce else coluna_esq
-        selo = _selo(m["avaliacao"], raio) if m.get("avaliacao") in ("boa", "ruim") else None
-        xs = x - 2 * raio - 24 if de_voce else x + b.width + 24
-        elementos.append((b, x, y, 0.3 + k * passo, selo, xs, y + (b.height - 2 * raio) / 2))
-        y += b.height + gap
-    fim = 0.3 + janela + ENTRADA + 0.5
+    moldura = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+    d = ImageDraw.Draw(moldura)
+    d.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=raio_cel, fill=(34, 37, 46, 255))
+    d.rounded_rectangle([tela_x0, tela_y0, pw - tela_x0, ph - tela_y0], radius=raio_cel - 10,
+                        fill=(13, 15, 20, 255))
+    # Cabeçalho do app: avatar, nome e "online".
+    av = int(cab_h * 0.56)
+    ax, ay = tela_x0 + int(tela_w * 0.07), tela_y0 + (cab_h - av) // 2 + int(cab_h * 0.12)
+    d.ellipse([ax, ay, ax + av, ay + av], fill=(*destaque, 255))
+    d.text((ax + av + 18, ay + av * 0.02), "Ela", font=fonte(int(av * 0.5)), fill=FG)
+    d.text((ax + av + 18, ay + av * 0.55), "online", font=fonte(int(av * 0.32), False), fill=MUTED)
+    d.line([tela_x0, tela_y0 + cab_h + int(cab_h * 0.12), pw - tela_x0, tela_y0 + cab_h + int(cab_h * 0.12)],
+           fill=(40, 43, 52, 255), width=2)
+    # Ilha/notch.
+    nw = int(pw * 0.26)
+    d.rounded_rectangle([(pw - nw) // 2, tela_y0 + 14, (pw + nw) // 2, tela_y0 + 14 + int(cab_h * 0.18)],
+                        radius=20, fill=(0, 0, 0, 255))
+    sombra = brilho(moldura, (0, 0, 0), 40, 1.0)
+    contorno = brilho(moldura, destaque, 22, 0.5)
 
-    def frame(t: float) -> Image.Image:
-        img = fundo(W, H, cores["fundo"]).copy()
-        if camada_titulo:
-            colar(img, camada_titulo, titulo_pos[0], titulo_pos[1], progresso(t, 0.0))
-        for b, x, yb, inicio, selo, xs, ys in elementos:
-            p = progresso(t, inicio)
-            colar(img, b, x, yb + (1 - p) * 30, p)
-            if selo is not None:
-                colar(img, selo, xs, ys, progresso(t, inicio + 0.35, 0.25))
+    tamanho = max(int(tela_w * (0.062 if vertical else 0.064)), 24)
+    largura_max = int(tela_w * 0.68)
+    bolhas = [_bolha(m["texto"], destaque if m.get("de") == "voce" else BOLHA_ELA, tamanho, largura_max)
+              for m in mensagens]
+    gap = int(tamanho * 0.55)
+    margem_x = int(tela_w * 0.05)
+    area_topo = tela_y0 + cab_h + int(cab_h * 0.3)
+    area_base = ph - tela_y0 - int(tamanho * 1.2)
+    raio_selo = int(tamanho * 0.62)
+
+    # Linha do tempo: "digitando..." antes de cada mensagem dela.
+    janela = dur * 0.68
+    passo = janela / len(mensagens)
+    agenda = []
+    t = 0.45
+    y_conteudo = 0
+    for m, b in zip(mensagens, bolhas):
+        dela = m.get("de") != "voce"
+        digitando = min(0.7, passo * 0.45) if dela else 0
+        agenda.append({
+            "bolha": b, "dela": dela, "digitando": (t, t + digitando),
+            "inicio": t + digitando, "y": y_conteudo,
+            "selo": _selo(m["avaliacao"], raio_selo) if m.get("avaliacao") in ("boa", "ruim") else None,
+        })
+        y_conteudo += b.height + gap
+        t += max(passo, digitando + 0.5)
+
+    camada_titulo = None
+    if titulo:
+        # Vertical: uma linha acima do celular. Horizontal: coluna à esquerda,
+        # grande e quebrada em linhas, como um letreiro.
+        tam = 54 if vertical else 76
+        largura_tit = W * 0.9 if vertical else W * 0.4
+        fnt_t = fonte(tam)
+        linhas_tit = [" ".join(l) for l in quebrar(titulo.split(), fnt_t, int(largura_tit))]
+        while vertical and len(linhas_tit) > 1 and tam > 30:
+            tam -= 4
+            fnt_t = fonte(tam)
+            linhas_tit = [" ".join(l) for l in quebrar(titulo.split(), fnt_t, int(largura_tit))]
+        alt_l = int(tam * 1.25)
+        camada_titulo = Image.new("RGBA", (int(largura_tit) + 20, alt_l * len(linhas_tit) + 20), (0, 0, 0, 0))
+        dt = ImageDraw.Draw(camada_titulo)
+        for k, l in enumerate(linhas_tit):
+            lx = (camada_titulo.width - fnt_t.getlength(l)) / 2 if vertical else 10
+            dt.text((lx, 10 + k * alt_l), l, font=fnt_t, fill=FG)
+
+    cel_cx = W / 2 if vertical or not camada_titulo else W * 0.68
+    cel_cy = (H / 2 + (50 if camada_titulo else 0)) if vertical else H / 2
+    tit_cx, tit_cy = (W / 2, cel_cy - ph / 2 - 70) if vertical else (W * 0.08 + W * 0.2, H / 2)
+
+    def pontinhos(t0: float, t: float) -> Image.Image:
+        lado_w, lado_h = int(tamanho * 2.8), int(tamanho * 1.7)
+        img = Image.new("RGBA", (lado_w, lado_h), (0, 0, 0, 0))
+        dd = ImageDraw.Draw(img)
+        dd.rounded_rectangle([0, 0, lado_w - 1, lado_h - 1], radius=lado_h // 2, fill=BOLHA_ELA)
+        for k in range(3):
+            fase = (t - t0) * 2 * math.pi * 1.6 - k * 0.9
+            dy = -abs(math.sin(fase)) * tamanho * 0.22
+            r = tamanho * 0.16
+            x = lado_w * (0.3 + 0.2 * k)
+            y = lado_h / 2 + dy
+            dd.ellipse([x - r, y - r, x + r, y + r], fill=(200, 200, 210, 255))
         return img
 
-    return frame, fim
+    def frame(t: float) -> Image.Image:
+        img = palco.base(t)
+        cel = moldura.copy()
+        # Rolagem: quando a conversa passa da área visível, sobe o conteúdo.
+        visiveis = [e for e in agenda if t >= e["digitando"][0]]
+        fundo_conteudo = 0
+        for e in visiveis:
+            fundo_conteudo = e["y"] + (e["bolha"].height if t >= e["inicio"] else int(tamanho * 1.7))
+        excesso = max(0, area_topo + fundo_conteudo - area_base)
+        rolagem = getattr(frame, "rolagem", 0.0)
+        rolagem += (excesso - rolagem) * 0.18
+        frame.rolagem = rolagem
+        conteudo = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+        for e in visiveis:
+            y = area_topo + e["y"] - rolagem
+            if e["dela"] and e["digitando"][0] <= t < e["inicio"]:
+                pt = pontinhos(e["digitando"][0], t)
+                a = ease_out(prog(t, e["digitando"][0], 0.2))
+                colar_centro(conteudo, pt, tela_x0 + margem_x + pt.width / 2, y + pt.height / 2, 0.8 + 0.2 * a, a)
+                continue
+            p = prog(t, e["inicio"], 0.42)
+            b = e["bolha"]
+            esc = 0.4 + 0.6 * ease_out_back(p)
+            if e["dela"]:
+                bx = tela_x0 + margem_x + b.width / 2
+            else:
+                bx = pw - tela_x0 - margem_x - b.width / 2
+            by = y + b.height / 2 + (1 - ease_out(p)) * 30
+            colar_centro(conteudo, b, bx, by, esc, min(1, p * 2))
+            if e["selo"] is not None:
+                q = prog(t, e["inicio"] + 0.45, 0.35)
+                if q > 0:
+                    sx = bx - b.width / 2 - raio_selo - 14 if not e["dela"] else bx + b.width / 2 + raio_selo + 14
+                    tremor = math.sin(q * 40) * 6 * (1 - q)
+                    colar_centro(conteudo, e["selo"], sx + tremor, by, 2.2 - 1.2 * ease_out_back(q), min(1, q * 3))
+        # Recorta o conteúdo no formato da tela do celular.
+        mascara = Image.new("L", (pw, ph), 0)
+        ImageDraw.Draw(mascara).rounded_rectangle(
+            [tela_x0, tela_y0 + cab_h + int(cab_h * 0.14), pw - tela_x0, ph - tela_y0], radius=raio_cel - 10, fill=255)
+        conteudo.putalpha(Image.composite(conteudo.getchannel("A"), Image.new("L", (pw, ph), 0), mascara))
+        cel.alpha_composite(conteudo)
+
+        entrada = ease_out_back(prog(t, 0.0, 0.6), 1.4)
+        flutua_y = math.sin(t * 1.1) * 10
+        ang = math.sin(t * 0.7) * 1.4 + (1 - entrada) * 6
+        cel_rot = cel.rotate(ang, resample=Image.BILINEAR, expand=True)
+        dy = (1 - entrada) * H * 0.25 + flutua_y
+        colar_centro(img, sombra, cel_cx, cel_cy + dy + 30, 1, 0.8 * entrada)
+        colar_centro(img, contorno, cel_cx, cel_cy + dy, 1, 0.6 * entrada)
+        colar_centro(img, cel_rot, cel_cx, cel_cy + dy, 1, min(1, entrada * 1.5))
+        if camada_titulo is not None:
+            q = ease_out(prog(t, 0.15, 0.5))
+            colar_centro(img, camada_titulo, tit_cx, tit_cy + (1 - q) * 40, 1, q)
+        return palco.camera(img, t)
+
+    return frame
 
 
 # --------------------------------------------------------------------------
@@ -345,11 +635,14 @@ CONSTRUTORES = {"texto": cena_texto, "numero": cena_numero, "chat": cena_chat}
 
 
 def render_motion(cena: dict, dur: float, out_path: str, fps: int, cor_destaque: str,
-                  W: int = 1920, H: int = 1080, cor_fundo: str = "#0C0C10") -> None:
+                  W: int = 1920, H: int = 1080, cor_fundo: str = "#0C0C10",
+                  imagem_fundo: str | None = None) -> None:
     """Gera um mp4 mudo de `dur` segundos para a cena de motion, em WxH
-    (1920x1080 ou 1080x1920: o layout se adapta à orientação)."""
+    (1920x1080 ou 1080x1920: o layout se adapta à orientação).
+    `imagem_fundo`: imagem de uma cena vizinha, usada desfocada no fundo."""
     cores = {"destaque": hex_para_rgb(cor_destaque), "fundo": hex_para_rgb(cor_fundo)}
-    frame, fim_animacao = CONSTRUTORES[cena["tipo"]](cena, dur, cores, W, H)
+    palco = Palco(W, H, cores, dur, imagem_fundo, semente=hash(out_path) & 0xFFFF)
+    frame = CONSTRUTORES[cena["tipo"]](cena, dur, cores, W, H, palco)
     total = max(int(round(dur * fps)), 1)
     proc = subprocess.Popen(
         ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
@@ -357,16 +650,9 @@ def render_motion(cena: dict, dur: float, out_path: str, fps: int, cor_destaque:
          "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-pix_fmt", "yuv420p", out_path],
         stdin=subprocess.PIPE, stderr=subprocess.PIPE,
     )
-    parado = None
     try:
         for n in range(total):
-            t = n / fps
-            if t > fim_animacao:
-                if parado is None:
-                    parado = frame(t).convert("RGB").tobytes()
-                proc.stdin.write(parado)
-            else:
-                proc.stdin.write(frame(t).convert("RGB").tobytes())
+            proc.stdin.write(frame(n / fps).convert("RGB").tobytes())
         proc.stdin.close()
     except BrokenPipeError:
         pass

@@ -21,7 +21,12 @@ psicologia evolutiva, sem estatística inventada.
 Render (formato e cores da marca):
 ```bash
 python3 scripts/documentario_faceless.py midia  --projeto <pasta>/aula-01 --formato vertical \
-  --estilo-imagem "Cool dark color palette with subtle indigo-violet accent lighting, modern Brazilian urban setting"
+  --estilo-imagem "Cool dark color palette with subtle indigo-violet accent lighting"
 python3 scripts/documentario_faceless.py render --projeto <pasta>/aula-01 --formato vertical \
   --cor-destaque "#4F4CFD" --cor-fundo "#0E1218" --nome-saida aula-01
 ```
+
+Não ponha cenário no `--estilo-imagem` (ex.: "urbano brasileiro"): ele vale
+pra todas as cenas e contamina as que não são urbanas (a fogueira dos
+ancestrais saiu com uma cidade ao fundo). Cenário vai no `prompt_imagem` de
+cada cena.
