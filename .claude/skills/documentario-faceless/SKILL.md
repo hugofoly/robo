@@ -66,7 +66,9 @@ nunca commite mídia gerada.
    python3 scripts/documentario_faceless.py midia --projeto <pasta> [--voz Charon]
    ```
    - Voz default `Charon` (grave, informativa). Alternativas boas pra
-     documentário: `Algenib`, `Orus`, `Iapetus`.
+     documentário: `Algenib`, `Orus`, `Iapetus`. O tom vem só da voz:
+     **nunca ponha instrução de estilo no campo `narracao`** ("fale devagar",
+     "[tom grave]"), porque o modelo de TTS lê a instrução em voz alta.
    - Cada arquivo que já existe é pulado. Pra usar **voz própria**, salve as
      gravações como `<pasta>/audio/cena_01.wav`, `cena_02.wav`, ... antes de
      rodar. Pra trocar uma imagem, apague (ou substitua por png/jpg/webp com o

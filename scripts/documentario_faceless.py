@@ -47,8 +47,8 @@ import wave
 from documentario_motion import TIPOS_MOTION, render_motion
 
 API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
-TEXT_MODEL = "gemini-2.5-flash"
-TTS_MODEL = "gemini-2.5-flash-preview-tts"
+TEXT_MODEL = "gemini-3.8-flash"
+TTS_MODEL = "gemini-3.8-flash-tts"
 IMAGE_MODEL = "gemini-3.1-flash-image"
 DEFAULT_VOICE = "Charon"  # voz grave e informativa, boa pra documentário
 MAX_ATTEMPTS = 3
@@ -133,11 +133,6 @@ ROTEIRO_SCHEMA = {
     "required": ["titulo", "cenas"],
 }
 
-TTS_STYLE = (
-    "Narre como um documentário: tom grave, calmo e confiante, ritmo "
-    "pausado, pequenas pausas entre as frases:\n\n"
-)
-
 IMAGE_STYLE = (
     "Cinematic documentary still, 35mm film look, natural moody lighting, "
     "shallow depth of field, muted color grade, subtle film grain, "
@@ -212,7 +207,10 @@ def gerar_roteiro(args: argparse.Namespace, api_key: str | None) -> None:
 
 def gerar_audio(texto: str, out_path: str, voz: str, model: str, api_key: str | None) -> None:
     data = gemini(model, {
-        "contents": [{"parts": [{"text": TTS_STYLE + texto}]}],
+        # Só o texto da fala: o modelo de TTS lê em voz alta qualquer instrução
+        # de estilo junto (testado em pt, en e como [tag]) e não aceita
+        # systemInstruction. O tom vem da escolha da voz.
+        "contents": [{"parts": [{"text": texto}]}],
         "generationConfig": {
             "responseModalities": ["AUDIO"],
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voz}}},
