@@ -204,8 +204,10 @@ def gemini(model: str, body: dict, api_key: str | None) -> dict:
                 break  # erro de configuração: repetir não resolve
             # Limite por minuto (429): espera o que a API pede e não gasta tentativa.
             # Cota diária esgotada não volta em segundos, então desiste.
+            if exc.code == 429 and "per_day" in detail.lower():
+                break  # cota diária: só volta no dia seguinte, repetir não adianta
             espera = re.search(r"retry in ([\d.]+)s", detail)
-            if exc.code == 429 and espera and "PerDay" not in detail and esperas < RATE_LIMIT_WAITS:
+            if exc.code == 429 and espera and esperas < RATE_LIMIT_WAITS:
                 esperas += 1
                 attempt -= 1
                 segundos = float(espera.group(1)) + 1
@@ -298,12 +300,18 @@ def gerar_midia(args: argparse.Namespace, api_key: str | None) -> None:
     for i, cena in enumerate(roteiro["cenas"], start=1):
         audio = caminho_audio(args.projeto, i)
         imagem = caminho_imagem(args.projeto, i)
+        # Voz e imagem em blocos separados: cota esgotada num modelo não
+        # impede o outro de adiantar o trabalho.
         try:
             if os.path.exists(audio):
                 print(f"cena {i:02d}: áudio já existe, pulando")
             else:
                 print(f"cena {i:02d}: gerando narração ...", flush=True)
                 gerar_audio(cena["narracao"], audio, args.voz, args.modelo_tts, api_key)
+        except Exception as exc:  # noqa: BLE001 - reporta e segue
+            falhas.append((i, f"narração: {exc}"))
+            print(f"cena {i:02d}: narração FALHOU: {str(exc)[:300]}")
+        try:
             if tipo_cena(cena) != "imagem":
                 pass  # motion é desenhado no render, não precisa de imagem
             elif existe_imagem(args.projeto, i):
@@ -316,9 +324,9 @@ def gerar_midia(args: argparse.Namespace, api_key: str | None) -> None:
                 proporcao = "9:16" if args.formato == "vertical" else "16:9"
                 gerar_imagem(cena["prompt_imagem"], imagem, args.modelo_imagem, api_key,
                              proporcao, args.estilo_imagem)
-        except Exception as exc:  # noqa: BLE001 - reporta e segue para a próxima cena
-            falhas.append((i, str(exc)))
-            print(f"cena {i:02d}: FALHOU: {exc}")
+        except Exception as exc:  # noqa: BLE001 - reporta e segue
+            falhas.append((i, f"imagem: {exc}"))
+            print(f"cena {i:02d}: imagem FALHOU: {str(exc)[:300]}")
     if falhas:
         print("\nCenas com falha (rode de novo para tentar só essas):")
         for i, err in falhas:
