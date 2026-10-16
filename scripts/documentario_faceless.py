@@ -47,7 +47,7 @@ import wave
 
 from PIL import Image
 
-from documentario_motion import TIPOS_MOTION, render_motion
+from documentario_motion import TIPOS_MOTION, render_motion, render_rotulo
 
 API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 TEXT_MODEL = "gemini-3.8-flash"
@@ -108,7 +108,16 @@ Tipo de cada cena (campo "tipo"):
     (2 a 5), cada uma com de ("voce" ou "ela"), texto curto e, quando a cena
     compara abordagens, avaliacao ("ruim" ou "boa"). texto_tela opcional vira
     o título acima da conversa.
+  - "lista": quando a fala enumera (passos, caixas, recapitulação). Preencha
+    texto_tela (título curto) e itens (2 a 6, até 6 palavras cada), na ordem
+    em que a narração fala.
+  - "comparacao": quando a fala contrasta duas coisas (fraco x forte, ruim x
+    boa, ele x ela). Preencha texto_tela e colunas: exatamente 2, cada uma com
+    titulo, tom ("ruim", "boa" ou "neutro") e itens (1 a 3 curtos).
   Em cenas de motion, a narração complementa o que está na tela, não lê a tela.
+- Em cerca de metade das cenas de imagem, preencha rotulo: o conceito-chave
+  da fala em 2 a 4 palavras (ex.: "Valor de reprodução"), que entra animado
+  por cima da imagem.
 """
 
 ROTEIRO_SCHEMA = {
@@ -124,7 +133,21 @@ ROTEIRO_SCHEMA = {
                     "narracao": {"type": "STRING"},
                     "prompt_imagem": {"type": "STRING"},
                     "texto_tela": {"type": "STRING"},
+                    "rotulo": {"type": "STRING"},
                     "numero": {"type": "STRING"},
+                    "itens": {"type": "ARRAY", "items": {"type": "STRING"}},
+                    "colunas": {
+                        "type": "ARRAY",
+                        "items": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "titulo": {"type": "STRING"},
+                                "tom": {"type": "STRING", "enum": ["ruim", "boa", "neutro"]},
+                                "itens": {"type": "ARRAY", "items": {"type": "STRING"}},
+                            },
+                            "required": ["titulo", "itens"],
+                        },
+                    },
                     "mensagens": {
                         "type": "ARRAY",
                         "items": {
@@ -350,13 +373,19 @@ def duracao(path: str) -> float:
     return float(out)
 
 
-def montar_clipe(entrada: str, filtro_video: str, audio: str, dur: float, out_path: str) -> None:
-    """Junta vídeo da cena + narração (com respiro no fim) num clipe intermediário."""
+def montar_clipe(entrada: str, filtro_video: str, audio: str, dur: float, out_path: str,
+                 sobreposicao: str | None = None) -> None:
+    """Junta vídeo da cena + narração (com respiro no fim) num clipe intermediário.
+    `sobreposicao`: vídeo com transparência (ex.: rótulo) por cima da cena."""
+    extra, video = [], f"[0:v]{filtro_video}[v]"
+    if sobreposicao:
+        extra = ["-i", sobreposicao]
+        video = f"[0:v]{filtro_video}[b];[b][2:v]overlay=0:0,format=yuv420p[v]"
     run([
         "ffmpeg", "-y", "-loglevel", "error",
-        "-i", entrada, "-i", audio,
+        "-i", entrada, "-i", audio, *extra,
         "-filter_complex",
-        f"[0:v]{filtro_video}[v];[1:a]aresample=48000,aformat=channel_layouts=stereo,"
+        f"{video};[1:a]aresample=48000,aformat=channel_layouts=stereo,"
         f"apad=pad_dur={SCENE_TAIL_SECONDS}[a]",
         "-map", "[v]", "-map", "[a]", "-t", f"{dur:.3f}",
         # Clipe intermediário: qualidade alta e preset rápido; o encode final refina.
@@ -437,8 +466,12 @@ def render_cena(cena: dict, imagem: str | None, audio: str, saidas: dict[str, st
     for nome, out_path in saidas.items():
         if nome == "16x9" or vertical:
             w, h = tamanhos[nome]
+            rotulo = None
+            if cena.get("rotulo"):
+                rotulo = out_path.replace(".mp4", "_rotulo.mov")
+                render_rotulo(cena["rotulo"], dur, rotulo, FPS, cor_destaque, w, h)
             montar_clipe(imagem, f"{ken_burns(imagem, w, h, dur, indice)},{fades}",
-                         audio, dur, out_path)
+                         audio, dur, out_path, rotulo)
     if "9x16" in saidas and not vertical:
         base = saidas.get("16x9") or saidas["9x16"].replace(".mp4", "_base16x9.mp4")
         if "16x9" not in saidas:

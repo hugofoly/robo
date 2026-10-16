@@ -14,12 +14,14 @@
     {
       "tipo": "imagem",
       "narracao": "Atração é uma resposta emocional. Ela acontece antes do raciocínio, numa parte do cérebro muito mais antiga do que qualquer argumento que você possa dar.",
-      "prompt_imagem": "ancient cave paintings of humans and animals lit by a flickering torch, dramatic close-up"
+      "prompt_imagem": "ancient cave paintings of humans and animals lit by a flickering torch, dramatic close-up",
+      "rotulo": "Emoção antes da razão"
     },
     {
       "tipo": "imagem",
       "narracao": "É por isso que você já viu isso acontecer: o cara que fez tudo certo, foi educado, pagou o jantar, mandou bom dia todo dia, e virou amigo. E o outro, que fez metade, ficou com ela.",
-      "prompt_imagem": "two men at a bar seen from behind, one sitting alone holding a bouquet of flowers, the other relaxed and laughing with a woman, cinematic"
+      "prompt_imagem": "two men at a bar seen from behind, one sitting alone holding a bouquet of flowers, the other relaxed and laughing with a woman, cinematic",
+      "rotulo": "O efeito amigo"
     },
     {
       "tipo": "texto",
@@ -29,7 +31,8 @@
     {
       "tipo": "imagem",
       "narracao": "Elogiar demais, listar as suas qualidades, insistir depois de um não. Tudo isso é tentar ganhar no argumento um jogo que é decidido na emoção.",
-      "prompt_imagem": "a man's hands typing a long message on a phone late at night, screen glow on his fingers, dark room"
+      "prompt_imagem": "a man's hands typing a long message on a phone late at night, screen glow on his fingers, dark room",
+      "rotulo": "Tentar convencer"
     },
     {
       "tipo": "imagem",
@@ -39,12 +42,14 @@
     {
       "tipo": "imagem",
       "narracao": "Pra responder isso, a gente precisa voltar no tempo. Centenas de milhares de anos.",
-      "prompt_imagem": "early humans walking across an African savanna at dawn, silhouettes against the sunrise, epic wide shot"
+      "prompt_imagem": "early humans walking across an African savanna at dawn, silhouettes against the sunrise, epic wide shot",
+      "rotulo": "Há milhares de anos"
     },
     {
       "tipo": "imagem",
       "narracao": "Nossos ancestrais viviam num mundo em que escolher mal um parceiro custava caro. E o cérebro foi sendo moldado para perceber, rapidinho, quem valia a pena.",
-      "prompt_imagem": "a tribal campfire at night, human silhouettes sitting around the fire, sparks rising"
+      "prompt_imagem": "a tribal campfire at night, human silhouettes sitting around the fire, sparks rising",
+      "rotulo": "Seleção de parceiros"
     },
     {
       "tipo": "numero",
@@ -55,17 +60,38 @@
     {
       "tipo": "imagem",
       "narracao": "O primeiro é o valor de reprodução: saúde, vitalidade, bons genes. Sinais de que dali sairiam filhos fortes e saudáveis.",
-      "prompt_imagem": "macro shot of a glowing DNA double helix floating in darkness"
+      "prompt_imagem": "macro shot of a glowing DNA double helix floating in darkness",
+      "rotulo": "Valor de reprodução"
     },
     {
       "tipo": "imagem",
       "narracao": "O segundo é o valor de sobrevivência: a capacidade de prosperar no mundo, de proteger e de prover para quem está ao seu lado.",
-      "prompt_imagem": "close-up of a man's strong hands working on wood in a workshop, warm side light, sawdust in the air"
+      "prompt_imagem": "close-up of a man's strong hands working on wood in a workshop, warm side light, sawdust in the air",
+      "rotulo": "Valor de sobrevivência"
     },
     {
-      "tipo": "texto",
-      "narracao": "E aqui está a diferença que muda tudo. Homens e mulheres dão pesos diferentes para esses dois valores.",
-      "texto_tela": "Ele busca *beleza*. Ela pesa *beleza e poder*."
+      "tipo": "comparacao",
+      "texto_tela": "Pesos diferentes",
+      "colunas": [
+        {
+          "titulo": "Ele busca",
+          "tom": "neutro",
+          "itens": [
+            "Beleza",
+            "Saúde e juventude"
+          ]
+        },
+        {
+          "titulo": "Ela pesa",
+          "tom": "neutro",
+          "itens": [
+            "Beleza",
+            "Poder",
+            "Capacidade de prover"
+          ]
+        }
+      ],
+      "narracao": "E aqui está a diferença que muda tudo. Homens e mulheres dão pesos diferentes para esses dois valores."
     },
     {
       "tipo": "imagem",
@@ -75,7 +101,8 @@
     {
       "tipo": "imagem",
       "narracao": "As mulheres precisam equilibrar os dois. Sentir desejo e, ao mesmo tempo, sentir que aquele homem é capaz. É o que se chama de estratégia dual.",
-      "prompt_imagem": "a woman seen from behind looking at a city skyline at dusk, contemplative mood"
+      "prompt_imagem": "a woman seen from behind looking at a city skyline at dusk, contemplative mood",
+      "rotulo": "Estratégia dual"
     },
     {
       "tipo": "imagem",
@@ -85,7 +112,8 @@
     {
       "tipo": "imagem",
       "narracao": "E isso explica por que o sinal importa mais do que a intenção. Você pode ter as melhores intenções do mundo. Se o sinal que chega nela é de carência, a emoção dela responde à carência.",
-      "prompt_imagem": "a man waiting alone at a restaurant table checking his watch, candle light, seen from behind"
+      "prompt_imagem": "a man waiting alone at a restaurant table checking his watch, candle light, seen from behind",
+      "rotulo": "Sinal > intenção"
     },
     {
       "tipo": "texto",
@@ -95,17 +123,45 @@
     {
       "tipo": "imagem",
       "narracao": "Mas calma. Poder aqui não é ser rico nem mandar nos outros. Poder é tudo aquilo que mostra que você tem opções e controle sobre a própria vida.",
-      "prompt_imagem": "a man seen from behind standing calmly on a rooftop overlooking a city at night"
+      "prompt_imagem": "a man seen from behind standing calmly on a rooftop overlooking a city at night",
+      "rotulo": "O que é poder"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Confiança é poder. Ser seguro de si é poder. Conduzir uma situação, fazer as pessoas rirem, não depender da aprovação dela. Tudo isso comunica poder.",
-      "prompt_imagem": "a group of friends laughing at a bar, one man seen from behind raising his glass for a toast"
+      "tipo": "lista",
+      "texto_tela": "Sinais de poder",
+      "itens": [
+        "Confiança",
+        "Segurança",
+        "Conduzir a situação",
+        "Fazer as pessoas rirem",
+        "Não depender da aprovação dela"
+      ],
+      "narracao": "Confiança é poder. Ser seguro de si é poder. Conduzir uma situação, fazer as pessoas rirem, não depender da aprovação dela. Tudo isso comunica poder."
     },
     {
-      "tipo": "imagem",
-      "narracao": "O contrário também comunica. Ficar ansioso esperando resposta, mudar todos os seus planos pra caber na agenda dela, concordar com tudo. Cada um desses sinais diz: eu não tenho opções. E a atração cai.",
-      "prompt_imagem": "a phone glowing on a nightstand, a man's silhouette sitting on the edge of the bed at night"
+      "tipo": "comparacao",
+      "texto_tela": "O que derruba a atração",
+      "colunas": [
+        {
+          "titulo": "Sinal de carência",
+          "tom": "ruim",
+          "itens": [
+            "Ansiedade esperando resposta",
+            "Mudar tudo pela agenda dela",
+            "Concordar com tudo"
+          ]
+        },
+        {
+          "titulo": "Sinal de poder",
+          "tom": "boa",
+          "itens": [
+            "Responder no seu ritmo",
+            "Manter seus planos",
+            "Ter opinião própria"
+          ]
+        }
+      ],
+      "narracao": "O contrário também comunica. Ficar ansioso esperando resposta, mudar todos os seus planos pra caber na agenda dela, concordar com tudo. Cada um desses sinais diz: eu não tenho opções. E a atração cai."
     },
     {
       "tipo": "chat",
@@ -144,9 +200,15 @@
       "texto_tela": "Atração é *emoção*, não argumento"
     },
     {
-      "tipo": "imagem",
-      "narracao": "A atração é emocional e antiga. Ela pesa sinais de beleza e de poder. E poder, pra você, é calma, opções e controle da própria vida. Tudo o que você faz ou escreve é um sinal.",
-      "prompt_imagem": "a lone figure standing on a hill overlooking a misty valley at dawn"
+      "tipo": "lista",
+      "texto_tela": "O que você levou",
+      "itens": [
+        "Atração é emoção, não argumento",
+        "Ela pesa beleza e poder",
+        "Poder é calma, opções e controle",
+        "Tudo o que você faz é um sinal"
+      ],
+      "narracao": "A atração é emocional e antiga. Ela pesa sinais de beleza e de poder. E poder, pra você, é calma, opções e controle da própria vida. Tudo o que você faz ou escreve é um sinal."
     },
     {
       "tipo": "texto",
@@ -156,7 +218,8 @@
     {
       "tipo": "imagem",
       "narracao": "Pegue as suas três últimas conversas com mulheres. Leia como se fosse ela. Marque cada mensagem em que você tentou convencer, se justificou ou correu atrás. É ali que você está perdendo atração.",
-      "prompt_imagem": "a phone lying on a café table next to a cup of coffee, moody morning light"
+      "prompt_imagem": "a phone lying on a café table next to a cup of coffee, moody morning light",
+      "rotulo": "Missão da aula"
     },
     {
       "tipo": "imagem",

@@ -9,13 +9,18 @@
     {
       "tipo": "imagem",
       "narracao": "Nesta aula, você vai ver as três etapas que levam um papo na rua até um encontro marcado. E o hábito que separa quem tem resultado de quem só sabe a teoria.",
-      "prompt_imagem": "two coffee cups on a café table by a window, rainy street outside"
+      "prompt_imagem": "two coffee cups on a café table by a window, rainy street outside",
+      "rotulo": "Do papo ao encontro"
     },
     {
-      "tipo": "numero",
-      "narracao": "São três etapas.",
-      "numero": "3",
-      "texto_tela": "etapas até o encontro"
+      "tipo": "lista",
+      "texto_tela": "3 etapas até o encontro",
+      "itens": [
+        "Qualificar",
+        "Enraizar",
+        "Propor"
+      ],
+      "narracao": "São três etapas."
     },
     {
       "tipo": "texto",
@@ -25,7 +30,8 @@
     {
       "tipo": "imagem",
       "narracao": "Até aqui, você gerou atração. Agora você inverte o jogo: faz ela mostrar que é mais do que um rosto bonito. Isso faz ela investir na conversa.",
-      "prompt_imagem": "a woman gesturing while talking in a café, her face out of frame, warm light"
+      "prompt_imagem": "a woman gesturing while talking in a café, her face out of frame, warm light",
+      "rotulo": "Inverta o jogo"
     },
     {
       "tipo": "chat",
@@ -49,12 +55,30 @@
     {
       "tipo": "imagem",
       "narracao": "Quando ela se explica ou conta algo de que se orgulha, ela está se qualificando. É sinal de que ela quer a sua aprovação. E isso aumenta o interesse dela.",
-      "prompt_imagem": "a woman's hands holding a coffee cup mid-conversation, soft window light"
+      "prompt_imagem": "a woman's hands holding a coffee cup mid-conversation, soft window light",
+      "rotulo": "Ela está se qualificando"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Atenção à ordem. Se você qualificar antes de gerar atração, vira entrevista de emprego. Primeiro ela ri. Depois ela se explica.",
-      "prompt_imagem": "a man and a woman laughing at a bar counter, seen from behind, warm light"
+      "tipo": "comparacao",
+      "texto_tela": "A ordem importa",
+      "colunas": [
+        {
+          "titulo": "Qualificar cedo demais",
+          "tom": "ruim",
+          "itens": [
+            "Vira entrevista de emprego"
+          ]
+        },
+        {
+          "titulo": "Atração primeiro",
+          "tom": "boa",
+          "itens": [
+            "Primeiro ela ri",
+            "Depois ela se explica"
+          ]
+        }
+      ],
+      "narracao": "Atenção à ordem. Se você qualificar antes de gerar atração, vira entrevista de emprego. Primeiro ela ri. Depois ela se explica."
     },
     {
       "tipo": "texto",
@@ -64,17 +88,20 @@
     {
       "tipo": "imagem",
       "narracao": "Depois de muita provocação, ela ainda sabe pouco sobre você. Então conte algo real: uma história, o que você faz, algo de que você gosta. O cara divertido da rua vira alguém de verdade.",
-      "prompt_imagem": "a man telling a story with a hand gesture at a café table, seen from behind"
+      "prompt_imagem": "a man telling a story with a hand gesture at a café table, seen from behind",
+      "rotulo": "Conte algo real"
     },
     {
       "tipo": "imagem",
       "narracao": "Plantar uma semente também ajuda. Numa das abordagens, ela queria ver um livro raro. E ele diz: traz uma garrafa de vinho que eu te mostro um dia. Fica a ideia do próximo encontro.",
-      "prompt_imagem": "an old red leather book on a wooden table next to a bottle of red wine"
+      "prompt_imagem": "an old red leather book on a wooden table next to a bottle of red wine",
+      "rotulo": "Plante uma semente"
     },
     {
       "tipo": "imagem",
       "narracao": "Enraizar também é a hora de trocar os nomes. Repara que, nas abordagens, o nome só aparece depois de vários minutos. Primeiro a conexão, depois as apresentações.",
-      "prompt_imagem": "close-up of two people shaking hands on a street at dusk"
+      "prompt_imagem": "close-up of two people shaking hands on a street at dusk",
+      "rotulo": "Conexão antes do nome"
     },
     {
       "tipo": "texto",
@@ -101,24 +128,43 @@
       ]
     },
     {
-      "tipo": "imagem",
-      "narracao": "Uma proposta forte é específica e confiante. Não é: quem sabe um dia a gente se vê. É: quero te levar pra tomar uma cerveja. Se vier uma objeção, não discuta. Mande mensagem depois e deixe ela decidir.",
-      "prompt_imagem": "a phone on a bar table lighting up with a new message, two beer glasses nearby"
+      "tipo": "comparacao",
+      "texto_tela": "Qual proposta funciona?",
+      "colunas": [
+        {
+          "titulo": "Proposta fraca",
+          "tom": "ruim",
+          "itens": [
+            "Quem sabe um dia a gente se vê"
+          ]
+        },
+        {
+          "titulo": "Proposta forte",
+          "tom": "boa",
+          "itens": [
+            "Quero te levar pra tomar uma cerveja"
+          ]
+        }
+      ],
+      "narracao": "Uma proposta forte é específica e confiante. Não é: quem sabe um dia a gente se vê. É: quero te levar pra tomar uma cerveja. Se vier uma objeção, não discuta. Mande mensagem depois e deixe ela decidir."
     },
     {
       "tipo": "imagem",
       "narracao": "E se ela disser que tem namorado? Respeite, agradeça a conversa e siga. Você não está ali para competir com ninguém. Tem muita mulher solteira esperando alguém com coragem de falar oi.",
-      "prompt_imagem": "a man walking alone through a city park at sunset, seen from behind, calm"
+      "prompt_imagem": "a man walking alone through a city park at sunset, seen from behind, calm",
+      "rotulo": "Respeite e siga"
     },
     {
       "tipo": "imagem",
       "narracao": "E saia por cima. Termine com uma piada que retome algo da conversa. E seja você quem encerra. Quem sai no ponto alto deixa vontade de mais.",
-      "prompt_imagem": "a man walking away down a street at sunset, seen from behind, relaxed posture"
+      "prompt_imagem": "a man walking away down a street at sunset, seen from behind, relaxed posture",
+      "rotulo": "Saia por cima"
     },
     {
       "tipo": "imagem",
       "narracao": "Depois de pegar o número, mande mensagem no mesmo dia. Curta, retomando a piada de vocês. E já proponha dia e lugar. Quanto mais tempo passa, mais a emoção esfria.",
-      "prompt_imagem": "a phone glowing on a bar counter, a hand typing a short message"
+      "prompt_imagem": "a phone glowing on a bar counter, a hand typing a short message",
+      "rotulo": "Mensagem no mesmo dia"
     },
     {
       "tipo": "texto",
@@ -128,7 +174,8 @@
     {
       "tipo": "imagem",
       "narracao": "Pensa em dois vendedores. Um é excelente, mas faz uma ligação por mês. O outro é mediano e faz trezentas por dia. Quem vende mais?",
-      "prompt_imagem": "a vintage office desk with an old telephone under a lamp, moody tones"
+      "prompt_imagem": "a vintage office desk with an old telephone under a lamp, moody tones",
+      "rotulo": "Volume vence talento"
     },
     {
       "tipo": "numero",
@@ -139,12 +186,14 @@
     {
       "tipo": "imagem",
       "narracao": "Na atração é igual. A forma mais fácil de ter mais sucesso é tentar mais vezes. Quanto mais rejeições você aceitar encarar, mais resultados você vai ter.",
-      "prompt_imagem": "a busy pedestrian crossing seen from above, many people walking"
+      "prompt_imagem": "a busy pedestrian crossing seen from above, many people walking",
+      "rotulo": "Tente mais vezes"
     },
     {
       "tipo": "imagem",
       "narracao": "E o tempo joga a seu favor. O homem começa por baixo, mas tem muito mais capacidade de aumentar o próprio valor ao longo dos anos. Cada caixa que você constrói hoje rende por décadas.",
-      "prompt_imagem": "a man hiking up a mountain trail at dawn, seen from behind"
+      "prompt_imagem": "a man hiking up a mountain trail at dawn, seen from behind",
+      "rotulo": "O tempo é seu aliado"
     },
     {
       "tipo": "texto",
@@ -152,9 +201,16 @@
       "texto_tela": "Biologia + *jogo* = resultado"
     },
     {
-      "tipo": "imagem",
-      "narracao": "A atração é emocional. O seu valor vem de três caixas. O ambiente muda o peso de cada uma. A abordagem tem quatro passos, e o encontro, três etapas. E tudo isso só funciona com volume.",
-      "prompt_imagem": "an aerial view of a city at night with glowing streets like a network"
+      "tipo": "lista",
+      "texto_tela": "O módulo em 5 linhas",
+      "itens": [
+        "Atração é emoção",
+        "Seu valor: 3 caixas",
+        "O ambiente muda o peso",
+        "4 passos da abordagem",
+        "3 etapas até o encontro"
+      ],
+      "narracao": "A atração é emocional. O seu valor vem de três caixas. O ambiente muda o peso de cada uma. A abordagem tem quatro passos, e o encontro, três etapas. E tudo isso só funciona com volume."
     },
     {
       "tipo": "texto",
@@ -162,9 +218,15 @@
       "texto_tela": "Missão final: *volume com intenção*"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Defina uma meta semanal de aberturas. Comece com cinco. Em cada uma, use os quatro passos da abordagem e as três etapas desta aula. Anote o que funcionou e onde você travou.",
-      "prompt_imagem": "an open notebook with checkboxes, a pen and a phone in morning light"
+      "tipo": "lista",
+      "texto_tela": "Missão final",
+      "itens": [
+        "5 aberturas por semana",
+        "Use os 4 passos",
+        "Siga as 3 etapas",
+        "Anote o que funcionou"
+      ],
+      "narracao": "Defina uma meta semanal de aberturas. Comece com cinco. Em cada uma, use os quatro passos da abordagem e as três etapas desta aula. Anote o que funcionou e onde você travou."
     },
     {
       "tipo": "imagem",

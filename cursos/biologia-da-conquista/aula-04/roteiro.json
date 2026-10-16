@@ -9,13 +9,19 @@
     {
       "tipo": "imagem",
       "narracao": "Nesta aula, a gente vai desmontar abordagens reais, feitas na rua, em plena luz do dia, e tirar delas um roteiro que você pode usar.",
-      "prompt_imagem": "a wide avenue sidewalk in a big city during the day, pedestrians seen from behind"
+      "prompt_imagem": "a wide avenue sidewalk in a big city during the day, pedestrians seen from behind",
+      "rotulo": "Abordagens reais"
     },
     {
-      "tipo": "numero",
-      "narracao": "São quatro passos.",
-      "numero": "4",
-      "texto_tela": "passos da abordagem"
+      "tipo": "lista",
+      "texto_tela": "Os 4 passos",
+      "itens": [
+        "Abertura direta",
+        "Elogio com várias pontas",
+        "Energia que não balança",
+        "Provoque, não impressione"
+      ],
+      "narracao": "São quatro passos."
     },
     {
       "tipo": "texto",
@@ -36,12 +42,14 @@
     {
       "tipo": "imagem",
       "narracao": "Funciona porque é verdade e porque mostra coragem. Você não se esconde atrás de uma pergunta sobre o horário. Você assume a sua intenção.",
-      "prompt_imagem": "a man approaching a woman on a sunny sidewalk, both seen from a distance from behind"
+      "prompt_imagem": "a man approaching a woman on a sunny sidewalk, both seen from a distance from behind",
+      "rotulo": "Coragem + intenção"
     },
     {
       "tipo": "imagem",
       "narracao": "O tom importa tanto quanto as palavras. Fale devagar, com um meio sorriso, e pare na frente dela, não atrás. Você não está pedindo licença. Está oferecendo uma conversa.",
-      "prompt_imagem": "a man in a casual jacket standing relaxed on a sidewalk with a half smile, his face in shadow"
+      "prompt_imagem": "a man in a casual jacket standing relaxed on a sidewalk with a half smile, his face in shadow",
+      "rotulo": "Devagar e de frente"
     },
     {
       "tipo": "texto",
@@ -51,7 +59,8 @@
     {
       "tipo": "imagem",
       "narracao": "Logo depois da abertura, você elabora o elogio. Mas não sobre o rosto dela. Sobre algo que ela escolheu: o estilo, uma peça de roupa, o jeito de andar.",
-      "prompt_imagem": "close-up of a vintage leather belt with two buckles and ankle boots, street fashion detail"
+      "prompt_imagem": "close-up of a vintage leather belt with two buckles and ankle boots, street fashion detail",
+      "rotulo": "Elogie o que ela escolheu"
     },
     {
       "tipo": "chat",
@@ -72,12 +81,14 @@
     {
       "tipo": "imagem",
       "narracao": "Isso é intencional. Se você puxa um assunto só, pode ser que ele não interesse. Se abre vários, ela escolhe o que mais tem a ver com ela, e a conversa anda sozinha.",
-      "prompt_imagem": "a woman with a suitcase walking on a street, her flared skirt swirling, seen from behind"
+      "prompt_imagem": "a woman with a suitcase walking on a street, her flared skirt swirling, seen from behind",
+      "rotulo": "Várias portas abertas"
     },
     {
       "tipo": "imagem",
       "narracao": "Outro exemplo real: um cinto com duas fivelas vira uma conversa sobre Game of Thrones, brechó e estilo. E ela responde justamente sobre moda, porque é a área dela.",
-      "prompt_imagem": "close-up of a stylish outfit with a double-buckle belt on a city street, fashion detail"
+      "prompt_imagem": "close-up of a stylish outfit with a double-buckle belt on a city street, fashion detail",
+      "rotulo": "Ela escolhe o assunto"
     },
     {
       "tipo": "texto",
@@ -87,17 +98,20 @@
     {
       "tipo": "imagem",
       "narracao": "Numa das abordagens, a garota responde logo de cara: tô com pressa. E o que ele faz? Continua, tranquilo, como se ela fosse ficar. E ela fica.",
-      "prompt_imagem": "a woman walking fast on a sidewalk glancing back, a calm man standing nearby, both seen from behind"
+      "prompt_imagem": "a woman walking fast on a sidewalk glancing back, a calm man standing nearby, both seen from behind",
+      "rotulo": "\"Tô com pressa\""
     },
     {
       "tipo": "imagem",
       "narracao": "A objeção inicial quase nunca é sobre você. É um reflexo. Se a sua energia não muda, ela percebe que você não depende daquilo, e relaxa.",
-      "prompt_imagem": "a calm man standing with hands in pockets on a busy street, the crowd blurred around him"
+      "prompt_imagem": "a calm man standing with hands in pockets on a busy street, the crowd blurred around him",
+      "rotulo": "Objeção é reflexo"
     },
     {
       "tipo": "imagem",
       "narracao": "Mas atenção: uma resposta curta no começo é normal. Agora, se depois de um minuto ela continua fechada, olhando pro lado, agradeça e siga. Respeitar o não também é poder.",
-      "prompt_imagem": "a man nodding politely and walking away from a woman on a sidewalk, both seen from behind"
+      "prompt_imagem": "a man nodding politely and walking away from a woman on a sidewalk, both seen from behind",
+      "rotulo": "Respeitar o não é poder"
     },
     {
       "tipo": "imagem",
@@ -133,17 +147,37 @@
     {
       "tipo": "imagem",
       "narracao": "Faça suposições divertidas sobre ela. Você tem cara de quem faz algo criativo. Aposto que você vai chegar em casa e fazer o meu horóscopo. Ela ri, corrige e começa a se explicar pra você.",
-      "prompt_imagem": "a woman laughing on a city street, her face hidden by her hair, backlit by the sun"
+      "prompt_imagem": "a woman laughing on a city street, her face hidden by her hair, backlit by the sun",
+      "rotulo": "Suposições divertidas"
     },
     {
       "tipo": "imagem",
       "narracao": "Repara que é provocação leve, nunca ofensa. Você brinca com a situação, não diminui ela. Ela tem que rir junto, não se sentir atacada.",
-      "prompt_imagem": "two people laughing together on a park bench at golden hour, seen from behind"
+      "prompt_imagem": "two people laughing together on a park bench at golden hour, seen from behind",
+      "rotulo": "Leve, nunca ofensa"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Quando ela perguntar o que você faz, não despeje o seu currículo. Brinque primeiro, depois responda de verdade. Quem tenta impressionar mostra que precisa da aprovação dela.",
-      "prompt_imagem": "a relaxed man leaning on a wall holding a coffee cup while chatting, seen from behind"
+      "tipo": "comparacao",
+      "texto_tela": "Quando ela pergunta o que você faz",
+      "colunas": [
+        {
+          "titulo": "Tentar impressionar",
+          "tom": "ruim",
+          "itens": [
+            "Despejar o currículo",
+            "Buscar aprovação"
+          ]
+        },
+        {
+          "titulo": "Provocar",
+          "tom": "boa",
+          "itens": [
+            "Brincar primeiro",
+            "Responder de verdade depois"
+          ]
+        }
+      ],
+      "narracao": "Quando ela perguntar o que você faz, não despeje o seu currículo. Brinque primeiro, depois responda de verdade. Quem tenta impressionar mostra que precisa da aprovação dela."
     },
     {
       "tipo": "imagem",
@@ -156,9 +190,15 @@
       "texto_tela": "Abra, elogie, mantenha, *provoque*"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Abertura direta e honesta. Elogio com várias pontas sobre algo que ela escolheu. Energia que não balança diante da objeção. E provocação leve, em vez de tentar impressionar.",
-      "prompt_imagem": "a city street at golden hour with people crossing, cinematic wide shot"
+      "tipo": "lista",
+      "texto_tela": "Recapitulando",
+      "itens": [
+        "Abertura direta e honesta",
+        "Elogio com várias pontas",
+        "Energia que não balança",
+        "Provocação leve"
+      ],
+      "narracao": "Abertura direta e honesta. Elogio com várias pontas sobre algo que ela escolheu. Energia que não balança diante da objeção. E provocação leve, em vez de tentar impressionar."
     },
     {
       "tipo": "texto",
@@ -168,7 +208,8 @@
     {
       "tipo": "imagem",
       "narracao": "Faça três aberturas diretas esta semana, de dia. Abertura honesta, elogio com várias pontas, e só. Não importa o resultado. O objetivo é sentir que você consegue.",
-      "prompt_imagem": "a man stepping onto a sidewalk in the morning sun, seen from behind"
+      "prompt_imagem": "a man stepping onto a sidewalk in the morning sun, seen from behind",
+      "rotulo": "Missão da aula"
     },
     {
       "tipo": "imagem",

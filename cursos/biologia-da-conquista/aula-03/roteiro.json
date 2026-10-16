@@ -9,7 +9,8 @@
     {
       "tipo": "imagem",
       "narracao": "Tubarão no deserto morre. Leão no mar se afoga. Na atração é igual: o peso de cada caixa muda conforme o ambiente.",
-      "prompt_imagem": "a lion silhouette standing on a rock at sunset in the savanna"
+      "prompt_imagem": "a lion silhouette standing on a rock at sunset in the savanna",
+      "rotulo": "Cada animal no seu habitat"
     },
     {
       "tipo": "numero",
@@ -25,7 +26,8 @@
     {
       "tipo": "imagem",
       "narracao": "Nos aplicativos, a terceira caixa quase não aparece. Ninguém sente a sua presença por uma foto. Quem tem a primeira caixa forte, a beleza, leva vantagem.",
-      "prompt_imagem": "a hand swiping on a phone in bed at night, screen glow on the sheets"
+      "prompt_imagem": "a hand swiping on a phone in bed at night, screen glow on the sheets",
+      "rotulo": "Online · vence a beleza"
     },
     {
       "tipo": "imagem",
@@ -35,7 +37,8 @@
     {
       "tipo": "imagem",
       "narracao": "Nas fotos, mostre a sua vida, não só o seu rosto. Você fazendo algo, com amigos, viajando, em lugares interessantes. É o jeito de colocar um pouco das outras caixas dentro de uma tela.",
-      "prompt_imagem": "a man seen from behind hiking with friends on a mountain ridge on a sunny day"
+      "prompt_imagem": "a man seen from behind hiking with friends on a mountain ridge on a sunny day",
+      "rotulo": "Fotos com contexto"
     },
     {
       "tipo": "texto",
@@ -45,7 +48,8 @@
     {
       "tipo": "imagem",
       "narracao": "Amigos, trabalho, faculdade. Aqui, quem recebe mais atenção é quem lidera o grupo. E esse status é decidido pelo seu comportamento ao longo do tempo.",
-      "prompt_imagem": "friends at a dinner table, one man seen from behind telling a story while the others laugh"
+      "prompt_imagem": "friends at a dinner table, one man seen from behind telling a story while the others laugh",
+      "rotulo": "Círculo · vence quem lidera"
     },
     {
       "tipo": "imagem",
@@ -55,7 +59,8 @@
     {
       "tipo": "imagem",
       "narracao": "O melhor jeito de subir no círculo é gerar valor para o grupo. Organizar o rolê, apresentar pessoas, trazer novidade. Quem conecta as pessoas vira o centro.",
-      "prompt_imagem": "a man seen from behind introducing two friends to each other at a rooftop party at dusk"
+      "prompt_imagem": "a man seen from behind introducing two friends to each other at a rooftop party at dusk",
+      "rotulo": "Gere valor pro grupo"
     },
     {
       "tipo": "texto",
@@ -65,7 +70,8 @@
     {
       "tipo": "imagem",
       "narracao": "Onde o dinheiro compra status, como num camarote, ele vira vantagem real. Na pista barulhenta, onde mal dá para conversar, a beleza ganha força.",
-      "prompt_imagem": "a crowded nightclub dance floor with laser lights, people seen from behind"
+      "prompt_imagem": "a crowded nightclub dance floor with laser lights, people seen from behind",
+      "rotulo": "Balada · beleza e dinheiro"
     },
     {
       "tipo": "imagem",
@@ -75,7 +81,8 @@
     {
       "tipo": "imagem",
       "narracao": "Uma dica prática: chegue cedo e converse com várias pessoas, homens e mulheres. Quando você for abordar alguém, já vai estar aquecido e já vai ser visto como alguém sociável ali dentro.",
-      "prompt_imagem": "a cocktail bar early in the evening, a man chatting with the bartender, warm lights, seen from behind"
+      "prompt_imagem": "a cocktail bar early in the evening, a man chatting with the bartender, warm lights, seen from behind",
+      "rotulo": "Chegue aquecido"
     },
     {
       "tipo": "texto",
@@ -85,12 +92,14 @@
     {
       "tipo": "imagem",
       "narracao": "Rua, café, livraria, supermercado, metrô. Aqui, dinheiro e status são invisíveis. A beleza ajuda, mas não conquista sozinha. Aqui, o jogo é rei.",
-      "prompt_imagem": "a busy city sidewalk during the day, a man walking with a coffee cup, seen from behind"
+      "prompt_imagem": "a busy city sidewalk during the day, a man walking with a coffee cup, seen from behind",
+      "rotulo": "Dia a dia · o jogo é rei"
     },
     {
       "tipo": "imagem",
       "narracao": "E tem uma vantagem escondida: concorrência quase zero. Quase nenhum homem tem coragem de puxar conversa de dia. Quem tem, se destaca na hora.",
-      "prompt_imagem": "a quiet bookstore aisle with a man browsing the shelves, soft window light"
+      "prompt_imagem": "a quiet bookstore aisle with a man browsing the shelves, soft window light",
+      "rotulo": "Concorrência quase zero"
     },
     {
       "tipo": "imagem",
@@ -103,14 +112,31 @@
       "texto_tela": "Escassez muda o seu *valor*"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Num lugar com mais mulheres do que homens, o seu valor relativo sobe. Com mais homens, ele cai. Pense em aulas de dança, cursos e eventos onde a proporção joga a seu favor.",
-      "prompt_imagem": "a dance class in a studio with couples dancing, seen from behind, warm light"
+      "tipo": "comparacao",
+      "texto_tela": "Escassez muda o seu valor",
+      "colunas": [
+        {
+          "titulo": "Mais mulheres que homens",
+          "tom": "boa",
+          "itens": [
+            "Seu valor relativo sobe"
+          ]
+        },
+        {
+          "titulo": "Mais homens que mulheres",
+          "tom": "ruim",
+          "itens": [
+            "Seu valor relativo cai"
+          ]
+        }
+      ],
+      "narracao": "Num lugar com mais mulheres do que homens, o seu valor relativo sobe. Com mais homens, ele cai. Pense em aulas de dança, cursos e eventos onde a proporção joga a seu favor."
     },
     {
       "tipo": "imagem",
       "narracao": "E ser novidade também conta. O estrangeiro, o recém-chegado, o cara novo no grupo desperta curiosidade só por ser diferente.",
-      "prompt_imagem": "a man with a backpack arriving in a foreign city square, seen from behind"
+      "prompt_imagem": "a man with a backpack arriving in a foreign city square, seen from behind",
+      "rotulo": "O fator novidade"
     },
     {
       "tipo": "texto",
@@ -118,9 +144,15 @@
       "texto_tela": "Jogue onde a sua *caixa* rende"
     },
     {
-      "tipo": "imagem",
-      "narracao": "Online, ganha a beleza. No círculo social, quem lidera. Na balada, beleza e dinheiro, mas o jogo compete. No dia a dia, o jogo é rei. E onde há escassez de homens, o seu valor sobe.",
-      "prompt_imagem": "a chessboard seen from above with pieces spread across different zones, dramatic light"
+      "tipo": "lista",
+      "texto_tela": "Quem ganha em cada ambiente",
+      "itens": [
+        "Online: beleza",
+        "Círculo social: quem lidera",
+        "Balada: beleza e dinheiro",
+        "Dia a dia: o jogo"
+      ],
+      "narracao": "Online, ganha a beleza. No círculo social, quem lidera. Na balada, beleza e dinheiro, mas o jogo compete. No dia a dia, o jogo é rei. E onde há escassez de homens, o seu valor sobe."
     },
     {
       "tipo": "texto",
@@ -130,7 +162,8 @@
     {
       "tipo": "imagem",
       "narracao": "Olhe as notas que você deu às suas caixas. Qual é a mais forte? Agora escolha um ambiente onde ela rende mais. E vá lá duas vezes esta semana.",
-      "prompt_imagem": "a city map on a table with a few pins, hands and a cup of coffee"
+      "prompt_imagem": "a city map on a table with a few pins, hands and a cup of coffee",
+      "rotulo": "Missão da aula"
     },
     {
       "tipo": "imagem",

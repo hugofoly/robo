@@ -10,6 +10,13 @@ Node/Remotion. Três tipos:
   - chat:   conversa dentro de um celular: "digitando..." antes da resposta
             dela, bolhas com mola, selos ruim/boa que batem na tela e rolagem
             quando a conversa passa da altura da tela.
+  - lista:  título + cards numerados que entram em sequência com mola; o card
+            mais recente pulsa na cor de destaque.
+  - comparacao: dois painéis (ex.: ruim x boa) que entram um de cada lado,
+            com um selo "VS" que bate no meio.
+
+Fora dos tipos de cena, render_rotulo() gera um letreiro animado (camada com
+transparência) pra sobrepor às cenas de imagem com o conceito-chave da fala.
 
 Linguagem visual comum (o que deixa o motion "cinematográfico"):
   - fundo vivo: a imagem da cena vizinha desfocada e escurecida (continuidade
@@ -29,7 +36,7 @@ import subprocess
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-TIPOS_MOTION = ("texto", "numero", "chat")
+TIPOS_MOTION = ("texto", "numero", "chat", "lista", "comparacao")
 
 FG = (242, 242, 245)
 MUTED = (160, 160, 172)
@@ -628,10 +635,261 @@ def cena_chat(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco)
 
 
 # --------------------------------------------------------------------------
+# Peças comuns: título de cena e card
+# --------------------------------------------------------------------------
+
+def _titulo_cena(titulo: str, W: int, H: int, cores: dict):
+    """Título no topo com sublinhado que varre; devolve (camada, y_centro, fim_y)."""
+    vertical = H > W
+    tam = 64 if vertical else 66
+    fnt = fonte(tam)
+    largura = int(W * (0.86 if vertical else 0.8))
+    linhas = [" ".join(l) for l in quebrar(titulo.split(), fnt, largura)]
+    alt = int(tam * 1.22)
+    camada = Image.new("RGBA", (W, alt * len(linhas) + 30), (0, 0, 0, 0))
+    d = ImageDraw.Draw(camada)
+    for k, l in enumerate(linhas):
+        d.text(((W - fnt.getlength(l)) / 2, k * alt), l, font=fnt, fill=FG)
+    y = H * (0.16 if vertical else 0.14)
+    return camada, y + camada.height / 2, y + camada.height
+
+
+def _card(texto: str, indice: int | None, largura: int, altura: int, tam: int, cores: dict,
+          icone: str | None = None) -> Image.Image:
+    img = Image.new("RGBA", (largura, altura), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fundo = tuple(min(c + 26, 255) for c in cores["fundo"])
+    d.rounded_rectangle([0, 0, largura - 1, altura - 1], radius=altura // 4, fill=(*fundo, 225),
+                        outline=(255, 255, 255, 30), width=2)
+    x = int(altura * 0.28)
+    if indice is not None or icone:
+        r = int(altura * 0.30)
+        cx, cy = x + r, altura // 2
+        if icone in ("boa", "ruim"):
+            sel = _selo(icone, r)
+            img.alpha_composite(sel, (cx - r, cy - r))
+        else:
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(*cores["destaque"], 255))
+            fn = fonte(int(r * 1.1))
+            num = str(indice)
+            d.text((cx - fn.getlength(num) / 2, cy - r * 0.62), num, font=fn, fill=FG)
+        x = cx + r + int(altura * 0.28)
+    fnt = fonte(tam)
+    linhas = [" ".join(l) for l in quebrar(texto.split(), fnt, largura - x - int(altura * 0.25))]
+    alt_l = int(tam * 1.2)
+    y0 = (altura - alt_l * len(linhas)) / 2
+    for k, l in enumerate(linhas):
+        d.text((x, y0 + k * alt_l), l, font=fnt, fill=FG)
+    return img
+
+
+# --------------------------------------------------------------------------
+# Tipo "lista": cards numerados em sequência
+# --------------------------------------------------------------------------
+
+def cena_lista(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco):
+    itens = [i for i in (cena.get("itens") or []) if i.strip()]
+    if not itens:
+        raise ValueError("cena 'lista' sem 'itens'")
+    vertical = H > W
+    titulo = (cena.get("texto_tela") or "").replace("*", "")
+    camada_tit, tit_cy, tit_fim = _titulo_cena(titulo, W, H, cores) if titulo else (None, 0, H * 0.12)
+
+    largura = int(W * (0.86 if vertical else 0.58))
+    area = (H * (0.80 if vertical else 0.86)) - tit_fim - 30
+    gap = int(H * 0.018)
+    altura = int(min(H * (0.085 if vertical else 0.13), (area - gap * (len(itens) - 1)) / len(itens)))
+    tam = max(int(altura * 0.42), 28)
+    cards = [_card(t, k + 1, largura, altura, tam, cores) for k, t in enumerate(itens)]
+    total = len(cards) * altura + (len(cards) - 1) * gap
+    y0 = tit_fim + 30 + (area - total) / 2
+    contorno = brilho(Image.new("RGBA", (largura, altura), (255, 255, 255, 255)), cores["destaque"], 16, 1.1)
+
+    passo = min(0.9, dur * 0.6 / len(cards))
+    inicios = [0.35 + k * passo for k in range(len(cards))]
+
+    def frame(t: float) -> Image.Image:
+        img = palco.base(t)
+        if camada_tit is not None:
+            q = ease_out(prog(t, 0.0, 0.45))
+            colar_centro(img, camada_tit, W / 2, tit_cy + (1 - q) * 30, 1, q)
+            larg_sub = int(W * 0.12 * ease_out(prog(t, 0.2, 0.5)))
+            if larg_sub > 0:
+                ImageDraw.Draw(img).rounded_rectangle(
+                    [W / 2 - larg_sub / 2, tit_fim - 4, W / 2 + larg_sub / 2, tit_fim + 4],
+                    radius=4, fill=(*cores["destaque"], 255))
+        ultimo = max((k for k, i0 in enumerate(inicios) if t >= i0), default=-1)
+        for k, (card, i0) in enumerate(zip(cards, inicios)):
+            p = prog(t, i0, 0.5)
+            if p <= 0:
+                continue
+            cy = y0 + k * (altura + gap) + altura / 2
+            dx = (1 - ease_out_back(p, 1.4)) * W * 0.18
+            if k == ultimo:  # o card que acabou de entrar pulsa
+                pulso = 0.5 + 0.5 * math.sin((t - i0) * 5)
+                colar_centro(img, contorno, W / 2 + dx, cy, 1, 0.35 + 0.35 * pulso * ease_out(p))
+            colar_centro(img, card, W / 2 + dx, cy, 0.92 + 0.08 * ease_out(p), min(1, p * 2.2))
+        return palco.camera(img, t)
+
+    return frame
+
+
+# --------------------------------------------------------------------------
+# Tipo "comparacao": dois painéis + VS
+# --------------------------------------------------------------------------
+
+def _painel(coluna: dict, largura: int, cores: dict, vertical: bool) -> Image.Image:
+    tom = coluna.get("tom")
+    cor_tom = {"ruim": VERMELHO, "boa": VERDE}.get(tom, cores["destaque"])
+    itens = coluna.get("itens") or []
+    tam_cab = 60 if vertical else 56
+    tam = 50 if vertical else 44
+    alt_item = int(tam * 2.3)
+    fnt_cab = fonte(tam_cab)
+    cab_linhas = [" ".join(l) for l in quebrar((coluna.get("titulo") or "").split(), fnt_cab, largura - 80)]
+    alt_cab = int(tam_cab * 1.25) * len(cab_linhas) + 50
+    cards = [_card(i, None, largura - 40, alt_item, tam, cores, icone=tom if tom in ("boa", "ruim") else None)
+             for i in itens]
+    altura = alt_cab + sum(c.height + 14 for c in cards) + 30
+    img = Image.new("RGBA", (largura, altura), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fundo = tuple(min(c + 12, 255) for c in cores["fundo"])
+    d.rounded_rectangle([0, 0, largura - 1, altura - 1], radius=36, fill=(*fundo, 215),
+                        outline=(*cor_tom, 160), width=3)
+    d.rounded_rectangle([0, 0, largura - 1, 14], radius=7, fill=(*cor_tom, 255))
+    for k, l in enumerate(cab_linhas):
+        d.text(((largura - fnt_cab.getlength(l)) / 2, 34 + k * int(tam_cab * 1.25)), l, font=fnt_cab, fill=FG)
+    y = alt_cab
+    for c in cards:
+        img.alpha_composite(c, (20, y))
+        y += c.height + 14
+    return img
+
+
+def cena_comparacao(cena: dict, dur: float, cores: dict, W: int, H: int, palco: Palco):
+    colunas = cena.get("colunas") or []
+    if len(colunas) != 2:
+        raise ValueError("cena 'comparacao' precisa de exatamente 2 'colunas'")
+    vertical = H > W
+    titulo = (cena.get("texto_tela") or "").replace("*", "")
+    camada_tit, tit_cy, tit_fim = _titulo_cena(titulo, W, H, cores) if titulo else (None, 0, H * 0.1)
+    largura = int(W * (0.86 if vertical else 0.38))
+    paineis = [_painel(c, largura, cores, vertical) for c in colunas]
+    if vertical:
+        area_topo = tit_fim + 40
+        total = sum(p.height for p in paineis) + 120
+        y1 = area_topo + max(0, (H * 0.86 - area_topo - total) / 2)
+        pos = [(W / 2, y1 + paineis[0].height / 2),
+               (W / 2, y1 + paineis[0].height + 120 + paineis[1].height / 2)]
+        vs_pos = (W / 2, y1 + paineis[0].height + 60)
+        origem = [(0, -H * 0.3), (0, H * 0.3)]
+    else:
+        cy = tit_fim + 40 + (H * 0.9 - tit_fim - 40) / 2
+        pos = [(W * 0.28, cy), (W * 0.72, cy)]
+        vs_pos = (W / 2, cy)
+        origem = [(-W * 0.35, 0), (W * 0.35, 0)]
+    r_vs = int(min(W, H) * 0.055)
+    vs = Image.new("RGBA", (2 * r_vs, 2 * r_vs), (0, 0, 0, 0))
+    dv = ImageDraw.Draw(vs)
+    dv.ellipse([0, 0, 2 * r_vs - 1, 2 * r_vs - 1], fill=(*cores["destaque"], 255))
+    fv = fonte(int(r_vs * 0.8))
+    dv.text((r_vs - fv.getlength("VS") / 2, r_vs * 0.52), "VS", font=fv, fill=FG)
+    halo_vs = brilho(vs, cores["destaque"], 26, 1.3)
+    inicios = [0.3, 0.3 + min(1.4, dur * 0.35)]
+    t_vs = inicios[1] + 0.35
+
+    def frame(t: float) -> Image.Image:
+        img = palco.base(t)
+        if camada_tit is not None:
+            q = ease_out(prog(t, 0.0, 0.45))
+            colar_centro(img, camada_tit, W / 2, tit_cy + (1 - q) * 30, 1, q)
+        for painel, (px, py), (ox, oy), i0 in zip(paineis, pos, origem, inicios):
+            p = prog(t, i0, 0.6)
+            if p <= 0:
+                continue
+            e = ease_out_back(p, 1.2)
+            colar_centro(img, painel, px + ox * (1 - e), py + oy * (1 - e), 0.94 + 0.06 * e, min(1, p * 2))
+        q = prog(t, t_vs, 0.45)
+        if q > 0:
+            esc = 2.4 - 1.4 * ease_out_back(q, 2.2)
+            colar_centro(img, halo_vs, *vs_pos, esc * (1 + 0.05 * math.sin(t * 4)), 0.9)
+            colar_centro(img, vs, *vs_pos, esc, min(1, q * 3))
+        return palco.camera(img, t)
+
+    return frame
+
+
+# --------------------------------------------------------------------------
+# Rótulo animado sobre cenas de imagem
+# --------------------------------------------------------------------------
+
+def render_rotulo(texto: str, dur: float, out_path: str, fps: int, cor_destaque: str,
+                  W: int, H: int) -> None:
+    """Letreiro com o conceito-chave da cena, num .mov com transparência
+    (codec png) pra ser sobreposto ao movimento de câmera da imagem.
+    Entra com barra na cor de destaque crescendo + texto revelado da esquerda
+    pra direita; sai deslizando no fim da cena."""
+    destaque = hex_para_rgb(cor_destaque)
+    vertical = H > W
+    tam = 46 if vertical else 44
+    fnt = fonte(tam)
+    rotulo = texto.upper()
+    espac = 3
+    larg_txt = int(sum(fnt.getlength(c) + espac for c in rotulo))
+    pad_x, alt = 28, int(tam * 1.9)
+    caixa_w = larg_txt + 2 * pad_x + 14
+    caixa = Image.new("RGBA", (caixa_w, alt), (0, 0, 0, 0))
+    d = ImageDraw.Draw(caixa)
+    d.rounded_rectangle([0, 0, caixa_w - 1, alt - 1], radius=10, fill=(8, 10, 14, 200))
+    d.rectangle([0, 0, 9, alt - 1], fill=(*destaque, 255))
+    x = 14 + pad_x
+    for c in rotulo:
+        d.text((x, (alt - tam * 1.16) / 2), c, font=fnt, fill=FG)
+        x += fnt.getlength(c) + espac
+    halo = brilho(caixa.crop((0, 0, 10, alt)), destaque, 14, 1.2)
+    x0 = int(W * (0.07 if vertical else 0.05))
+    y0 = int(H * (0.12 if vertical else 0.08))
+
+    total = max(int(round(dur * fps)), 1)
+    proc = subprocess.Popen(
+        ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba",
+         "-s", f"{W}x{H}", "-r", str(fps), "-i", "-", "-c:v", "png", out_path],
+        stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+    )
+    vazio = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    vazio_bytes = vazio.tobytes()
+    try:
+        for n in range(total):
+            t = n / fps
+            entrada = prog(t, 0.35, 0.55)
+            saida = prog(t, dur - 0.55, 0.4)
+            if entrada <= 0 or saida >= 1:
+                proc.stdin.write(vazio_bytes)
+                continue
+            img = vazio.copy()
+            barra = ease_out(prog(t, 0.35, 0.25))
+            revela = ease_out(prog(t, 0.5, 0.45))
+            corte = int(14 + (caixa_w - 14) * revela)
+            parte = caixa.crop((0, 0, max(corte, 10), alt))
+            if barra < 1:  # barra cresce de cima pra baixo antes do texto
+                parte = parte.crop((0, 0, 10, max(1, int(alt * barra))))
+            dx = -saida * (caixa_w + x0) * ease_in_out(saida)
+            colar_centro(img, halo, x0 + dx + 5, y0 + alt / 2, 1, 0.8 * (1 - saida))
+            img.alpha_composite(com_alpha(parte, 1 - saida), (max(0, int(x0 + dx)), y0))
+            proc.stdin.write(img.tobytes())
+        proc.stdin.close()
+    except BrokenPipeError:
+        pass
+    if proc.wait() != 0:
+        raise RuntimeError(f"FFmpeg falhou no rótulo: {proc.stderr.read().decode()[-1500:]}")
+
+
+# --------------------------------------------------------------------------
 # Render
 # --------------------------------------------------------------------------
 
-CONSTRUTORES = {"texto": cena_texto, "numero": cena_numero, "chat": cena_chat}
+CONSTRUTORES = {"texto": cena_texto, "numero": cena_numero, "chat": cena_chat,
+                "lista": cena_lista, "comparacao": cena_comparacao}
 
 
 def render_motion(cena: dict, dur: float, out_path: str, fps: int, cor_destaque: str,

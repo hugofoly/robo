@@ -56,7 +56,15 @@ nunca commite mídia gerada.
    | `imagem` | `narracao`, `prompt_imagem` (inglês) | maioria das cenas; Ken Burns |
    | `texto` | `narracao`, `texto_tela` (≤12 palavras, `*palavra*` = destaque) | gancho, virada, CTA |
    | `numero` | `narracao`, `numero` ("90%", "3x", "1.200"), `texto_tela` (legenda) | dado citado; contador animado |
-   | `chat` | `narracao`, `mensagens` [{`de`: voce/ela, `texto`, `avaliacao`: ruim/boa}], `texto_tela` (título opcional) | exemplo de conversa, ruim vs boa |
+   | `chat` | `narracao`, `mensagens` [{`de`: voce/ela, `texto`, `avaliacao`: ruim/boa}], `texto_tela` (título opcional) | exemplo de conversa dentro de um celular, ruim vs boa |
+   | `lista` | `narracao`, `texto_tela` (título), `itens` (2-6 curtos, na ordem da fala) | passos, caixas, recapitulação |
+   | `comparacao` | `narracao`, `texto_tela`, `colunas` (2× {`titulo`, `tom`: ruim/boa/neutro, `itens`}) | fraco x forte, ele x ela |
+
+   Cenas de `imagem` aceitam `rotulo` (2-4 palavras): letreiro animado com o
+   conceito-chave da fala por cima do movimento de câmera. Use em ~metade das
+   imagens. Pra deixar o vídeo mais animado sem gastar com imagem, converta em
+   `lista`/`comparacao` as cenas cuja fala já enumera ou contrasta algo — a
+   narração não muda, então o áudio existente é reaproveitado.
 
    Pra trocar o tipo de uma cena, edite o `roteiro.json` (ex.: transformar uma
    cena de imagem em `texto`) e rode a partir da etapa 2.
