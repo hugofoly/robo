@@ -1,0 +1,179 @@
+{
+  "titulo": "Aula 4 — Anatomia de uma abordagem",
+  "cenas": [
+    {
+      "tipo": "texto",
+      "narracao": "Os primeiros trinta segundos de uma abordagem decidem quase tudo. E a maioria dos homens desperdiça esses segundos tentando parecer interessante.",
+      "texto_tela": "Os primeiros *30 segundos* decidem tudo"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nesta aula, a gente vai desmontar abordagens reais, feitas na rua, em plena luz do dia, e tirar delas um roteiro que você pode usar.",
+      "prompt_imagem": "a wide avenue sidewalk in a big city during the day, pedestrians seen from behind"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "São quatro passos.",
+      "numero": "4",
+      "texto_tela": "passos da abordagem"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O primeiro é a abertura direta.",
+      "texto_tela": "Passo 1: *abertura direta*"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "É assim: honesta e sem truque. Você diz o que estava fazendo, que achou ela bonita e que decidiu falar oi.",
+      "texto_tela": "A abertura",
+      "mensagens": [
+        {
+          "de": "voce",
+          "texto": "Oi, pode parecer meio aleatório. Eu tava indo tomar um café, te vi, te achei bonita e decidi falar oi."
+        }
+      ]
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Funciona porque é verdade e porque mostra coragem. Você não se esconde atrás de uma pergunta sobre o horário. Você assume a sua intenção.",
+      "prompt_imagem": "a man approaching a woman on a sunny sidewalk, both seen from a distance from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O tom importa tanto quanto as palavras. Fale devagar, com um meio sorriso, e pare na frente dela, não atrás. Você não está pedindo licença. Está oferecendo uma conversa.",
+      "prompt_imagem": "a man in a casual jacket standing relaxed on a sidewalk with a half smile, his face in shadow"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O segundo passo é o mais esperto.",
+      "texto_tela": "Passo 2: *elogio com várias pontas*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Logo depois da abertura, você elabora o elogio. Mas não sobre o rosto dela. Sobre algo que ela escolheu: o estilo, uma peça de roupa, o jeito de andar.",
+      "prompt_imagem": "close-up of a vintage leather belt with two buckles and ankle boots, street fashion detail"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Repara que um único elogio abre várias portas ao mesmo tempo: filme, dança, viagem, Argentina.",
+      "texto_tela": "Elogio com várias pontas",
+      "mensagens": [
+        {
+          "de": "voce",
+          "texto": "Parece que você saiu de um filme. Essa saia de roda, parece que tava dançando... mas tem essa mala. Voltou de uma aula de tango na Argentina?",
+          "avaliacao": "boa"
+        },
+        {
+          "de": "ela",
+          "texto": "Haha não, tô só mudando de trabalho mesmo"
+        }
+      ]
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Isso é intencional. Se você puxa um assunto só, pode ser que ele não interesse. Se abre vários, ela escolhe o que mais tem a ver com ela, e a conversa anda sozinha.",
+      "prompt_imagem": "a woman with a suitcase walking on a street, her flared skirt swirling, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Outro exemplo real: um cinto com duas fivelas vira uma conversa sobre Game of Thrones, brechó e estilo. E ela responde justamente sobre moda, porque é a área dela.",
+      "prompt_imagem": "close-up of a stylish outfit with a double-buckle belt on a city street, fashion detail"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O terceiro passo é sobre a sua energia.",
+      "texto_tela": "Passo 3: *energia que não balança*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Numa das abordagens, a garota responde logo de cara: tô com pressa. E o que ele faz? Continua, tranquilo, como se ela fosse ficar. E ela fica.",
+      "prompt_imagem": "a woman walking fast on a sidewalk glancing back, a calm man standing nearby, both seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "A objeção inicial quase nunca é sobre você. É um reflexo. Se a sua energia não muda, ela percebe que você não depende daquilo, e relaxa.",
+      "prompt_imagem": "a calm man standing with hands in pockets on a busy street, the crowd blurred around him"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Mas atenção: uma resposta curta no começo é normal. Agora, se depois de um minuto ela continua fechada, olhando pro lado, agradeça e siga. Respeitar o não também é poder.",
+      "prompt_imagem": "a man nodding politely and walking away from a woman on a sidewalk, both seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Ela também vai te testar. Perguntas do tipo: você não é desses, né? Se você se justifica, perde. Se responde com leveza e um pouco de humor, passa.",
+      "prompt_imagem": "two silhouettes laughing at a café counter, backlit by a window"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Olha a diferença. A primeira resposta se defende. A segunda brinca e continua no comando.",
+      "texto_tela": "Respondendo um teste",
+      "mensagens": [
+        {
+          "de": "ela",
+          "texto": "Você para todas as garotas na rua assim?"
+        },
+        {
+          "de": "voce",
+          "texto": "Não, não! Juro que eu sou um cara sério...",
+          "avaliacao": "ruim"
+        },
+        {
+          "de": "voce",
+          "texto": "Só as que usam duas fivelas. Critério rigoroso.",
+          "avaliacao": "boa"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "narracao": "E o quarto passo é provocar, em vez de tentar impressionar.",
+      "texto_tela": "Passo 4: *provoque, não impressione*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Faça suposições divertidas sobre ela. Você tem cara de quem faz algo criativo. Aposto que você vai chegar em casa e fazer o meu horóscopo. Ela ri, corrige e começa a se explicar pra você.",
+      "prompt_imagem": "a woman laughing on a city street, her face hidden by her hair, backlit by the sun"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Repara que é provocação leve, nunca ofensa. Você brinca com a situação, não diminui ela. Ela tem que rir junto, não se sentir atacada.",
+      "prompt_imagem": "two people laughing together on a park bench at golden hour, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Quando ela perguntar o que você faz, não despeje o seu currículo. Brinque primeiro, depois responda de verdade. Quem tenta impressionar mostra que precisa da aprovação dela.",
+      "prompt_imagem": "a relaxed man leaning on a wall holding a coffee cup while chatting, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E um detalhe importante: nenhuma dessas conversas foi perfeita. Teve erro, teve frase estranha. Você não precisa ser perfeito. Só precisa ser melhor do que os outros homens que ela conhece.",
+      "prompt_imagem": "crumpled paper notes and a pen on a wooden desk, moody light"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Recapitulando.",
+      "texto_tela": "Abra, elogie, mantenha, *provoque*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Abertura direta e honesta. Elogio com várias pontas sobre algo que ela escolheu. Energia que não balança diante da objeção. E provocação leve, em vez de tentar impressionar.",
+      "prompt_imagem": "a city street at golden hour with people crossing, cinematic wide shot"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Sua missão desta aula.",
+      "texto_tela": "Missão: *3 aberturas* esta semana"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Faça três aberturas diretas esta semana, de dia. Abertura honesta, elogio com várias pontas, e só. Não importa o resultado. O objetivo é sentir que você consegue.",
+      "prompt_imagem": "a man stepping onto a sidewalk in the morning sun, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Na última aula, você vai aprender a transformar esse papo num encontro. Sem forçar e sem virar o cara chato.",
+      "prompt_imagem": "two drinks on a bar counter in warm light, empty stools"
+    }
+  ]
+}

@@ -63,8 +63,18 @@ nunca commite mídia gerada.
 
 2. **Mídia** (narração + imagens):
    ```bash
-   python3 scripts/documentario_faceless.py midia --projeto <pasta> [--voz Charon]
+   python3 scripts/documentario_faceless.py midia --projeto <pasta> [--voz Charon] \
+       [--formato vertical] [--estilo-imagem "<direção de arte em inglês>"]
    ```
+   - **Decida o formato antes desta etapa**: com `--formato vertical` as
+     imagens já saem em 9:16 (sem desperdiçar laterais); nos outros formatos
+     saem em 16:9. Use o mesmo `--formato` no render.
+   - `--estilo-imagem` soma uma direção de arte a todas as imagens (ex.:
+     paleta da marca: "cool dark palette with subtle indigo-violet accent
+     lighting"), pra o episódio ter unidade visual.
+   - Limite por minuto da API (HTTP 429) é tratado sozinho: o script espera o
+     tempo que a API pede. Cota diária esgotada falha e precisa esperar o dia
+     seguinte ou subir o plano.
    - Voz default `Charon` (grave, informativa). Alternativas boas pra
      documentário: `Algenib`, `Orus`, `Iapetus`. O tom vem só da voz:
      **nunca ponha instrução de estilo no campo `narracao`** ("fale devagar",
@@ -79,11 +89,14 @@ nunca commite mídia gerada.
 3. **Render**:
    ```bash
    python3 scripts/documentario_faceless.py render --projeto <pasta> \
-       [--musica trilha.mp3] [--cor-destaque "#F5B700"] [--sem-vertical]
+       [--formato ambos|vertical|horizontal] [--cor-destaque "#F5B700"] \
+       [--cor-fundo "#0C0C10"] [--nome-saida documentario] [--musica trilha.mp3]
    ```
+   `--cor-destaque` pinta palavras destacadas, contador e as bolhas "voce" do
+   chat; `--cor-fundo` é o fundo das cenas de motion. Use as cores da marca.
    Cenas de motion são desenhadas nativas em 16:9 e em 9:16 (texto e conversa
    legíveis no celular) e ficam sem legenda, porque o texto já está na tela.
-   Saída: `<pasta>/documentario_16x9.mp4` e `<pasta>/documentario_9x16.mp4`.
+   Saída: `<pasta>/<nome-saida>_16x9.mp4` e/ou `<pasta>/<nome-saida>_9x16.mp4`.
    Áudio normalizado em -14 LUFS (padrão YouTube); com `--musica` a trilha
    abaixa sozinha quando a narração fala (ducking). Use só trilha com licença
    livre.
@@ -105,5 +118,11 @@ nunca commite mídia gerada.
   vídeo gerado. Pra B-roll em vídeo real, o caminho seria somar footage de
   banco (Pexels) ou geração de vídeo (Veo) — mais custo, avaliar só depois de
   validar retenção.
-- Motion usa fonte do sistema (DejaVu no Linux, Arial no Mac/Windows); a cor
-  de destaque padrão é âmbar — ajuste `--cor-destaque` pra cor da marca.
+- Motion usa fonte do sistema (DejaVu no Linux, Arial no Mac/Windows).
+- Duração: a voz Charon fala ~2,4 palavras/s. Pra uma aula de ~5 min, mire
+  ~650-700 palavras de narração no roteiro todo.
+
+## Cursos / séries
+Roteiros de cursos ficam versionados em `cursos/<curso>/aula-NN/roteiro.json`
+(só texto; mídia e vídeos nunca vão pro repo). Ex.: `cursos/biologia-da-conquista`
+(Robô de Date: destaque `#4F4CFD`, fundo `#0E1218`, formato vertical).

@@ -1,0 +1,169 @@
+{
+  "titulo": "Aula 2 — As 3 caixas do seu valor",
+  "cenas": [
+    {
+      "tipo": "texto",
+      "narracao": "A maioria dos homens acha que o valor deles está em uma coisa só. E é exatamente por isso que eles travam.",
+      "texto_tela": "Seu valor não é *uma coisa*. São *três*."
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Uns acham que é tudo questão de beleza. Outros, que é tudo questão de dinheiro. E vivem frustrados, porque estão olhando só uma parte da equação.",
+      "prompt_imagem": "a man seen from behind looking at his reflection in a dark shop window at night"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "A verdade é que o valor de um homem no mercado da atração se divide em três caixas. E quem decide é a soma delas.",
+      "prompt_imagem": "three wooden boxes on a dark table under a spotlight, low angle"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "A primeira caixa é a sua herança genética.",
+      "numero": "1",
+      "texto_tela": "Caixa da genética"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Altura, estrutura física, rosto, inteligência. É a caixa que você menos controla. Dá pra otimizar, com treino, cuidado e um bom corte de cabelo. Mas não vale a pena ficar obcecado com ela.",
+      "prompt_imagem": "a man lifting weights in a dark gym, seen from behind, dramatic rim light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Pensa assim: a genética é a carta que você recebeu. Você não troca a carta, mas pode jogar muito melhor com ela. Postura, roupa que veste bem, corpo em forma. Isso já muda a primeira impressão.",
+      "prompt_imagem": "playing cards on a dark table, a single card turned face up under a spotlight"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "A segunda caixa é a das externalidades.",
+      "numero": "2",
+      "texto_tela": "Caixa das externalidades"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Dinheiro, fama, status. Do músico que toca no bar ao diretor da empresa. É uma caixa poderosa e escalável, mas tem limites. Em muitos lugares, ela simplesmente não aparece.",
+      "prompt_imagem": "a guitarist playing on a small bar stage, seen from behind the audience silhouettes, warm stage lights"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E o dinheiro, sozinho, pesa pouco na atração inicial. Ninguém vê o seu salário na rua. O que ela percebe é como você se comporta. O dinheiro aparece depois, no estilo de vida que você constrói.",
+      "prompt_imagem": "a man's wrist with a simple watch resting on a café table, morning light"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "E a terceira caixa é a do comportamento.",
+      "numero": "3",
+      "texto_tela": "Caixa do comportamento"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Aqui entram a confiança, a segurança, a liderança, a habilidade social, o carisma e o desapego. É o seu jogo. E é a caixa menos compreendida de todas.",
+      "prompt_imagem": "a man leaning casually on a bar counter talking to a small group, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O desapego é o mais subestimado. É a sensação de que, se ela disser não, a sua vida continua ótima. Quem tem desapego conversa mais solto, arrisca mais e, por isso, atrai mais.",
+      "prompt_imagem": "a man walking on a beach at sunset leaving footprints in the sand, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Inclusive, é por não entender essa caixa que tanto homem diz que as mulheres são um mistério.",
+      "texto_tela": "As mulheres não são um *mistério*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Não são. Quando você não entende a atração que vem do comportamento, parece aleatório ela escolher um cara mais baixo, menos bonito ou com menos dinheiro que você. Mas não é aleatório.",
+      "prompt_imagem": "a couple walking together on a night street seen from behind, the man slightly shorter than the woman"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O que as três caixas têm em comum? Todas comunicam poder. O mais forte tem poder. O mais rico tem poder. E o mais seguro, que conduz a conversa e diverte a sala, também tem.",
+      "prompt_imagem": "a chess king piece on a chessboard, dramatic light, shallow depth of field"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Olha a caixa três em ação. Mesma pergunta dela. Um pede desculpa por existir. O outro conduz a conversa pra frente.",
+      "texto_tela": "Caixa 3 em ação",
+      "mensagens": [
+        {
+          "de": "ela",
+          "texto": "Você sempre puxa papo com estranhas assim?"
+        },
+        {
+          "de": "voce",
+          "texto": "Desculpa, não queria incomodar...",
+          "avaliacao": "ruim"
+        },
+        {
+          "de": "voce",
+          "texto": "Só com as que parecem ter uma boa história. Qual é a sua?",
+          "avaliacao": "boa"
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "narracao": "E aqui vem a regra de prioridade mais útil deste módulo.",
+      "texto_tela": "Se só puder ter uma, tenha *jogo*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Se puder, tenha beleza, status e jogo. Se só puder ter dois, tenha beleza e jogo. E se só puder ter um, tenha jogo.",
+      "prompt_imagem": "a man walking alone through a crowded street with confidence, crowd in motion blur around him"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Porque um homem só com a terceira caixa consegue atrair mulheres mais bonitas do que ele. E, mais importante, consegue manter essa atração ao longo do tempo.",
+      "prompt_imagem": "a couple laughing at a café table, seen from behind, warm evening light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Agora, um aviso honesto. Só com o jogo você vai bem como amante. Mas pra ser escolhido para algo sério, ajuda muito estar construindo também as outras duas caixas.",
+      "prompt_imagem": "a man working late on a laptop in an apartment, city lights through the window, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E o status é mais contextual do que parece. Vestir-se bem e se portar bem já fazem as pessoas assumirem que você é alguém.",
+      "prompt_imagem": "close-up of a man adjusting the cuff of a dark jacket, elegant dark tones"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Vire cliente fixo de um bar. Seja simpático com o dono, com o segurança, com o barman. Quando você chega com ela e todo mundo te cumprimenta, ela já está se perguntando quem é você.",
+      "prompt_imagem": "a bartender greeting a regular customer at a cozy bar, the customer seen from behind, warm lights"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Status também se constrói no próprio ambiente. Converse com várias pessoas, circule, faça amizade com quem trabalha ali. Status é, em grande parte, quem as pessoas acham que você é.",
+      "prompt_imagem": "a man chatting with a bouncer at the entrance of a lounge at night, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Recapitulando.",
+      "texto_tela": "Genética, status e *jogo*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "São três caixas: genética, externalidades e comportamento. Todas comunicam poder. E a do comportamento é a que mais depende de você e a que mais rende em quase todo lugar.",
+      "prompt_imagem": "three glowing boxes on a dark table, the third one lit brighter than the others"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Sua missão desta aula.",
+      "texto_tela": "Missão: dê uma *nota* para cada caixa"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Dê uma nota de zero a dez para cada uma das suas três caixas. Seja brutalmente honesto. Depois escolha uma ação concreta para cada caixa nesta semana. Uma só.",
+      "prompt_imagem": "an open notebook with three hand-drawn columns, a pen and a cup of coffee under a desk lamp"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Por exemplo: treinar três vezes, comprar duas peças de roupa que caem bem em você e puxar conversa com três desconhecidos. Pequeno, mas toda semana.",
+      "prompt_imagem": "running shoes and a gym bag next to an apartment door at dawn"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Na próxima aula, você vai ver que o peso de cada caixa muda conforme o lugar. E que escolher onde jogar pode valer mais do que melhorar o seu jogo.",
+      "prompt_imagem": "aerial view of a city at night with glowing neighborhoods"
+    }
+  ]
+}

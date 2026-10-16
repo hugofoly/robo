@@ -37,12 +37,15 @@ import argparse
 import base64
 import json
 import os
+import re
 import subprocess
 import sys
 import time
 import urllib.error
 import urllib.request
 import wave
+
+from PIL import Image
 
 from documentario_motion import TIPOS_MOTION, render_motion
 
@@ -53,6 +56,7 @@ IMAGE_MODEL = "gemini-3.1-flash-image"
 DEFAULT_VOICE = "Charon"  # voz grave e informativa, boa pra documentário
 MAX_ATTEMPTS = 3
 RETRY_BACKOFF_SECONDS = 4
+RATE_LIMIT_WAITS = 30  # esperas por limite de requisições/minuto antes de desistir
 
 FPS = 30
 SCENE_TAIL_SECONDS = 0.5  # respiro depois de cada fala
@@ -60,6 +64,13 @@ FADE_SECONDS = 0.25
 KEN_BURNS_ZOOM = 0.12  # quanto a câmera aproxima/afasta ao longo da cena
 FONT_NAME = "DejaVu Sans"
 COR_DESTAQUE = "#F5B700"
+COR_FUNDO = "#0C0C10"
+# formato -> saídas geradas (nome, largura, altura, palavras por bloco de legenda, crf)
+FORMATOS = {
+    "ambos": [("16x9", 1920, 1080, 7, "20"), ("9x16", 1080, 1920, 4, "21")],
+    "horizontal": [("16x9", 1920, 1080, 7, "20")],
+    "vertical": [("9x16", 1080, 1920, 4, "21")],
+}
 
 ROTEIRO_PROMPT = """Você é roteirista de documentários curtos para YouTube, no estilo
 canal faceless (narração em off sobre imagens). Escreva em português do Brasil.
@@ -136,8 +147,8 @@ ROTEIRO_SCHEMA = {
 IMAGE_STYLE = (
     "Cinematic documentary still, 35mm film look, natural moody lighting, "
     "shallow depth of field, muted color grade, subtle film grain, "
-    "photorealistic, 16:9 composition, no text, no captions, no logos, "
-    "no visible faces. Scene: "
+    "photorealistic, {proporcao} composition, no text, no captions, no logos, "
+    "no visible faces. {extra}Scene: "
 )
 
 
@@ -156,15 +167,27 @@ def gemini(model: str, body: dict, api_key: str | None) -> dict:
         method="POST",
     )
     last_error: Exception | None = None
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    attempt = esperas = 0
+    while attempt < MAX_ATTEMPTS:
+        attempt += 1
         try:
             with urllib.request.urlopen(req, timeout=300) as resp:
                 return json.load(resp)
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", "replace")[:500]
-            last_error = RuntimeError(f"HTTP {exc.code}: {detail}")
+            detail = exc.read().decode("utf-8", "replace")
+            last_error = RuntimeError(f"HTTP {exc.code}: {detail[:500]}")
             if exc.code in (400, 401, 403, 404):
                 break  # erro de configuração: repetir não resolve
+            # Limite por minuto (429): espera o que a API pede e não gasta tentativa.
+            # Cota diária esgotada não volta em segundos, então desiste.
+            espera = re.search(r"retry in ([\d.]+)s", detail)
+            if exc.code == 429 and espera and "PerDay" not in detail and esperas < RATE_LIMIT_WAITS:
+                esperas += 1
+                attempt -= 1
+                segundos = float(espera.group(1)) + 1
+                print(f"  limite por minuto de {model}; aguardando {segundos:.0f}s", flush=True)
+                time.sleep(segundos)
+                continue
         except (urllib.error.URLError, TimeoutError) as exc:
             last_error = exc
         if attempt < MAX_ATTEMPTS:
@@ -228,12 +251,14 @@ def gerar_audio(texto: str, out_path: str, voz: str, model: str, api_key: str | 
         w.writeframes(pcm)
 
 
-def gerar_imagem(prompt: str, out_path: str, model: str, api_key: str | None) -> None:
+def gerar_imagem(prompt: str, out_path: str, model: str, api_key: str | None,
+                 proporcao: str = "16:9", estilo_extra: str = "") -> None:
+    extra = f"{estilo_extra.strip()}. " if estilo_extra.strip() else ""
     data = gemini(model, {
-        "contents": [{"parts": [{"text": IMAGE_STYLE + prompt}]}],
+        "contents": [{"parts": [{"text": IMAGE_STYLE.format(proporcao=proporcao, extra=extra) + prompt}]}],
         "generationConfig": {
             "responseModalities": ["IMAGE"],
-            "imageConfig": {"aspectRatio": "16:9"},
+            "imageConfig": {"aspectRatio": proporcao},
         },
     }, api_key)
     _, img = first_inline(data)
@@ -263,7 +288,10 @@ def gerar_midia(args: argparse.Namespace, api_key: str | None) -> None:
                 print(f"cena {i:02d}: gerando imagem ...", flush=True)
                 if not cena.get("prompt_imagem"):
                     raise ValueError("cena de imagem sem prompt_imagem no roteiro")
-                gerar_imagem(cena["prompt_imagem"], imagem, args.modelo_imagem, api_key)
+                # Só vertical: imagem nativa 9:16, sem desperdiçar as laterais.
+                proporcao = "9:16" if args.formato == "vertical" else "16:9"
+                gerar_imagem(cena["prompt_imagem"], imagem, args.modelo_imagem, api_key,
+                             proporcao, args.estilo_imagem)
         except Exception as exc:  # noqa: BLE001 - reporta e segue para a próxima cena
             falhas.append((i, str(exc)))
             print(f"cena {i:02d}: FALHOU: {exc}")
@@ -336,49 +364,71 @@ def montar_clipe(entrada: str, filtro_video: str, audio: str, dur: float, out_pa
     ])
 
 
-def render_cena(cena: dict, imagem: str | None, audio: str, out_h: str, out_v: str | None,
-                indice: int, cor_destaque: str) -> float:
-    """Cena + narração -> clipe 1920x1080 e, se pedido, clipe 1080x1920.
-
-    Imagem ganha Ken Burns e vinheta (sem grão animado: ele multiplica o
-    bitrate; o grão vem do prompt da imagem); na vertical vira o quadro 16:9
-    sobre uma cópia ampliada e desfocada dele. Motion é desenhado frame a
-    frame em documentario_motion.py, nativo em cada orientação, pra texto e
-    conversa continuarem legíveis no celular."""
-    dur = duracao(audio) + SCENE_TAIL_SECONDS
-    fades = (
-        f"fade=t=in:st=0:d={FADE_SECONDS},"
-        f"fade=t=out:st={dur - FADE_SECONDS:.3f}:d={FADE_SECONDS},format=yuv420p"
-    )
-    if tipo_cena(cena) != "imagem":
-        tamanhos = [(out_h, 1920, 1080)] + ([(out_v, 1080, 1920)] if out_v else [])
-        for out_path, w, h in tamanhos:
-            motion = out_path.replace(".mp4", "_motion.mp4")
-            render_motion(cena, dur, motion, FPS, cor_destaque, w, h)
-            montar_clipe(motion, fades, audio, dur, out_path)
-        return dur
-
+def ken_burns(imagem: str, w: int, h: int, dur: float, indice: int) -> str:
+    """Filtro de zoom lento sobre a imagem, cobrindo o quadro w x h."""
     frames = max(int(round(dur * FPS)), 1)
     passo = KEN_BURNS_ZOOM / frames
     if indice % 2:  # alterna aproximar/afastar para não ficar monótono
         zoom = f"min(1+{passo:.6f}*on,{1 + KEN_BURNS_ZOOM})"
     else:
         zoom = f"max({1 + KEN_BURNS_ZOOM}-{passo:.6f}*on,1)"
-    # Escala grande antes do zoompan evita o "tremido" típico do filtro.
-    montar_clipe(imagem, (
-        "scale=2880:1620:force_original_aspect_ratio=increase,crop=2880:1620,"
+    # Escala grande (1,5x) antes do zoompan evita o "tremido" típico do filtro.
+    gw, gh = w * 3 // 2, h * 3 // 2
+    return (
+        f"scale={gw}:{gh}:force_original_aspect_ratio=increase,crop={gw}:{gh},"
         f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        f":d={frames}:s=1920x1080:fps={FPS},vignette=PI/5,{fades}"
-    ), audio, dur, out_h)
-    if out_v:
-        run(["ffmpeg", "-y", "-loglevel", "error", "-i", out_h, "-filter_complex",
+        f":d={frames}:s={w}x{h}:fps={FPS},vignette=PI/5"
+    )
+
+
+def imagem_vertical(imagem: str) -> bool:
+    with Image.open(imagem) as im:
+        return im.height > im.width
+
+
+def render_cena(cena: dict, imagem: str | None, audio: str, saidas: dict[str, str],
+                indice: int, cor_destaque: str, cor_fundo: str) -> float:
+    """Cena + narração -> um clipe por formato pedido (saidas: "16x9"/"9x16" -> caminho).
+
+    Imagem ganha Ken Burns e vinheta (sem grão animado: ele multiplica o
+    bitrate; o grão vem do prompt da imagem) na orientação dela; imagem
+    horizontal num vídeo vertical vira o quadro 16:9 sobre uma cópia ampliada
+    e desfocada dele. Motion é desenhado frame a frame em
+    documentario_motion.py, nativo em cada orientação, pra texto e conversa
+    continuarem legíveis no celular."""
+    dur = duracao(audio) + SCENE_TAIL_SECONDS
+    fades = (
+        f"fade=t=in:st=0:d={FADE_SECONDS},"
+        f"fade=t=out:st={dur - FADE_SECONDS:.3f}:d={FADE_SECONDS},format=yuv420p"
+    )
+    tamanhos = {"16x9": (1920, 1080), "9x16": (1080, 1920)}
+    if tipo_cena(cena) != "imagem":
+        for nome, out_path in saidas.items():
+            w, h = tamanhos[nome]
+            motion = out_path.replace(".mp4", "_motion.mp4")
+            render_motion(cena, dur, motion, FPS, cor_destaque, w, h, cor_fundo)
+            montar_clipe(motion, fades, audio, dur, out_path)
+        return dur
+
+    vertical = imagem_vertical(imagem)
+    for nome, out_path in saidas.items():
+        if nome == "16x9" or vertical:
+            w, h = tamanhos[nome]
+            montar_clipe(imagem, f"{ken_burns(imagem, w, h, dur, indice)},{fades}",
+                         audio, dur, out_path)
+    if "9x16" in saidas and not vertical:
+        base = saidas.get("16x9") or saidas["9x16"].replace(".mp4", "_base16x9.mp4")
+        if "16x9" not in saidas:
+            montar_clipe(imagem, f"{ken_burns(imagem, 1920, 1080, dur, indice)},{fades}",
+                         audio, dur, base)
+        run(["ffmpeg", "-y", "-loglevel", "error", "-i", base, "-filter_complex",
              "[0:v]split=2[a][b];"
              # Desfoque em baixa resolução e depois amplia: bem mais rápido que gblur em 1080p.
              "[a]scale=270:480:force_original_aspect_ratio=increase,crop=270:480,"
              "boxblur=8:2,eq=brightness=-0.15,scale=1080:1920[bg];"
              "[b]scale=1080:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]",
              "-map", "[v]", "-map", "0:a",
-             "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-c:a", "copy", out_v])
+             "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-c:a", "copy", saidas["9x16"]])
     return dur
 
 
@@ -470,26 +520,24 @@ def render(args: argparse.Namespace) -> None:
     if faltando:
         sys.exit(f"Faltam áudio/imagem nas cenas {faltando}. Rode a etapa 'midia' antes.")
 
-    clipes_h, clipes_v, duracoes, falas = [], [], [], []
+    formatos = FORMATOS[args.formato]
+    clipes: dict[str, list[str]] = {nome: [] for nome, *_ in formatos}
+    duracoes, falas = [], []
     for i, cena in enumerate(cenas, start=1):
         audio = caminho_audio(args.projeto, i)
-        clipe_h = os.path.join(build, f"cena_{i:02d}_16x9.mp4")
-        clipe_v = None if args.sem_vertical else os.path.join(build, f"cena_{i:02d}_9x16.mp4")
+        saidas_cena = {nome: os.path.join(build, f"cena_{i:02d}_{nome}.mp4") for nome in clipes}
         print(f"render: cena {i:02d}/{len(cenas)} ({tipo_cena(cena)})", flush=True)
-        duracoes.append(render_cena(cena, existe_imagem(args.projeto, i), audio, clipe_h, clipe_v,
-                                    i, args.cor_destaque))
+        duracoes.append(render_cena(cena, existe_imagem(args.projeto, i), audio, saidas_cena,
+                                    i, args.cor_destaque, args.cor_fundo))
         falas.append(duracao(audio))
-        clipes_h.append(clipe_h)
-        clipes_v.append(clipe_v)
+        for nome, caminho in saidas_cena.items():
+            clipes[nome].append(caminho)
 
-    formatos = [("16x9", clipes_h, 1920, 1080, 7, "20")]
-    if not args.sem_vertical:
-        formatos.append(("9x16", clipes_v, 1080, 1920, 4, "21"))
     saidas = []
-    for nome, clipes, w, h, max_palavras, crf in formatos:
+    for nome, w, h, max_palavras, crf in formatos:
         lista = os.path.join(build, f"concat_{nome}.txt")
         with open(lista, "w", encoding="utf-8") as f:
-            f.writelines(f"file '{os.path.abspath(c)}'\n" for c in clipes)
+            f.writelines(f"file '{os.path.abspath(c)}'\n" for c in clipes[nome])
         bruto = os.path.join(build, f"master_bruto_{nome}.mp4")
         run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
              "-i", lista, "-c", "copy", bruto])
@@ -497,7 +545,7 @@ def render(args: argparse.Namespace) -> None:
         mixar_audio(bruto, args.musica, master)
         legenda = os.path.join(build, f"legenda_{nome}.ass")
         escrever_legenda(cenas, duracoes, falas, legenda, w, h, max_palavras)
-        saida = os.path.join(args.projeto, f"documentario_{nome}.mp4")
+        saida = os.path.join(args.projeto, f"{args.nome_saida}_{nome}.mp4")
         run(["ffmpeg", "-y", "-loglevel", "error", "-i", master,
              "-vf", f"ass='{ass_filter_path(legenda)}'",
              "-c:v", "libx264", "-preset", "medium", "-crf", crf, "-c:a", "copy", saida])
@@ -533,8 +581,16 @@ def main() -> None:
                         help="%% aproximado de cenas de motion graphics no roteiro (default 30)")
     parser.add_argument("--cor-destaque", default=COR_DESTAQUE,
                         help=f"Cor de destaque do motion, hex (default {COR_DESTAQUE})")
+    parser.add_argument("--cor-fundo", default=COR_FUNDO,
+                        help=f"Cor de fundo do motion, hex (default {COR_FUNDO})")
+    parser.add_argument("--estilo-imagem", default="",
+                        help="Direção de arte extra pras imagens (em inglês), ex.: paleta da marca")
+    parser.add_argument("--formato", choices=list(FORMATOS), default="ambos",
+                        help="ambos (16:9 + 9:16), horizontal ou vertical. Em 'vertical' as "
+                             "imagens já são geradas em 9:16 (default ambos)")
+    parser.add_argument("--nome-saida", default="documentario",
+                        help="Prefixo do arquivo final (default documentario)")
     parser.add_argument("--musica", help="Trilha de fundo (mp3/wav), com ducking automático")
-    parser.add_argument("--sem-vertical", action="store_true", help="Não gera o corte 9:16")
     parser.add_argument("--modelo-texto", default=TEXT_MODEL)
     parser.add_argument("--modelo-tts", default=TTS_MODEL)
     parser.add_argument("--modelo-imagem", default=IMAGE_MODEL)

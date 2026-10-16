@@ -22,12 +22,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 TIPOS_MOTION = ("texto", "numero", "chat")
 
-BG = (12, 12, 16)
-BG_CENTRO = (32, 32, 42)
 FG = (242, 242, 245)
 MUTED = (160, 160, 172)
 BOLHA_ELA = (44, 44, 52)
-BOLHA_VOCE = (10, 132, 255)
 VERMELHO = (235, 72, 72)
 VERDE = (52, 199, 89)
 ENTRADA = 0.35  # duração da animação de entrada de cada elemento (s)
@@ -70,9 +67,11 @@ def progresso(t: float, inicio: float, duracao: float = ENTRADA) -> float:
     return ease_out((t - inicio) / duracao)
 
 
-@functools.lru_cache(maxsize=2)
-def fundo(W: int, H: int) -> Image.Image:
-    """Gradiente radial escuro: calculado pequeno e ampliado (rápido e suave)."""
+@functools.lru_cache(maxsize=4)
+def fundo(W: int, H: int, BG: tuple = (12, 12, 16)) -> Image.Image:
+    """Gradiente radial a partir da cor de fundo (centro um pouco mais claro):
+    calculado pequeno e ampliado (rápido e suave)."""
+    BG_CENTRO = tuple(min(c + 20, 255) for c in BG)
     pw, ph = W // 30, H // 30
     img = Image.new("RGB", (pw, ph))
     px = img.load()
@@ -122,7 +121,8 @@ def quebrar(palavras: list[str], fnt: ImageFont.FreeTypeFont, largura: int) -> l
 # Tipo "texto": tipografia animada
 # --------------------------------------------------------------------------
 
-def cena_texto(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
+def cena_texto(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
+    destaque = cores["destaque"]
     bruto = (cena.get("texto_tela") or "").split()
     if not bruto:
         raise ValueError("cena 'texto' sem 'texto_tela'")
@@ -158,7 +158,7 @@ def cena_texto(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
     fim = 0.15 + janela + ENTRADA + 0.4
 
     def frame(t: float) -> Image.Image:
-        img = fundo(W, H).copy()
+        img = fundo(W, H, cores["fundo"]).copy()
         draw = ImageDraw.Draw(img)
         for camada, x, y, inicio, marcado, largura in elementos:
             p = progresso(t, inicio)
@@ -200,7 +200,8 @@ def _formatar(valor: float, casas: int, milhar: bool) -> str:
     return s if milhar or casas else s.replace(".", "")
 
 
-def cena_numero(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
+def cena_numero(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
+    destaque = cores["destaque"]
     alvo = (cena.get("numero") or "").strip()
     if not alvo:
         raise ValueError("cena 'numero' sem 'numero'")
@@ -231,7 +232,7 @@ def cena_numero(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
     fim = 0.2 + contagem + 0.9 + ENTRADA
 
     def frame(t: float) -> Image.Image:
-        img = fundo(W, H).copy()
+        img = fundo(W, H, cores["fundo"]).copy()
         p = progresso(t, 0.1)
         num = camada_texto(texto_em(t), fnt_num, destaque)
         colar(img, num, (W - num.width) / 2, topo + (1 - p) * 30, p)
@@ -247,7 +248,7 @@ def cena_numero(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
 # Tipo "chat": conversa de app de mensagens
 # --------------------------------------------------------------------------
 
-def _bolha(texto: str, de_voce: bool, tamanho: int, largura_max: int) -> Image.Image:
+def _bolha(texto: str, cor, tamanho: int, largura_max: int) -> Image.Image:
     fnt = fonte(tamanho, negrito=False)
     linhas = [" ".join(l) for l in quebrar(texto.split(), fnt, largura_max)]
     alt_linha = int(tamanho * 1.3)
@@ -256,7 +257,7 @@ def _bolha(texto: str, de_voce: bool, tamanho: int, largura_max: int) -> Image.I
     img = Image.new("RGBA", (larg + 2 * px, alt_linha * len(linhas) + 2 * py), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     d.rounded_rectangle([0, 0, img.width - 1, img.height - 1], radius=int(tamanho * 0.75),
-                        fill=BOLHA_VOCE if de_voce else BOLHA_ELA)
+                        fill=cor)
     for k, linha in enumerate(linhas):
         d.text((px, py + k * alt_linha), linha, font=fnt, fill=FG)
     return img
@@ -278,7 +279,7 @@ def _selo(avaliacao: str, raio: int) -> Image.Image:
     return img
 
 
-def cena_chat(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
+def cena_chat(cena: dict, dur: float, cores: dict, W: int, H: int) -> tuple:
     mensagens = cena.get("mensagens") or []
     if not mensagens:
         raise ValueError("cena 'chat' sem 'mensagens'")
@@ -294,7 +295,9 @@ def cena_chat(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
     tamanho = 46 if W > H else 44
     while True:  # diminui a fonte até a conversa caber na tela
         largura_max = int((coluna_dir - coluna_esq) * 0.72)
-        bolhas = [_bolha(m["texto"], m.get("de") == "voce", tamanho, largura_max) for m in mensagens]
+        # "voce" usa a cor de destaque (marca); "ela" fica cinza neutro.
+        bolhas = [_bolha(m["texto"], cores["destaque"] if m.get("de") == "voce" else BOLHA_ELA,
+                         tamanho, largura_max) for m in mensagens]
         gap = int(tamanho * 0.5)
         total = sum(b.height for b in bolhas) + gap * (len(bolhas) - 1)
         total += 100 if camada_titulo else 0
@@ -321,7 +324,7 @@ def cena_chat(cena: dict, dur: float, destaque, W: int, H: int) -> tuple:
     fim = 0.3 + janela + ENTRADA + 0.5
 
     def frame(t: float) -> Image.Image:
-        img = fundo(W, H).copy()
+        img = fundo(W, H, cores["fundo"]).copy()
         if camada_titulo:
             colar(img, camada_titulo, titulo_pos[0], titulo_pos[1], progresso(t, 0.0))
         for b, x, yb, inicio, selo, xs, ys in elementos:
@@ -342,10 +345,11 @@ CONSTRUTORES = {"texto": cena_texto, "numero": cena_numero, "chat": cena_chat}
 
 
 def render_motion(cena: dict, dur: float, out_path: str, fps: int, cor_destaque: str,
-                  W: int = 1920, H: int = 1080) -> None:
+                  W: int = 1920, H: int = 1080, cor_fundo: str = "#0C0C10") -> None:
     """Gera um mp4 mudo de `dur` segundos para a cena de motion, em WxH
     (1920x1080 ou 1080x1920: o layout se adapta à orientação)."""
-    frame, fim_animacao = CONSTRUTORES[cena["tipo"]](cena, dur, hex_para_rgb(cor_destaque), W, H)
+    cores = {"destaque": hex_para_rgb(cor_destaque), "fundo": hex_para_rgb(cor_fundo)}
+    frame, fim_animacao = CONSTRUTORES[cena["tipo"]](cena, dur, cores, W, H)
     total = max(int(round(dur * fps)), 1)
     proc = subprocess.Popen(
         ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",

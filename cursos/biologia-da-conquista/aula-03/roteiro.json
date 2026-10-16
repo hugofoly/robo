@@ -1,0 +1,146 @@
+{
+  "titulo": "Aula 3 — O ambiente decide o jogo",
+  "cenas": [
+    {
+      "tipo": "texto",
+      "narracao": "Tem homem que é ótimo e não consegue resultado nenhum. Não porque ele é ruim, mas porque está jogando no lugar errado.",
+      "texto_tela": "Você pode estar jogando no *lugar errado*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Tubarão no deserto morre. Leão no mar se afoga. Na atração é igual: o peso de cada caixa muda conforme o ambiente.",
+      "prompt_imagem": "a lion silhouette standing on a rock at sunset in the savanna"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "Vamos ver os quatro ambientes principais. E qual caixa ganha em cada um.",
+      "numero": "4",
+      "texto_tela": "ambientes, quatro jogos diferentes"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O primeiro é o online.",
+      "texto_tela": "Ambiente 1: *online*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nos aplicativos, a terceira caixa quase não aparece. Ninguém sente a sua presença por uma foto. Quem tem a primeira caixa forte, a beleza, leva vantagem.",
+      "prompt_imagem": "a hand swiping on a phone in bed at night, screen glow on the sheets"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Se o seu forte é o comportamento, você vai render muito abaixo do seu potencial nos aplicativos. Use, mas capriche nas fotos. E não faça deles o seu único jogo.",
+      "prompt_imagem": "a man seen from behind holding a camera outdoors at golden hour"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nas fotos, mostre a sua vida, não só o seu rosto. Você fazendo algo, com amigos, viajando, em lugares interessantes. É o jeito de colocar um pouco das outras caixas dentro de uma tela.",
+      "prompt_imagem": "a man seen from behind hiking with friends on a mountain ridge on a sunny day"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O segundo é o círculo social.",
+      "texto_tela": "Ambiente 2: *círculo social*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Amigos, trabalho, faculdade. Aqui, quem recebe mais atenção é quem lidera o grupo. E esse status é decidido pelo seu comportamento ao longo do tempo.",
+      "prompt_imagem": "friends at a dinner table, one man seen from behind telling a story while the others laugh"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O problema é que as pessoas já têm um histórico seu. Se você muda de repente, sem motivo, vai ser desafiado. Dá para subir, mas é lento.",
+      "prompt_imagem": "coworkers chatting in an office break area, people seen from behind, soft daylight"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O melhor jeito de subir no círculo é gerar valor para o grupo. Organizar o rolê, apresentar pessoas, trazer novidade. Quem conecta as pessoas vira o centro.",
+      "prompt_imagem": "a man seen from behind introducing two friends to each other at a rooftop party at dusk"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "O terceiro, bares e baladas.",
+      "texto_tela": "Ambiente 3: *bares e baladas*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Onde o dinheiro compra status, como num camarote, ele vira vantagem real. Na pista barulhenta, onde mal dá para conversar, a beleza ganha força.",
+      "prompt_imagem": "a crowded nightclub dance floor with laser lights, people seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Mas nos bares onde a abordagem exige conversa, e o seu comportamento é observado o tempo todo, quem tem jogo leva vantagem. E cria status ali dentro, pelo jeito como se movimenta.",
+      "prompt_imagem": "a man laughing with a small group in a cocktail bar, seen from behind, warm amber light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Uma dica prática: chegue cedo e converse com várias pessoas, homens e mulheres. Quando você for abordar alguém, já vai estar aquecido e já vai ser visto como alguém sociável ali dentro.",
+      "prompt_imagem": "a cocktail bar early in the evening, a man chatting with the bartender, warm lights, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "E o quarto ambiente é onde quase ninguém joga.",
+      "texto_tela": "Ambiente 4: *o dia a dia*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Rua, café, livraria, supermercado, metrô. Aqui, dinheiro e status são invisíveis. A beleza ajuda, mas não conquista sozinha. Aqui, o jogo é rei.",
+      "prompt_imagem": "a busy city sidewalk during the day, a man walking with a coffee cup, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E tem uma vantagem escondida: concorrência quase zero. Quase nenhum homem tem coragem de puxar conversa de dia. Quem tem, se destaca na hora.",
+      "prompt_imagem": "a quiet bookstore aisle with a man browsing the shelves, soft window light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E de dia, o contexto te ajuda. Ela está numa livraria? Comente o livro. No café? O pedido. Na rua? O estilo dela. O ambiente te dá o primeiro assunto de graça.",
+      "prompt_imagem": "close-up of hands holding an open book in a bookstore, soft window light"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Além do ambiente, existe um fator que pouca gente usa a seu favor: a escassez.",
+      "texto_tela": "Escassez muda o seu *valor*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Num lugar com mais mulheres do que homens, o seu valor relativo sobe. Com mais homens, ele cai. Pense em aulas de dança, cursos e eventos onde a proporção joga a seu favor.",
+      "prompt_imagem": "a dance class in a studio with couples dancing, seen from behind, warm light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E ser novidade também conta. O estrangeiro, o recém-chegado, o cara novo no grupo desperta curiosidade só por ser diferente.",
+      "prompt_imagem": "a man with a backpack arriving in a foreign city square, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Recapitulando.",
+      "texto_tela": "Jogue onde a sua *caixa* rende"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Online, ganha a beleza. No círculo social, quem lidera. Na balada, beleza e dinheiro, mas o jogo compete. No dia a dia, o jogo é rei. E onde há escassez de homens, o seu valor sobe.",
+      "prompt_imagem": "a chessboard seen from above with pieces spread across different zones, dramatic light"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Sua missão desta aula.",
+      "texto_tela": "Missão: escolha o seu *mar*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Olhe as notas que você deu às suas caixas. Qual é a mais forte? Agora escolha um ambiente onde ela rende mais. E vá lá duas vezes esta semana.",
+      "prompt_imagem": "a city map on a table with a few pins, hands and a cup of coffee"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Se o seu forte é o comportamento, o seu lugar é o dia a dia e os bares de conversa. É lá que você vai encontrar as mulheres mais interessantes para você.",
+      "prompt_imagem": "a café terrace in the evening with people sitting at small tables, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Na próxima aula, a gente desmonta abordagens reais, frase por frase, pra você ver exatamente o que falar nos primeiros trinta segundos.",
+      "prompt_imagem": "a city crosswalk with people walking at dusk, cinematic wide shot"
+    }
+  ]
+}

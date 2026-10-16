@@ -1,0 +1,175 @@
+{
+  "titulo": "Aula 5 — Do papo ao encontro",
+  "cenas": [
+    {
+      "tipo": "texto",
+      "narracao": "Uma conversa ótima que termina sem próximo passo é só uma conversa ótima. E a maioria dos homens para exatamente aí.",
+      "texto_tela": "Papo bom não é *encontro*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nesta aula, você vai ver as três etapas que levam um papo na rua até um encontro marcado. E o hábito que separa quem tem resultado de quem só sabe a teoria.",
+      "prompt_imagem": "two coffee cups on a café table by a window, rainy street outside"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "São três etapas.",
+      "numero": "3",
+      "texto_tela": "etapas até o encontro"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "A primeira é a qualificação.",
+      "texto_tela": "Etapa 1: *qualifique*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Até aqui, você gerou atração. Agora você inverte o jogo: faz ela mostrar que é mais do que um rosto bonito. Isso faz ela investir na conversa.",
+      "prompt_imagem": "a woman gesturing while talking in a café, her face out of frame, warm light"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Funciona assim. Você deixa claro o que valoriza, e ela quer mostrar que tem.",
+      "texto_tela": "Qualificando",
+      "mensagens": [
+        {
+          "de": "voce",
+          "texto": "Te achei bonita. Mas eu gosto quando alguém é mais do que um rosto bonito, sabe?"
+        },
+        {
+          "de": "ela",
+          "texto": "E o que é mais do que um rosto bonito?"
+        },
+        {
+          "de": "voce",
+          "texto": "Ter uma paixão por alguma coisa. Qual é a sua?"
+        }
+      ]
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Quando ela se explica ou conta algo de que se orgulha, ela está se qualificando. É sinal de que ela quer a sua aprovação. E isso aumenta o interesse dela.",
+      "prompt_imagem": "a woman's hands holding a coffee cup mid-conversation, soft window light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Atenção à ordem. Se você qualificar antes de gerar atração, vira entrevista de emprego. Primeiro ela ri. Depois ela se explica.",
+      "prompt_imagem": "a man and a woman laughing at a bar counter, seen from behind, warm light"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "A segunda etapa é enraizar.",
+      "texto_tela": "Etapa 2: *enraíze*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Depois de muita provocação, ela ainda sabe pouco sobre você. Então conte algo real: uma história, o que você faz, algo de que você gosta. O cara divertido da rua vira alguém de verdade.",
+      "prompt_imagem": "a man telling a story with a hand gesture at a café table, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Plantar uma semente também ajuda. Numa das abordagens, ela queria ver um livro raro. E ele diz: traz uma garrafa de vinho que eu te mostro um dia. Fica a ideia do próximo encontro.",
+      "prompt_imagem": "an old red leather book on a wooden table next to a bottle of red wine"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Enraizar também é a hora de trocar os nomes. Repara que, nas abordagens, o nome só aparece depois de vários minutos. Primeiro a conexão, depois as apresentações.",
+      "prompt_imagem": "close-up of two people shaking hands on a street at dusk"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "E a terceira etapa é propor.",
+      "texto_tela": "Etapa 3: *proponha*"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Repara na estrutura: encerrar, propor algo concreto e pedir o contato. Sem rodeio.",
+      "texto_tela": "A proposta",
+      "mensagens": [
+        {
+          "de": "voce",
+          "texto": "Tenho que ir. Mas um outro dia quero te levar pra tomar uma cerveja. O que acha?"
+        },
+        {
+          "de": "ela",
+          "texto": "Acho que é uma boa ideia"
+        },
+        {
+          "de": "voce",
+          "texto": "Então me passa seu número."
+        }
+      ]
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Uma proposta forte é específica e confiante. Não é: quem sabe um dia a gente se vê. É: quero te levar pra tomar uma cerveja. Se vier uma objeção, não discuta. Mande mensagem depois e deixe ela decidir.",
+      "prompt_imagem": "a phone on a bar table lighting up with a new message, two beer glasses nearby"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E se ela disser que tem namorado? Respeite, agradeça a conversa e siga. Você não está ali para competir com ninguém. Tem muita mulher solteira esperando alguém com coragem de falar oi.",
+      "prompt_imagem": "a man walking alone through a city park at sunset, seen from behind, calm"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E saia por cima. Termine com uma piada que retome algo da conversa. E seja você quem encerra. Quem sai no ponto alto deixa vontade de mais.",
+      "prompt_imagem": "a man walking away down a street at sunset, seen from behind, relaxed posture"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Depois de pegar o número, mande mensagem no mesmo dia. Curta, retomando a piada de vocês. E já proponha dia e lugar. Quanto mais tempo passa, mais a emoção esfria.",
+      "prompt_imagem": "a phone glowing on a bar counter, a hand typing a short message"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Agora, o hábito mais importante deste módulo.",
+      "texto_tela": "Não basta ter valor. *Mostre ele.*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Pensa em dois vendedores. Um é excelente, mas faz uma ligação por mês. O outro é mediano e faz trezentas por dia. Quem vende mais?",
+      "prompt_imagem": "a vintage office desk with an old telephone under a lamp, moody tones"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "O mediano. Sempre. Volume vence talento parado.",
+      "numero": "300",
+      "texto_tela": "ligações por dia vencem o talento parado"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Na atração é igual. A forma mais fácil de ter mais sucesso é tentar mais vezes. Quanto mais rejeições você aceitar encarar, mais resultados você vai ter.",
+      "prompt_imagem": "a busy pedestrian crossing seen from above, many people walking"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E o tempo joga a seu favor. O homem começa por baixo, mas tem muito mais capacidade de aumentar o próprio valor ao longo dos anos. Cada caixa que você constrói hoje rende por décadas.",
+      "prompt_imagem": "a man hiking up a mountain trail at dawn, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Recapitulando o módulo inteiro.",
+      "texto_tela": "Biologia + *jogo* = resultado"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "A atração é emocional. O seu valor vem de três caixas. O ambiente muda o peso de cada uma. A abordagem tem quatro passos, e o encontro, três etapas. E tudo isso só funciona com volume.",
+      "prompt_imagem": "an aerial view of a city at night with glowing streets like a network"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "A sua missão final.",
+      "texto_tela": "Missão final: *volume com intenção*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Defina uma meta semanal de aberturas. Comece com cinco. Em cada uma, use os quatro passos da abordagem e as três etapas desta aula. Anote o que funcionou e onde você travou.",
+      "prompt_imagem": "an open notebook with checkboxes, a pen and a phone in morning light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Em um mês, você vai ter mais prática do que a maioria dos homens tem na vida inteira. A biologia define as regras. Mas o jogo quem escreve é você.",
+      "prompt_imagem": "a man standing on a rooftop at night overlooking the city lights, seen from behind"
+    }
+  ]
+}

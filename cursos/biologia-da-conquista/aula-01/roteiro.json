@@ -1,0 +1,172 @@
+{
+  "titulo": "Aula 1 — Atração não é uma escolha",
+  "cenas": [
+    {
+      "tipo": "texto",
+      "narracao": "Existe uma coisa sobre atração que quase nenhum homem entende. E enquanto você não entender, vai continuar tentando convencer quem não dá pra convencer.",
+      "texto_tela": "Ela *não escolhe* sentir atração"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Pensa na última vez que você se sentiu atraído por alguém. Você não fez uma planilha. Não pesou prós e contras. Simplesmente sentiu. Com ela é igual.",
+      "prompt_imagem": "a man seen from behind at a dim bar, looking across the room toward a blurred woman silhouette, warm bokeh lights"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Atração é uma resposta emocional. Ela acontece antes do raciocínio, numa parte do cérebro muito mais antiga do que qualquer argumento que você possa dar.",
+      "prompt_imagem": "ancient cave paintings of humans and animals lit by a flickering torch, dramatic close-up"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "É por isso que você já viu isso acontecer: o cara que fez tudo certo, foi educado, pagou o jantar, mandou bom dia todo dia, e virou amigo. E o outro, que fez metade, ficou com ela.",
+      "prompt_imagem": "two men at a bar seen from behind, one sitting alone holding a bouquet of flowers, the other relaxed and laughing with a woman, cinematic"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Por isso, a primeira regra deste módulo é simples. E dói um pouco.",
+      "texto_tela": "Você não *convence* ninguém a sentir atração"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Elogiar demais, listar as suas qualidades, insistir depois de um não. Tudo isso é tentar ganhar no argumento um jogo que é decidido na emoção.",
+      "prompt_imagem": "a man's hands typing a long message on a phone late at night, screen glow on his fingers, dark room"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Então a pergunta certa não é: como eu convenço ela? A pergunta certa é: que sinais eu estou passando?",
+      "prompt_imagem": "silhouette of a man walking confidently down a wet city street at night, reflections on the asphalt"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Pra responder isso, a gente precisa voltar no tempo. Centenas de milhares de anos.",
+      "prompt_imagem": "early humans walking across an African savanna at dawn, silhouettes against the sunrise, epic wide shot"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nossos ancestrais viviam num mundo em que escolher mal um parceiro custava caro. E o cérebro foi sendo moldado para perceber, rapidinho, quem valia a pena.",
+      "prompt_imagem": "a tribal campfire at night, human silhouettes sitting around the fire, sparks rising"
+    },
+    {
+      "tipo": "numero",
+      "narracao": "A psicologia evolutiva organiza essa avaliação em dois tipos de valor.",
+      "numero": "2",
+      "texto_tela": "tipos de valor que a atração avalia"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O primeiro é o valor de reprodução: saúde, vitalidade, bons genes. Sinais de que dali sairiam filhos fortes e saudáveis.",
+      "prompt_imagem": "macro shot of a glowing DNA double helix floating in darkness"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O segundo é o valor de sobrevivência: a capacidade de prosperar no mundo, de proteger e de prover para quem está ao seu lado.",
+      "prompt_imagem": "close-up of a man's strong hands working on wood in a workshop, warm side light, sawdust in the air"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "E aqui está a diferença que muda tudo. Homens e mulheres dão pesos diferentes para esses dois valores.",
+      "texto_tela": "Ele busca *beleza*. Ela pesa *beleza e poder*."
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Os homens tendem a focar quase só no primeiro, na aparência. Por isso a atração masculina é tão visual e tão rápida.",
+      "prompt_imagem": "close-up of a man's hand holding a glass at a bar counter, a woman blurred in the background"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "As mulheres precisam equilibrar os dois. Sentir desejo e, ao mesmo tempo, sentir que aquele homem é capaz. É o que se chama de estratégia dual.",
+      "prompt_imagem": "a woman seen from behind looking at a city skyline at dusk, contemplative mood"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Nada disso é um cálculo consciente. Ela não pensa: esse cara tem bons genes. Ela sente. Está impresso nas emoções dela.",
+      "prompt_imagem": "silhouette of a woman by a window with rain droplets, soft city lights outside"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "E isso explica por que o sinal importa mais do que a intenção. Você pode ter as melhores intenções do mundo. Se o sinal que chega nela é de carência, a emoção dela responde à carência.",
+      "prompt_imagem": "a man waiting alone at a restaurant table checking his watch, candle light, seen from behind"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Se fosse pra resumir em uma frase: os homens são atraídos pela beleza, e as mulheres, pelo poder.",
+      "texto_tela": "Elas sentem atração por *poder*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Mas calma. Poder aqui não é ser rico nem mandar nos outros. Poder é tudo aquilo que mostra que você tem opções e controle sobre a própria vida.",
+      "prompt_imagem": "a man seen from behind standing calmly on a rooftop overlooking a city at night"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Confiança é poder. Ser seguro de si é poder. Conduzir uma situação, fazer as pessoas rirem, não depender da aprovação dela. Tudo isso comunica poder.",
+      "prompt_imagem": "a group of friends laughing at a bar, one man seen from behind raising his glass for a toast"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "O contrário também comunica. Ficar ansioso esperando resposta, mudar todos os seus planos pra caber na agenda dela, concordar com tudo. Cada um desses sinais diz: eu não tenho opções. E a atração cai.",
+      "prompt_imagem": "a phone glowing on a nightstand, a man's silhouette sitting on the edge of the bed at night"
+    },
+    {
+      "tipo": "chat",
+      "narracao": "Olha a diferença na prática. Ela desmarcou. Uma resposta implora. A outra mostra que a sua vida continua.",
+      "texto_tela": "Qual resposta passa mais poder?",
+      "mensagens": [
+        {
+          "de": "ela",
+          "texto": "Hoje não vai dar, desculpa"
+        },
+        {
+          "de": "voce",
+          "texto": "Poxa, sério? Mas por quê? Achei que você queria...",
+          "avaliacao": "ruim"
+        },
+        {
+          "de": "voce",
+          "texto": "Tranquilo! Semana que vem te chamo pra aquele bar novo.",
+          "avaliacao": "boa"
+        }
+      ]
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "A segunda resposta não tem técnica mágica nenhuma. Ela só passa o sinal certo: você não precisa daquilo para ficar bem.",
+      "prompt_imagem": "a relaxed man walking away down a sunny street at golden hour, seen from behind"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Repara que a segunda resposta não é fria nem joguinho. É educada, leve, e mantém o convite de pé. Poder não é desprezo. Poder é calma.",
+      "prompt_imagem": "a man calmly reading his phone at a sunlit café, seen from the side with his face in shadow"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Recapitulando o que você levou desta aula.",
+      "texto_tela": "Atração é *emoção*, não argumento"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "A atração é emocional e antiga. Ela pesa sinais de beleza e de poder. E poder, pra você, é calma, opções e controle da própria vida. Tudo o que você faz ou escreve é um sinal.",
+      "prompt_imagem": "a lone figure standing on a hill overlooking a misty valley at dawn"
+    },
+    {
+      "tipo": "texto",
+      "narracao": "Agora, a sua missão desta aula.",
+      "texto_tela": "Missão: troque *argumentos* por *sinais*"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Pegue as suas três últimas conversas com mulheres. Leia como se fosse ela. Marque cada mensagem em que você tentou convencer, se justificou ou correu atrás. É ali que você está perdendo atração.",
+      "prompt_imagem": "a phone lying on a café table next to a cup of coffee, moody morning light"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Depois, reescreva duas delas do jeito que um homem tranquilo, com opções, escreveria. Mais curto, mais leve, sem pedir aprovação. Você vai sentir a diferença na hora.",
+      "prompt_imagem": "a notebook with handwritten notes next to a phone, a hand holding a pen under a warm desk lamp"
+    },
+    {
+      "tipo": "imagem",
+      "narracao": "Na próxima aula, você vai descobrir as três caixas que formam o seu valor. E por que a mais importante delas é justamente a que você mais controla.",
+      "prompt_imagem": "three wooden boxes on a dark table under a single spotlight"
+    }
+  ]
+}
